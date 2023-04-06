@@ -1,4 +1,4 @@
-WORKSHOP_TITLE
+Shiny in Production: Tools and Techniques
 ================
 
 ### posit::conf 2023
