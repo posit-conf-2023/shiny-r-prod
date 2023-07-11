@@ -2,9 +2,9 @@
 // README at: https://github.com/rocker-org/devcontainer-templates/tree/main/src/r-ver
 {
 	"name": "Prod Shiny Workshop 2023(rocker/r-ver base)",
-	"build": {
-        "dockerfile": "Dockerfile"
-  },
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "vscode",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	//"image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3",
 	"features": {
