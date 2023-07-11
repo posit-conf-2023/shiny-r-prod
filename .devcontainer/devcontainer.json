@@ -1,0 +1,54 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/rocker-org/devcontainer-templates/tree/main/src/r-ver
+{
+	"name": "Prod Shiny Workshop 2023(rocker/r-ver base)",
+	"build": {
+        "dockerfile": "Dockerfile"
+  },
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	//"image": "ghcr.io/rocker-org/devcontainer/r-ver:4.3",
+	"features": {
+		"ghcr.io/rocker-org/devcontainer-features/pandoc:1": {},
+		"ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+		    "version": "1.3.433"
+		},
+		"ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {},
+		"ghcr.io/guiyomh/features/vim:0": {}
+	},
+
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "R -q -e 'renv::install()'",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ionutvmi.path-autocomplete",
+				"hoovercj.vscode-power-mode",
+				"REditorSupport.r",
+				"hediet.vscode-drawio",
+				"redhat.vscode-yaml",
+				"codezombiech.gitignore",
+				"ms-python.python",
+				"quarto.quarto"
+			],
+			"settings": {
+				"editor.wordWrap": "on",
+				"editor.tabSize": 2,
+				"path-autocomplete.pathMappings": {
+						"/": "/",
+						"./": "${folder}"
+				},
+				"editor.bracketPairColorization.enabled": true,
+				"editor.guides.bracketPairs": "active"
+			}
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
