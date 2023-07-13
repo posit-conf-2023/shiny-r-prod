@@ -7,3 +7,6 @@
 .devcontainer/.rstudio_config/*
 !.devcontainer/.rstudio_config/README.md
 .env
+
+/.quarto/
+_site/
