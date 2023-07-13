@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: Dockerfile_rstudio
     volumes:
-      - ..:/workspaces:cached
+      - ..:/home/rstudio/workspaces:cached
       - ${RENV_PATHS_CACHE_HOST}:/renv/cache
       - ./.rstudio_config:/home/rstudio/.config/rstudio
     restart:
