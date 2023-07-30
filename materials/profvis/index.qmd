@@ -1,0 +1,30 @@
+---
+title: "Improving Performance by Profiling Your R Code"
+subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
+author: "Michael Thomas"
+footer: "[shinyprod.com](https://shinyprod.com)"
+format:
+  revealjs:
+    # theme: [default, ../slides.scss] # moon= teal bg  |  dark
+    scrollable: true
+    incremental: true
+    slide-number: c/t # c/t | c | h/v | h.v
+    slide-tone: false #true
+    code-line-numbers: false
+    history: false
+    #title-slide-attributes:
+      #data-background-image: assets/img/bg/vincentiu-solomon-ln5drpv_ImI-unsplash.jpg
+
+---
+
+## What is {profvis}?
+
+R package for visualizing how (and how fast/slow) your R code runs
+
+[{profvis} website](https://rstudio.github.io/profvis/index.html)
+
+![](www/example_profvis_report.png)
+
+::: {.notes}
+* The package is from RStudio
+:::
