@@ -1,0 +1,14 @@
+/*-- scss:defaults --*/
+
+// fonts
+// TODO: Select a font (choose something different from last year's version)
+// @import url('https://fonts.googleapis.com/css2?family=Play&display=swap');
+
+// $font-family-sans-serif: "Play", sans-serif;
+
+.v-center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
+}

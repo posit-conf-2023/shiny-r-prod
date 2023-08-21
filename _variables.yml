@@ -1,14 +1,14 @@
 version: 0.1
-break_location: "TBD"
-lunch_location: "TBD"
-quiet_location: "TBD"
+break_location: "BreakroomTBD"
+lunch_location: "LunchTBD"
+quiet_location: "QuietTBD"
 lactation_location: "TBD"
-bathrooms_location: "TBD"
-wifi_username: "TBD"
-wifi_password: "TBD"
-room: "TBD"
+bathrooms_location: "BathroomTBD"
+wifi_username: "WIFIUserTBD"
+wifi_password: "WIFIPassTBD"
+room: "Grand Hall I"
 rsconnect_url: "URL Forthcoming"
-rstudio_cloud_workspace_url: "URL Forthcoming"
+posit_cloud_workspace_url: "URL Forthcoming"
 people:
   enantz:
     name: "Eric Nantz"

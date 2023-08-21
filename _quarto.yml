@@ -13,6 +13,10 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      - href: schedule.qmd
+        text: Schedule
+      - href: setup.qmd
+        text: Setup
 
 format:
   html:
@@ -21,6 +25,4 @@ format:
       dark: darkly
     #css: styles.css
     toc: true
-
-
-
+    link-external-newwindow: true

@@ -1,0 +1,184 @@
+---
+title: "Welcome!"
+subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
+author: "Eric Nantz"
+footer: "LINK TBD"
+format: 
+  revealjs:
+    theme: [default, ../slides.scss] # moon= teal bg  |  dark
+    css: assets/web/postit.css
+    scrollable: true
+    incremental: true
+    slide-number: c/t # c/t | c | h/v | h.v
+    slide-tone: false #true
+    code-line-numbers: false
+    history: false
+---
+
+## Welcome to posit::conf(2023)! {background-color="black" background-image="assets/img/bg/rstudioconf_crowd.jpg" background-size="cover"}
+
+## Conference Logistics
+
+::: {.nonincremental}
+1. Identify the exits closes to you in case of emergency
+1. Gender neutral bathrooms located {{< var bathrooms_location >}}
+1. Lactation room located at {{< var lactation_location >}}
+1. A meditation room is available at {{< var quiet_location >}} (Open 8 AM - 5 PM).
+1. Please do not photograph anyone wearing red lanyards
+:::
+
+## Workshop Policies 
+
+::: {.nonincremental}
+1. Please review the `posit::conf` [Code of Conduct](https://posit.co/code-of-conduct/).
+1. Issues can be addressed in following ways:
+     1. **In person:** Contact any `posit::conf` staff member, identifiable by their staff t-shirt shirt, or visit the conference registration desk.
+     1. **By email:** Send a message to `conf@posit.com`; event organizers will respond promptly.
+     1. **By phone:** call `844—448—1212`
+
+:::
+
+## Meet the Team!
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](assets/img/people/enantz.jpg){fig-alt="Eric Nantz" fig-align="center" width="70%"}
+:::
+
+::: {.column width="50%"}
+![](assets/img/people/mthomas.jpeg){fig-alt="Michael Thomas" fig-align="center"}
+:::
+
+::::
+
+::: footer
+TODO: Link to Meet the Team Section on Home Page
+:::
+
+## Your Turn
+
+Introduce yourself to your neighbor(s)
+
+What is your most memorable Shiny application in production experience?
+
+```{r}
+#| label: timer-prodquality
+library(countdown)
+countdown(minutes = 2, seconds = 0)
+```
+
+---
+
+:::: {.columns .v-center-container}
+
+::: {.column width="23%"}
+
+### WiFi
+
+<br> 
+
+`r fontawesome::fa("wifi", height="3em", fill = "blue")`
+
+<br>
+
+### `{{< var wifi_username >}}`
+
+:::
+
+::: {.column width="47%"}
+
+![](assets/img/bg/surf_internet.jpg)
+
+:::
+
+::: {.column width="30%"}
+
+### Password
+
+<br>
+
+`r fontawesome::fa("key", height="3em", fill = "blue")`
+
+<br>
+
+### `{{< var wifi_password >}}`
+
+:::
+
+::::
+
+## About those post-its
+
+:::: {.columns .v-center-container}
+
+::: {.column width="50%"}
+
+```{=html}
+<ul id="notes-green">
+    <li>
+        <p>Done with activity</p>
+    </li>
+</ul>
+```
+
+:::
+
+::: {.column width="50%"}
+
+```{=html}
+<ul id="notes-pink">
+    <li>
+        <p>I'd like help</p>
+    </li>
+</ul>
+```
+
+:::
+
+:::
+
+# Power-On (Setup)
+
+Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
+
+* RStudio Connect
+* RStudio Cloud
+* Account Integrations
+
+# The Beginning ... {background-color="black" background-image="assets/img/bg/beginning.png" background-size="cover"}
+
+::: {.notes}
+* You've seen Shiny could be a game-changer for a project
+* Build an application quickly, purely with R code
+* You send it to a key stakeholder, and they love it
+:::
+
+# A New World {background-image="assets/img/bg/metroid_ship.jpg" background-size="cover" background-color="black"}
+
+::: {.notes}
+* Everyone who sees it thinks the app is amazing
+* Suddenly you are asked (or told) this needs to get into PRODUCTION
+* ..... and now what?
+:::
+
+
+## Many Users {background-image="assets/img/bg/many_users.jpg" background-size="contain" background-color="black"}
+
+## High-Profile Situations {background-image="assets/img/bg/nasa_mission_control.jpg" background-size="contain" background-color="black"}
+
+
+## Part of a Critical Pipeline {background-image="assets/img/bg/pinky_brain_take_over_world.jpg" background-size="contain" background-color="black"}
+
+## The Journey Ahead
+
+<br> 
+
+**Production** has more than one meaning for Shiny apps
+
+. . .
+
+<br>
+
+The tooling & principles discussed in this workshop will guide you to the destination
+

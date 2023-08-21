@@ -16,16 +16,24 @@ format:
 
 <br />
 
-
-::: callout-warning
-High-level description forthcoming!
-:::
+Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine.  In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience.  
 
 ## Logistics
 
-## Assumptions
+The workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at <<LINK TBD>> and hosted on GitHub at [github.com/posit-conf-2023/shiny-r-prod](https://github.com/posit-conf-2023/shiny-r-prod). We also have a [discussion board](https://github.com/rstudio-conf-2022/shiny-prod-apps/discussions) within the GitHub repository available for collaboration on questions and issues. For real-time messaging, we will be using a specific channel within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop.
+
+## Is this workshop for me?
+
+This course assumes intermediate knowledge of building Shiny applications in R and prior experience deploying an application to a platform such as the shinyapps.io service or products like Posit Connect. This workshop will be appropriate for you if you answer yes to any of these questions:
+
+* Have you had a Shiny application work just fine on your machine, but encounters critical issues after deployed to a hosting platform?
+* Are you willing to prospectively implement techniques before deployment to plan for the unexpected?
+* Do you want to know the potential pitfalls within various deployment platforms?
+* Do you want to employ best practices for structuring your application source code and dependencies?
 
 ## Prework & Setup
+
+You can find complete details on the required pre-work and setup instructions at the [setup](setup.qmd) tab. 
 
 ## Meet the Workshop Team
 
