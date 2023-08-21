@@ -28,3 +28,39 @@ R package for visualizing how (and how fast/slow) your R code runs
 ::: {.notes}
 * The package is from RStudio
 :::
+
+## Working with {profvis} & {golem} {auto-animate=true}
+
+Our `dev/run_dev.R` script is where we can profile our app interactively.
+
+We can modify the original code...
+
+```{.r}
+options(golem.app.prod = FALSE)
+
+golem::detach_all_attached()
+
+golem::document_and_reload()
+
+run_app()
+```
+
+## Working with {profvis} & {golem} {auto-animate=true}
+
+and wrap `run_app()` in `print()`, then `profvis()`...
+
+```{.r}
+options(golem.app.prod = FALSE)
+
+golem::detach_all_attached()
+
+golem::document_and_reload()
+
+profvis::profvis({
+  print(run_app())
+})
+```
+
+::: {.notes}
+You need to wrap the `run_app()` function in `print()`, before passing it to `profvis::profvis()`
+:::
