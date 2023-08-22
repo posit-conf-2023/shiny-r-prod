@@ -17,8 +17,4 @@ RUN apt-get update \
   && apt-get -y install ./tmp/shinycannon.deb
 
 # install R package dependencies
-RUN install2.r renv httpgd languageserver shiny rmarkdown markdown rhino 
-
-# install R packages I missed earlier
-# TODO: Clean up before workshop
-RUN install2.r countdown fontawesome profvis
+RUN install2.r renv httpgd languageserver shiny rmarkdown markdown countdown fontawesome profvis golem rsconnect devtools
