@@ -76,6 +76,6 @@ You can workshop materials using the following procedure:
 
 The materials for this workshop are available as a Docker container. 
 
-* something here
+* If using visual studio code, the user needs to add the renv library path to their `r.libPaths` setting in the R extension. Details at https://github.com/REditorSupport/vscode-R/wiki/Working-with-renv-enabled-projects .
 
 :::
