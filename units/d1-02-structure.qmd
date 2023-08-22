@@ -1,0 +1,29 @@
+---
+title: "Application Structure"
+subtitle: "9:30 - 10:30"
+author: "Eric Nantz & Michael Thomas"
+date: "2023-09-18"
+listing:
+  - id: exercises
+    contents:
+      - ../materials/d1-02-structure/ex-*.qmd
+    type: table
+    fields: [subtitle, title]
+    field-display-names: 
+      subtitle: "Exercise"
+    sort: [filename]
+    sort-ui: false
+    filter-ui: false
+    image-placeholder: assets/img/placeholder.png
+tbl-colwidths: [5,20,75]
+---
+
+## Slides
+
+[View slides in full screen](../materials/d1-02-structure/index.html)
+
+```{=html}
+<iframe class="slide-deck" src="../materials/d1-02-structure/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
+```
+
+TODO: Add exercises

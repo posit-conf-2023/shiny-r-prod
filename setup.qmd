@@ -67,3 +67,15 @@ You can workshop materials using the following procedure:
 1. The `{renv}` package will begin bootstrapping the package library. When prompted, run `renv::restore()` to complete the package installation process.
 
 :::
+
+**TODO** Finish Docker Container instructions
+
+:::{.callout-tip collapse="true"}
+
+## Docker Container with Visual Studio Code & RStudio 
+
+The materials for this workshop are available as a Docker container. 
+
+* something here
+
+:::

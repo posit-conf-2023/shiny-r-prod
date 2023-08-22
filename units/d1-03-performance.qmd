@@ -1,0 +1,29 @@
+---
+title: "Performance"
+subtitle: "TBD"
+author: "Eric Nantz & Michael Thomas"
+date: "2023-09-18"
+listing:
+  - id: exercises
+    contents:
+      - ../materials/d1-03-performance/ex-*.qmd
+    type: table
+    fields: [subtitle, title]
+    field-display-names: 
+      subtitle: "Exercise"
+    sort: [filename]
+    sort-ui: false
+    filter-ui: false
+    image-placeholder: assets/img/placeholder.png
+tbl-colwidths: [5,20,75]
+---
+
+## Slides
+
+[View slides in full screen](../materials/d1-03-performance/index.html)
+
+```{=html}
+<iframe class="slide-deck" src="../materials/d1-03-performance/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
+```
+
+TODO: Add exercises
