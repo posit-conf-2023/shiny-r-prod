@@ -26,4 +26,5 @@ if (FALSE) {
   library(rsconnect)
   library(connectapi)
   library(httpgd)
+  library(crew)
 }
