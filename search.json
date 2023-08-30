@@ -1,0 +1,387 @@
+[
+  {
+    "objectID": "materials/d1-02-structure/index.html#its-never-just-shiny",
+    "href": "materials/d1-02-structure/index.html#its-never-just-shiny",
+    "title": "Application Structure",
+    "section": "It’s Never Just Shiny",
+    "text": "It’s Never Just Shiny\n… at least for production-quality apps!\n\nExternal data sources\nConnections to other execution backends\nAdditional R packages!"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#turned-upside-down",
+    "href": "materials/d1-02-structure/index.html#turned-upside-down",
+    "title": "Application Structure",
+    "section": "Turned Upside-Down",
+    "text": "Turned Upside-Down\nImagine your application is working great!\n\n\n\n\nupdate.packages(ask = FALSE)\nremotes::install_github(\"pkg\")"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#turned-upside-down-1",
+    "href": "materials/d1-02-structure/index.html#turned-upside-down-1",
+    "title": "Application Structure",
+    "section": "Turned Upside-Down",
+    "text": "Turned Upside-Down\n\n\nggplot2 version 0.9.3\n\n\nggplot2 version 1.0.0"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#take-control-with-renv",
+    "href": "materials/d1-02-structure/index.html#take-control-with-renv",
+    "title": "Application Structure",
+    "section": "Take Control with {renv}",
+    "text": "Take Control with {renv}\n\nCreate reproducible environments for your R projects.\n\n\nNext generation of {packrat}\nIsolated package library from rest of your system\nTransfer projects to different collaborators / platforms\nReproducible package installation\nEasily create new projects or convert existing projects with RStudio or built-in functions."
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#under-the-hood",
+    "href": "materials/d1-02-structure/index.html#under-the-hood",
+    "title": "Application Structure",
+    "section": "Under the Hood",
+    "text": "Under the Hood\nUpon initializing a project:\n\nProject-level .Rprofile to activate custom package library on startup\nLockfile renv.lock to describe state of project library\nrenv/library to hold private project library\nrenv/activate.R performs activation"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#develop-a-routine",
+    "href": "materials/d1-02-structure/index.html#develop-a-routine",
+    "title": "Application Structure",
+    "section": "Develop a Routine",
+    "text": "Develop a Routine\nSticking with {renv} will pay off (trust me)\n\nFair play to mix packages from CRAN, GitHub, and proprietary sources\nRoll back when a package upgrade doesn’t play nicely\nYou make the call when to update your library!"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#a-single-point-app.r",
+    "href": "materials/d1-02-structure/index.html#a-single-point-app.r",
+    "title": "Application Structure",
+    "section": "A Single Point: app.R",
+    "text": "A Single Point: app.R\nPrototype apps can coast by with a single app.R\n\nMore inputs, visualizations, modules, tabs …\nEventually the app.R almost explodes\nDifficult to collaborate without conflicts"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#r-directory",
+    "href": "materials/d1-02-structure/index.html#r-directory",
+    "title": "Application Structure",
+    "section": "R Directory",
+    "text": "R Directory\n\nShiny supports auto-loading scripts in an R directory\nNested directories not supported\nMore information on the App Formats article"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#enter-the-golem",
+    "href": "materials/d1-02-structure/index.html#enter-the-golem",
+    "title": "Application Structure",
+    "section": "Enter the {golem}",
+    "text": "Enter the {golem}\n\nOpinionated framework for building production-grade Shiny applications as R packages\n\n\nScripts guide you with first steps akin to {usethis} & {devtools}\nEncourages Shiny best practices (especially modules)\nStreamlines deployment on multiple platforms\n\n\nAdditional content on golem goes here. Remove this note when finished."
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#what-are-modules",
+    "href": "materials/d1-02-structure/index.html#what-are-modules",
+    "title": "Application Structure",
+    "section": "What are Modules?",
+    "text": "What are Modules?\n\nBuilding blocks to compose any Shiny app out of smaller, more understandable pieces\n\nAvoids namespace collisions when using same widget across different areas of your app\nAllow you to encapsulate distinct app interfaces\nOrganize code into logical and easy-to-understand components\nFacilitate collaboration"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#sound-familiar",
+    "href": "materials/d1-02-structure/index.html#sound-familiar",
+    "title": "Application Structure",
+    "section": "Sound familiar?",
+    "text": "Sound familiar?\n\nR functions also help avoid collisions in variable names with general R code\nEssential for creating non-trivial and extensive workflows"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-function-ui",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-function-ui",
+    "title": "Application Structure",
+    "section": "Anatomy of a Function (UI)",
+    "text": "Anatomy of a Function (UI)\n\n\nartUI <- function() {\n  tagList(\n    checkboxInput(\n      \"input1\",\n      \"Check Here\"\n    ),\n    selectInput(\n      \"input2\",\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    ),\n    plotOutput(\"plot1\")\n  )\n}"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
+    "title": "Application Structure",
+    "section": "Anatomy of a Module (UI)",
+    "text": "Anatomy of a Module (UI)\n\n\nartUI <- function(id) {\n  ns <- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    ),\n    plotOutput(ns(\"plot1\"))\n  )\n}"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
+    "title": "Application Structure",
+    "section": "Anatomy of a Module (UI)",
+    "text": "Anatomy of a Module (UI)\n\n\nartUI <- function(id) {\n  ns <- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    )\n  )\n}\n\n\nid: String to use for namespace\nns <- NS(id): Create proper namespace function"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
+    "title": "Application Structure",
+    "section": "Anatomy of a Module (Server)",
+    "text": "Anatomy of a Module (Server)\n\n\nartServer <- function(input, output, session) {\n  df <- reactive({\n    # do something fancy\n  })\n  \n  output$plot1 <- renderPlot({\n    ggplot(df(), aes(x = x, y = y)) +\n      geom_point()\n  })\n}"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
+    "title": "Application Structure",
+    "section": "Anatomy of a Module (Server)",
+    "text": "Anatomy of a Module (Server)\n\n\nartServer <- function(id) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      df <- reactive({\n        # do something fancy\n      })\n      \n      output$plot1 <- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point()\n      })\n    }\n  )\n}\n\nMinimal changes necessary"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
+    "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
+    "title": "Application Structure",
+    "section": "Anatomy of a Module (Server)",
+    "text": "Anatomy of a Module (Server)\n\n\nartServer <- function(id) {\n  moduleServer(id,\n    function(input, output, session) {\n      df <- reactive({\n        # do something fancy\n      })\n      \n      output$plot1 <- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point()\n      })\n    }\n  )\n}\n\n:thinking: id\n\n\n\n`moduleServer(): Encapsulate server-side logic with namespace applied."
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#invoking-modules",
+    "href": "materials/d1-02-structure/index.html#invoking-modules",
+    "title": "Application Structure",
+    "section": "Invoking Modules",
+    "text": "Invoking Modules\nui <- fluidPage(\n  fluidRow(\n    artUI(\"mod1\")\n  )\n)\n\nserver <- function(input, output, session) {\n  artServer(\"mod1\")\n}\n\nshinyApp(ui, server)"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#giving-and-receiving",
+    "href": "materials/d1-02-structure/index.html#giving-and-receiving",
+    "title": "Application Structure",
+    "section": "Giving and Receiving",
+    "text": "Giving and Receiving\n\n\nartUI <- function(id, choices = c(\"jar\", \"vase\")) {\n  ns <- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = choices,\n      selected = choices[1],\n      multiple = FALSE\n    ),\n    plotOutput(ns(\"plot1\"))\n  )\n}\n\n\nReasonable inputs: static values, vectors, flags\nAvoid reactive parameters\nReturn value: tagList() of inputs, output placeholders, and other UI elements"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#giving-and-receiving-1",
+    "href": "materials/d1-02-structure/index.html#giving-and-receiving-1",
+    "title": "Application Structure",
+    "section": "Giving and Receiving",
+    "text": "Giving and Receiving\nartServer <- function(id, df, title = \"My Plot\") {\n  moduleServer(id,\n    function(input, output, session) {\n      user_selections <- reactive({\n        list(input1 = input$input1, input2 = input$input2)\n      })\n      \n      output$plot1 <- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point() +\n          ggtitle(title)\n      })\n      \n      user_selections\n    }\n  )\n}\n\nInput parameters (and return values) can be a mix of static and reactive objects"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#to-or-not-to",
+    "href": "materials/d1-02-structure/index.html#to-or-not-to",
+    "title": "Application Structure",
+    "section": "To () or not to ()",
+    "text": "To () or not to ()\n\n\n# app server\ndf <- reactive({\n  art_data |>\n    filter(dept == input$dept)\n})\n\nartServer(\"mod1\", df)\n\nartServer <- function(id, df, title = \"Amazing\") {\n  moduleServer(id,\n    function(input, output, session) {\n      user_selections <- reactive({\n        list(input1 = input$input1,\n             input2 = input$input2)\n      })\n      \n      output$plot1 <- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point() +\n          ggtitle(title)\n      })\n      \n      user_selections\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: df\nInside module, invoke reactive parameter as you would any other reactive in Shiny: df()\nAny reactive(s) returned by module should also be reference by name: user_selections, user_selections()\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#welcome-to-positconf2023",
+    "href": "materials/d1-01-welcome/index.html#welcome-to-positconf2023",
+    "title": "Welcome!",
+    "section": "Welcome to posit::conf(2023)!",
+    "text": "Welcome to posit::conf(2023)!"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#workshop-policies",
+    "href": "materials/d1-01-welcome/index.html#workshop-policies",
+    "title": "Welcome!",
+    "section": "Workshop Policies",
+    "text": "Workshop Policies\n\n\nPlease review the posit::conf Code of Conduct.\nIssues can be addressed in following ways:\n\nIn person: Contact any posit::conf staff member, identifiable by their staff t-shirt shirt, or visit the conference registration desk.\nBy email: Send a message to conf@posit.com; event organizers will respond promptly.\nBy phone: call 844—448—1212"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#meet-the-team",
+    "href": "materials/d1-01-welcome/index.html#meet-the-team",
+    "title": "Welcome!",
+    "section": "Meet the Team!",
+    "text": "Meet the Team!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTODO: Link to Meet the Team Section on Home Page"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#your-turn",
+    "href": "materials/d1-01-welcome/index.html#your-turn",
+    "title": "Welcome!",
+    "section": "Your Turn",
+    "text": "Your Turn\nIntroduce yourself to your neighbor(s)\nWhat is your most memorable Shiny application in production experience?\n\n\n\n−+\n02:00"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#about-those-post-its",
+    "href": "materials/d1-01-welcome/index.html#about-those-post-its",
+    "title": "Welcome!",
+    "section": "About those post-its",
+    "text": "About those post-its\n\n\n\n    \n        Done with activity\n    \n\n\n\n    \n        I'd like help"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#many-users",
+    "href": "materials/d1-01-welcome/index.html#many-users",
+    "title": "Welcome!",
+    "section": "Many Users",
+    "text": "Many Users"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#high-profile-situations",
+    "href": "materials/d1-01-welcome/index.html#high-profile-situations",
+    "title": "Welcome!",
+    "section": "High-Profile Situations",
+    "text": "High-Profile Situations"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
+    "href": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
+    "title": "Welcome!",
+    "section": "Part of a Critical Pipeline",
+    "text": "Part of a Critical Pipeline"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#the-journey-ahead",
+    "href": "materials/d1-01-welcome/index.html#the-journey-ahead",
+    "title": "Welcome!",
+    "section": "The Journey Ahead",
+    "text": "The Journey Ahead\n\nProduction has more than one meaning for Shiny apps\n\n\nThe tooling & principles discussed in this workshop will guide you to the destination\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#more-to-come",
+    "href": "materials/d1-03-performance/index.html#more-to-come",
+    "title": "Performance",
+    "section": "More to Come",
+    "text": "More to Come\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/profvis/index.html#what-is-profvis",
+    "href": "materials/profvis/index.html#what-is-profvis",
+    "title": "Improving Performance by Profiling Your R Code",
+    "section": "What is {profvis}?",
+    "text": "What is {profvis}?\nR package for visualizing how (and how fast/slow) your R code runs\n{profvis} website\n\n\n\nThe package is from RStudio"
+  },
+  {
+    "objectID": "materials/profvis/index.html#working-with-profvis-golem",
+    "href": "materials/profvis/index.html#working-with-profvis-golem",
+    "title": "Improving Performance by Profiling Your R Code",
+    "section": "Working with {profvis} & {golem}",
+    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\nWe can modify the original code…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nrun_app()"
+  },
+  {
+    "objectID": "materials/profvis/index.html#working-with-profvis-golem-1",
+    "href": "materials/profvis/index.html#working-with-profvis-golem-1",
+    "title": "Improving Performance by Profiling Your R Code",
+    "section": "Working with {profvis} & {golem}",
+    "text": "Working with {profvis} & {golem}\nand wrap run_app() in print(), then profvis()…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()\n\n\n\nshinyprod.com"
+  },
+  {
+    "objectID": "materials/d1-04-deploy-admin/index.html#more-to-come",
+    "href": "materials/d1-04-deploy-admin/index.html#more-to-come",
+    "title": "Deployment & Administration",
+    "section": "More to come",
+    "text": "More to come\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/setup-resources/index.html#section-12",
+    "href": "materials/setup-resources/index.html#section-12",
+    "title": "Workshop Environment Setup",
+    "section": "",
+    "text": "posit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
+    "href": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
+    "title": "shiny-r-prod",
+    "section": "Creative Commons Attribution-ShareAlike 4.0 International Public License",
+    "text": "Creative Commons Attribution-ShareAlike 4.0 International Public License\nBy exercising the Licensed Rights (defined below), You accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-ShareAlike 4.0 International Public License (“Public License”). To the extent this Public License may be interpreted as a contract, You are granted the Licensed Rights in consideration of Your acceptance of these terms and conditions, and the Licensor grants You such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.\n\nSection 1 – Definitions.\n\nAdapted Material means material subject to Copyright and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.\nAdapter’s License means the license You apply to Your Copyright and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.\nBY-SA Compatible License means a license listed at creativecommons.org/compatiblelicenses, approved by Creative Commons as essentially the equivalent of this Public License.\nCopyright and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.\nEffective Technological Measures means those measures that, in the absence of proper authority, may not be circumvented under laws fulfilling obligations under Article 11 of the WIPO Copyright Treaty adopted on December 20, 1996, and/or similar international agreements.\nExceptions and Limitations means fair use, fair dealing, and/or any other exception or limitation to Copyright and Similar Rights that applies to Your use of the Licensed Material.\nLicense Elements means the license attributes listed in the name of a Creative Commons Public License. The License Elements of this Public License are Attribution and ShareAlike.\nLicensed Material means the artistic or literary work, database, or other material to which the Licensor applied this Public License.\nLicensed Rights means the rights granted to You subject to the terms and conditions of this Public License, which are limited to all Copyright and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.\nLicensor means the individual(s) or entity(ies) granting rights under this Public License.\nShare means to provide material to the public by any means or process that requires permission under the Licensed Rights, such as reproduction, public display, public performance, distribution, dissemination, communication, or importation, and to make material available to the public including in ways that members of the public may access the material from a place and at a time individually chosen by them.\nSui Generis Database Rights means rights other than copyright resulting from Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, as amended and/or succeeded, as well as other essentially equivalent rights anywhere in the world.\nYou means the individual or entity exercising the Licensed Rights under this Public License. Your has a corresponding meaning.\n\n\n\nSection 2 – Scope.\n\nLicense grant.\n\nSubject to the terms and conditions of this Public License, the Licensor hereby grants You a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable license to exercise the Licensed Rights in the Licensed Material to:\nA. reproduce and Share the Licensed Material, in whole or in part; and\nB. produce, reproduce, and Share Adapted Material.\nExceptions and Limitations. For the avoidance of doubt, where Exceptions and Limitations apply to Your use, this Public License does not apply, and You do not need to comply with its terms and conditions.\nTerm. The term of this Public License is specified in Section 6(a).\nMedia and formats; technical modifications allowed. The Licensor authorizes You to exercise the Licensed Rights in all media and formats whether now known or hereafter created, and to make technical modifications necessary to do so. The Licensor waives and/or agrees not to assert any right or authority to forbid You from making technical modifications necessary to exercise the Licensed Rights, including technical modifications necessary to circumvent Effective Technological Measures. For purposes of this Public License, simply making modifications authorized by this Section 2(a)(4) never produces Adapted Material.\nDownstream recipients.\nA. Offer from the Licensor – Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.\nB. __Additional offer from the Licensor – Adapted Material. Every recipient of Adapted Material from You automatically receives an offer from the Licensor to exercise the Licensed Rights in the Adapted Material under the conditions of the Adapter’s License You apply.\nC. No downstream restrictions. You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, the Licensed Material if doing so restricts exercise of the Licensed Rights by any recipient of the Licensed Material.\nNo endorsement. Nothing in this Public License constitutes or may be construed as permission to assert or imply that You are, or that Your use of the Licensed Material is, connected with, or sponsored, endorsed, or granted official status by, the Licensor or others designated to receive attribution as provided in Section 3(a)(1)(A)(i).\n\nOther rights.\n\nMoral rights, such as the right of integrity, are not licensed under this Public License, nor are publicity, privacy, and/or other similar personality rights; however, to the extent possible, the Licensor waives and/or agrees not to assert any such rights held by the Licensor to the limited extent necessary to allow You to exercise the Licensed Rights, but not otherwise.\nPatent and trademark rights are not licensed under this Public License.\nTo the extent possible, the Licensor waives any right to collect royalties from You for the exercise of the Licensed Rights, whether directly or through a collecting society under any voluntary or waivable statutory or compulsory licensing scheme. In all other cases the Licensor expressly reserves any right to collect such royalties.\n\n\n\n\nSection 3 – License Conditions.\nYour exercise of the Licensed Rights is expressly made subject to the following conditions.\n\nAttribution.\n\nIf You Share the Licensed Material (including in modified form), You must:\nA. retain the following if it is supplied by the Licensor with the Licensed Material:\n\nidentification of the creator(s) of the Licensed Material and any others designated to receive attribution, in any reasonable manner requested by the Licensor (including by pseudonym if designated);\na copyright notice;\na notice that refers to this Public License;\na notice that refers to the disclaimer of warranties;\na URI or hyperlink to the Licensed Material to the extent reasonably practicable;\n\nB. indicate if You modified the Licensed Material and retain an indication of any previous modifications; and\nC. indicate the Licensed Material is licensed under this Public License, and include the text of, or the URI or hyperlink to, this Public License.\nYou may satisfy the conditions in Section 3(a)(1) in any reasonable manner based on the medium, means, and context in which You Share the Licensed Material. For example, it may be reasonable to satisfy the conditions by providing a URI or hyperlink to a resource that includes the required information.\nIf requested by the Licensor, You must remove any of the information required by Section 3(a)(1)(A) to the extent reasonably practicable.\n\nShareAlike.\n\nIn addition to the conditions in Section 3(a), if You Share Adapted Material You produce, the following conditions also apply.\n\nThe Adapter’s License You apply must be a Creative Commons license with the same License Elements, this version or later, or a BY-SA Compatible License.\nYou must include the text of, or the URI or hyperlink to, the Adapter’s License You apply. You may satisfy this condition in any reasonable manner based on the medium, means, and context in which You Share Adapted Material.\nYou may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, Adapted Material that restrict exercise of the rights granted under the Adapter’s License You apply.\n\n\n\nSection 4 – Sui Generis Database Rights.\nWhere the Licensed Rights include Sui Generis Database Rights that apply to Your use of the Licensed Material:\n\nfor the avoidance of doubt, Section 2(a)(1) grants You the right to extract, reuse, reproduce, and Share all or a substantial portion of the contents of the database;\nif You include all or a substantial portion of the database contents in a database in which You have Sui Generis Database Rights, then the database in which You have Sui Generis Database Rights (but not its individual contents) is Adapted Material, including for purposes of Section 3(b); and\nYou must comply with the conditions in Section 3(a) if You Share all or a substantial portion of the contents of the database.\n\nFor the avoidance of doubt, this Section 4 supplements and does not replace Your obligations under this Public License where the Licensed Rights include other Copyright and Similar Rights.\n\n\nSection 5 – Disclaimer of Warranties and Limitation of Liability.\n\nUnless otherwise separately undertaken by the Licensor, to the extent possible, the Licensor offers the Licensed Material as-is and as-available, and makes no representations or warranties of any kind concerning the Licensed Material, whether express, implied, statutory, or other. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not known or discoverable. Where disclaimers of warranties are not allowed in full or in part, this disclaimer may not apply to You.\nTo the extent possible, in no event will the Licensor be liable to You on any legal theory (including, without limitation, negligence) or otherwise for any direct, special, indirect, incidental, consequential, punitive, exemplary, or other losses, costs, expenses, or damages arising out of this Public License or use of the Licensed Material, even if the Licensor has been advised of the possibility of such losses, costs, expenses, or damages. Where a limitation of liability is not allowed in full or in part, this limitation may not apply to You.\nThe disclaimer of warranties and limitation of liability provided above shall be interpreted in a manner that, to the extent possible, most closely approximates an absolute disclaimer and waiver of all liability.\n\n\n\nSection 6 – Term and Termination.\n\nThis Public License applies for the term of the Copyright and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.\nWhere Your right to use the Licensed Material has terminated under Section 6(a), it reinstates:\n\nautomatically as of the date the violation is cured, provided it is cured within 30 days of Your discovery of the violation; or\nupon express reinstatement by the Licensor.\n\nFor the avoidance of doubt, this Section 6(b) does not affect any right the Licensor may have to seek remedies for Your violations of this Public License.\nFor the avoidance of doubt, the Licensor may also offer the Licensed Material under separate terms or conditions or stop distributing the Licensed Material at any time; however, doing so will not terminate this Public License.\nSections 1, 5, 6, 7, and 8 survive termination of this Public License.\n\n\n\nSection 7 – Other Terms and Conditions.\n\nThe Licensor shall not be bound by any additional or different terms or conditions communicated by You unless expressly agreed.\nAny arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.t stated herein are separate from and independent of the terms and conditions of this Public License.\n\n\n\nSection 8 – Interpretation.\n\nFor the avoidance of doubt, this Public License does not, and shall not be interpreted to, reduce, limit, restrict, or impose conditions on any use of the Licensed Material that could lawfully be made without permission under this Public License.\nTo the extent possible, if any provision of this Public License is deemed unenforceable, it shall be automatically reformed to the minimum extent necessary to make it enforceable. If the provision cannot be reformed, it shall be severed from this Public License without affecting the enforceability of the remaining terms and conditions.\nNo term or condition of this Public License will be waived and no failure to comply consented to unless expressly agreed to by the Licensor.\nNothing in this Public License constitutes or may be interpreted as a limitation upon, or waiver of, any privileges and immunities that apply to the Licensor or You, including from the legal processes of any jurisdiction or authority.\n\n\nCreative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the “Licensor.” Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark “Creative Commons” or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.\nCreative Commons may be contacted at creativecommons.org"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "",
+    "text": "Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience."
+  },
+  {
+    "objectID": "index.html#logistics",
+    "href": "index.html#logistics",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Logistics",
+    "text": "Logistics\nThe workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at posit-conf-2023.github.io/shiny-r-prod and hosted on GitHub at github.com/posit-conf-2023/shiny-r-prod. For real-time messaging, we will be using a specific channel within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop."
+  },
+  {
+    "objectID": "index.html#is-this-workshop-for-me",
+    "href": "index.html#is-this-workshop-for-me",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Is this workshop for me?",
+    "text": "Is this workshop for me?\nThis course assumes intermediate knowledge of building Shiny applications in R and prior experience deploying an application to a platform such as the shinyapps.io service or products like Posit Connect. This workshop will be appropriate for you if you answer yes to any of these questions:\n\nHave you had a Shiny application work just fine on your machine, but encounters critical issues after deployed to a hosting platform?\nAre you willing to prospectively implement techniques before deployment to plan for the unexpected?\nDo you want to know the potential pitfalls within various deployment platforms?\nDo you want to employ best practices for structuring your application source code and dependencies?"
+  },
+  {
+    "objectID": "index.html#prework-setup",
+    "href": "index.html#prework-setup",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Prework & Setup",
+    "text": "Prework & Setup\nYou can find complete details on the required pre-work and setup instructions at the setup tab."
+  },
+  {
+    "objectID": "index.html#meet-the-workshop-team",
+    "href": "index.html#meet-the-workshop-team",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Meet the Workshop Team",
+    "text": "Meet the Workshop Team\n\nInstructors\n Eric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the R-Podcast that he launched in 2012. Eric is also the creator of the Shiny Developer Series where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his Twitch channel. In addition, Eric is a curator for the RWeekly project and co-host of the RWeekly Highlights podcast which accompanies every issue.\n Michael Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the RWeekly Highlights Podcast.\n\n\nTeaching Assistants\nTBD"
+  },
+  {
+    "objectID": "units/d1-04b-break.html",
+    "href": "units/d1-04b-break.html",
+    "title": "Coffee & refreshments break",
+    "section": "",
+    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at BreakroomTBD. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
+  },
+  {
+    "objectID": "units/d1-01-welcome.html",
+    "href": "units/d1-01-welcome.html",
+    "title": "Welcome & Setup",
+    "section": "",
+    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
+  },
+  {
+    "objectID": "units/d1-04-deploy-admin.html",
+    "href": "units/d1-04-deploy-admin.html",
+    "title": "Deployment & Administration",
+    "section": "",
+    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
+  },
+  {
+    "objectID": "units/d1-03-performance.html",
+    "href": "units/d1-03-performance.html",
+    "title": "Performance",
+    "section": "",
+    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
+  },
+  {
+    "objectID": "units/d1-02-structure.html",
+    "href": "units/d1-02-structure.html",
+    "title": "Application Structure",
+    "section": "",
+    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
+  },
+  {
+    "objectID": "units/d1-03b-lunch.html",
+    "href": "units/d1-03b-lunch.html",
+    "title": "Lunch break",
+    "section": "",
+    "text": "It’s time to replenish that Shiny learning energy with a delicious lunch! Before you head over to the LunchTBD, we would greatly appreciate if you take a minute to provide your feedback on how the workshop is going so far:\n\nWrite one positive thing such as a new technique/capability you learned on a green sticky note\nWrite one item that could use improvement, such as a topic going too fast or not clear enough on a pink sticky note.\n\nYour workshop team is also using this time to re-charge. If you have any questions, please wait to ask until we re-convene for the next unit."
+  },
+  {
+    "objectID": "units/d1-02b-break.html",
+    "href": "units/d1-02b-break.html",
+    "title": "Coffee & refreshments break",
+    "section": "",
+    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at BreakroomTBD. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
+  },
+  {
+    "objectID": "schedule.html",
+    "href": "schedule.html",
+    "title": "Workshop Schedule",
+    "section": "",
+    "text": "Warning\n\n\n\nThis page is under construction and will be updated as the materials are posted online. Ordering of topics is subject to change.\n\n\n\n\n\n\n\n\n\n\n\n\nTime\n\n\nModule\n\n\nPresenter\n\n\n\n\n\n\n9:00 - 9:30\n\n\nWelcome & Setup\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n9:30 - 10:30\n\n\nApplication Structure\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n10:30 - 11:00\n\n\nCoffee & refreshments break\n\n\n\n\n\n\nTBD\n\n\nPerformance\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n12:30 - 13:30\n\n\nLunch break\n\n\n\n\n\n\nTBD\n\n\nDeployment & Administration\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n15:00 - 15:30\n\n\nCoffee & refreshments break\n\n\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "setup.html",
+    "href": "setup.html",
+    "title": "Setup",
+    "section": "",
+    "text": "We are excited to have you join us for our workshop Shiny in Production: Tools and Techniques! The format of the workshop will be a mix of presentation slides, example Shiny applications, and hands-on exercises. To ensure you are ready for the journey, please review the following instructions."
+  },
+  {
+    "objectID": "setup.html#pre-work",
+    "href": "setup.html#pre-work",
+    "title": "Setup",
+    "section": "Pre-Work",
+    "text": "Pre-Work\nThis workshop will be a blend of teaching materials, live-coding demonstrations, and hands-on exercises to practice key concepts. Posit has generously provided us access to a dedicated workshop coding environment using Posit Cloud, which is accessible with a modern web browser such as Google Chrome, Microsoft Edge, Firefox, or others. In addition, Posit is also providing a dedicated instance of the Posit Connect platform for hosting Shiny applications that you create and view throughout the workshop.\nIn the first session of the workshop, we will allocate time for everyone to configure their accounts and development environments. If you would like to complete these steps before the workshop, you can follow the procedures detailed in Environment Configuration below."
+  },
+  {
+    "objectID": "setup.html#accounts",
+    "href": "setup.html#accounts",
+    "title": "Setup",
+    "section": "Accounts",
+    "text": "Accounts\n\nGitHub account: You can create a GitHub account for free using the instructions provided in the Register for GitHub chapter of Jenny Bryan’s Happy Git and GitHub for the UseR. If you already have an account, you are welcome to use it for the workshop. While version control itself is not a major focus of the course, we will discuss how certain elements can play an important role in application development and deployment. A great resource for getting a basic familiarity with Git version control is Jenny Bryan’s Happy Git and GitHub for the useR online book.\nPosit Cloud account: Visit posit.cloud and click the Sign Up link. Then create a Free account. If you already have an account, you do not need to create a new one."
+  },
+  {
+    "objectID": "setup.html#local-clone-of-repository",
+    "href": "setup.html#local-clone-of-repository",
+    "title": "Setup",
+    "section": "Local Clone of Repository",
+    "text": "Local Clone of Repository\nIf we encounter any technical issues with the cloud-based environments, it is a good idea to have a clone of this repository on your local laptop as a backup."
+  },
+  {
+    "objectID": "setup.html#environment-configuration",
+    "href": "setup.html#environment-configuration",
+    "title": "Setup",
+    "section": "Environment Configuration",
+    "text": "Environment Configuration\nPlease view the information in the callouts below for step-by-step instructions on configuring your accounts and environments. While Posit Cloud is the preferred development environment, you may utilize your local installation of R with your preferred integrated development environment such as RStudio, Visual Studio Code, or even vim/emacs if you prefer.\n\n\n\n\n\n\nPosit Connect\n\n\n\n\n\nView screenshots in full screen\n\n\nCreate an account on the workshop RStudio Connect server by visiting https://rsc.training.rstudio.com and clicking the login link in the upper right corner.\nYou will see a window that asks for either an email/password or to use a GitHub account. Please choose the GitHub option and follow the instructions to authorize Posit Connect to your GitHub account.\nYou should now be logged in to Posit Connect. Please create an API key for your account by following the Posit Connect User Guide instructions on creating an API key. Save it to a secure place as you will need it for account integration.\n\n\n\n\n\n\n\n\n\n\nPosit Cloud\n\n\n\n\n\nView screenshots in full screen\n\n\nJoin the Posit Cloud Workspace dedicated to this workshop by visiting this customized invitation URL. If you already have a Posit Cloud account, you are welcome to use it for the workshop. Otherwise, you can create a new account for free.\nYou will see a project called shiny-r-prod. Open that project and create a saved copy. This process could take a couple of minutes depending on server load.\nAfter the project loads, you will see messages in the R console about restoring or repairing the package library. Execute renv::restore(prompt = FALSE) to install packages into the project. This process should complete in one or two minutes.\n\n\n\n\n\n\n\n\n\n\nLocal R & RStudio IDE\n\n\n\n\n\nIf you prefer to use a local installation of R and RStudio, ensure you setup meets the following requirements:\n\nR version 4.3 or later.\nLatest release of RStudio IDE, 2023.06.1-524 or later\nThe {renv} R package.\n\nYou can workshop materials using the following procedure:\n\nVisit the workshop repository at https://github.com/posit-conf-2023/shiny-r-prod and either clone to your local machine with Git or download a zip archive of the materials. A direct link to the archive is here.\nLaunch RStudio and open the project file shiny-r-prod.Rproj to initialize the workshop project.\nThe {renv} package will begin bootstrapping the package library. When prompted, run renv::restore() to complete the package installation process.\n\n\n\n\n\n\n\n\n\n\nDocker Container with Visual Studio Code & RStudio\n\n\n\n\n\nThe repository for this workshop also gives you the ability to create custom Docker containers to encapsulate a complete R development environment tailored to this workshop.\n\nIf using visual studio code, the user needs to add the renv library path to their r.libPaths setting in the R extension. Details at https://github.com/REditorSupport/vscode-R/wiki/Working-with-renv-enabled-projects ."
+  }
+]

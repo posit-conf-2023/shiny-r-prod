@@ -1,0 +1,30 @@
+[
+  {
+    "listing": "/units/d1-01-welcome.html",
+    "items": []
+  },
+  {
+    "listing": "/units/d1-04-deploy-admin.html",
+    "items": []
+  },
+  {
+    "listing": "/units/d1-03-performance.html",
+    "items": []
+  },
+  {
+    "listing": "/units/d1-02-structure.html",
+    "items": []
+  },
+  {
+    "listing": "/schedule.html",
+    "items": [
+      "/units/d1-01-welcome.html",
+      "/units/d1-02-structure.html",
+      "/units/d1-02b-break.html",
+      "/units/d1-03-performance.html",
+      "/units/d1-03b-lunch.html",
+      "/units/d1-04-deploy-admin.html",
+      "/units/d1-04b-break.html"
+    ]
+  }
+]
