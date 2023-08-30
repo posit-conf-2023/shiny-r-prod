@@ -1,13 +1,5 @@
 [
   {
-    "listing": "/units/d1-01-welcome.html",
-    "items": []
-  },
-  {
-    "listing": "/units/d1-04-deploy-admin.html",
-    "items": []
-  },
-  {
     "listing": "/units/d1-03-performance.html",
     "items": []
   },
@@ -26,5 +18,13 @@
       "/units/d1-04-deploy-admin.html",
       "/units/d1-04b-break.html"
     ]
+  },
+  {
+    "listing": "/units/d1-04-deploy-admin.html",
+    "items": []
+  },
+  {
+    "listing": "/units/d1-01-welcome.html",
+    "items": []
   }
 ]
