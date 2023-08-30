@@ -3,75 +3,41 @@ Shiny in Production: Tools and Techniques
 
 ### posit::conf 2023
 
-by INSTRUCTOR_NAME
+by Eric Nantz & Michael Thomas
 
 -----
 
-INSTRUCTIONS FOR INSTRUCTORS: Please insert information about your
-workshop below. Then, add workshop content in the materials folder and
-link to each session’s materials from the schedule below. You are
-welcomed to add more rows to the schedule. We just ask that you take
-breaks at the specified times. Once you are done adding information, you
-can remove these instructions from the README.
-
-Alternatively, you can completely redo the organization of this repo 
-as a Quarto website or some other format you prefer to host your workshop
-materials. The only requirement is that your workshop materials are hosted 
-here.
-
------
-
-:spiral_calendar: September 17 and 18, 2023  
+:spiral_calendar: September 18th, 2023  
 :alarm_clock:     09:00 - 17:00  
-:hotel:           ROOM TBD  
+:hotel:           Grand Hall I 
 :writing_hand:    [pos.it/conf](http://pos.it/conf)
 
 -----
 
-## Overview
+## Workshop Website
 
-ADD ABSTRACT
+This repository contains materials for the 1-day **Shiny in Production: Tools & Techniques** workshop at Posit::conf(2023). See <https://posit-conf-2023.github.io/shiny-r-prod> for the rendered workshop materials (including slides and exercises) as well as important setup information.
 
-**This workshop is for you if you...*
+## Workshop Overview
 
-ADD THREE POINTS
+Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine.  In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience.  
+
+This course assumes intermediate knowledge of building Shiny applications in R and prior experience deploying an application to a platform such as the shinyapps.io service or products like Posit Connect. This workshop will be appropriate for you if you answer yes to any of these questions:
+
+* Have you had a Shiny application work just fine on your machine, but encounters critical issues after deployed to a hosting platform?
+* Are you willing to prospectively implement techniques before deployment to plan for the unexpected?
+* Do you want to know the potential pitfalls within various deployment platforms?
+* Do you want to employ best practices for structuring your application source code and dependencies?
 
 ## Prework
 
-ADD INFORMATION YOU WANT LEARNERS TO HAVE / STEPS THEY WANT THEM TO
-COMPLETE PRIOR TO THE WORKSHOP. THIS COULD BE A LINK TO A THREAD ON
-RSTUDIO COMMUNITY, PACKAGE INSTALL INSTRUCTIONS, HOW TO GET AN
-RSTUDIO.CLOUD ACCOUNT, ETC.
+Refer to the setup instructions at <https://posit-conf-2023.github.io/shiny-r-prod/setup> for details.
 
-## Schedule
+## Instructors
 
-### Day 1
+Eric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the [R-Podcast](https://r-podcast.org) that he launched in 2012. Eric is also the creator of the [Shiny Developer Series](https://shinydevseries.com) where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his [Twitch channel](https://twitch.tv/rpodcast). In addition, Eric is a curator for the [RWeekly project](https://rweekly.org) and co-host of the [RWeekly Highlights podcast](https://rweekly.fireside.fm) which accompanies every issue.
 
-| Time          | Activity         |
-| :------------ | :--------------- |
-| 09:00 - 10:30 | Session 1        |
-| 10:30 - 11:00 | *Coffee break*   |
-| 11:00 - 12:30 | Session 2        |
-| 12:30 - 13:30 | *Lunch break*    |
-| 13:30 - 15:00 | Session 3        |
-| 15:00 - 15:30 | *Coffee break*   |
-| 15:30 - 17:00 | Session 4        |
-
-### Day 2
-
-| Time          | Activity         |
-| :------------ | :--------------- |
-| 09:00 - 10:30 | Session 1        |
-| 10:30 - 11:00 | *Coffee break*   |
-| 11:00 - 12:30 | Session 2        |
-| 12:30 - 13:30 | *Lunch break*    |
-| 13:30 - 15:00 | Session 3        |
-| 15:00 - 15:30 | *Coffee break*   |
-| 15:30 - 17:00 | Session 4        |
-
-## Instructor
-
-ADD INSTRUCTOR BIO
+Michael Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the [RWeekly Highlights Podcast](https://rweekly.fireside.fm).
 
 -----
 
