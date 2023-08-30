@@ -1,8 +1,8 @@
 ---
-title: "Deployment & Administration"
+title: "Performance"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 author: "TBD"
-footer: "LINK TBD"
+footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
@@ -14,18 +14,4 @@ format:
     history: false
 ---
 
-## More to come
-
-::: callout-warning
-These slides are under construction and will be updated continuously until the workshop date.
-:::
-
-TODO: Determine if we need to break these out into individual sections
-
-* Posit Connect
-    + Push-button deployment vs using `{rsconnect}` directly
-    * Tuning application for performance
-    * App usage with `{connectapi}` package
-* Load-test app with `shinycannon`
-* Docker containers for application
-* Async Processing with `{crew}`
+## More to Come

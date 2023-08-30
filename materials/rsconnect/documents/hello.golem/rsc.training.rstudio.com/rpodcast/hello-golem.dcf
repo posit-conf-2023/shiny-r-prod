@@ -1,0 +1,12 @@
+name: hello-golem
+title: hello-golem
+username: rpodcast
+account: rpodcast
+server: rsc.training.rstudio.com
+hostUrl: https://rsc.training.rstudio.com/__api__
+appId: 410
+bundleId:
+url: https://rsc.training.rstudio.com/content/f2fca3d8-47fb-45f5-9509-793f9cb59d6f/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

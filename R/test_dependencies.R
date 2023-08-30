@@ -18,3 +18,6 @@ controller$push(name = "get_pid", command = ps::ps_pid())
 controller$pop()
 task <- controller$pop()
 task$result[[1]]
+
+# test basic shinyloadtest ----
+shinyloadtest::record_session('https://rsc.training.rstudio.com/content/4d9124a0-158b-4bd9-9b65-07b877db0906')

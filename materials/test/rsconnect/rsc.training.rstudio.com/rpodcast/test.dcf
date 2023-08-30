@@ -1,0 +1,12 @@
+name: test
+title: test
+username: rpodcast
+account: rpodcast
+server: rsc.training.rstudio.com
+hostUrl: https://rsc.training.rstudio.com/__api__
+appId: 415
+bundleId: 206694
+url: https://rsc.training.rstudio.com/content/4d9124a0-158b-4bd9-9b65-07b877db0906/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

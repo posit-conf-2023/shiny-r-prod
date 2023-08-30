@@ -1,4 +1,6 @@
 version: 0.1
+workshop_full_url: "https://posit-conf-2023.github.io/shiny-r-prod"
+workshop_short_url: "posit-conf-2023.github.io/shiny-r-prod"
 break_location: "BreakroomTBD"
 lunch_location: "LunchTBD"
 quiet_location: "QuietTBD"
@@ -7,7 +9,7 @@ bathrooms_location: "BathroomTBD"
 wifi_username: "WIFIUserTBD"
 wifi_password: "WIFIPassTBD"
 room: "Grand Hall I"
-rsconnect_url: "URL Forthcoming"
+rsconnect_url: "https://rsc.training.rstudio.com"
 posit_cloud_workspace_url: "URL Forthcoming"
 people:
   enantz:

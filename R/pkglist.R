@@ -27,4 +27,6 @@ if (FALSE) {
   library(connectapi)
   library(httpgd)
   library(crew)
+  library(shinyloadtest)
+  library(usethis)
 }

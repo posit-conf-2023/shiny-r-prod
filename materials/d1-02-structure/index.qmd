@@ -2,7 +2,7 @@
 title: "Application Structure"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 author: "TBD"
-footer: "LINK TBD"
+footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
@@ -13,20 +13,6 @@ format:
     code-line-numbers: false
     history: false
 ---
-
-## More to come
-
-::: callout-warning
-These slides are under construction and will be updated continuously until the workshop date.
-:::
-
-TODO: Determine if we need to break these out into individual sections
-
-* Package management with `{renv}`
-* Golem
-* Modules
-
-
 
 # Application Dependencies
 
@@ -138,6 +124,10 @@ Prototype apps can coast by with a single `app.R`
 * Encourages Shiny best practices (especially **modules**)
 * Streamlines deployment on multiple platforms
 
+::: {.notes}
+Additional content on golem goes here. Remove this note when finished.
+:::
+
 # All About Modules
 
 ## What are Modules?
@@ -156,9 +146,11 @@ Prototype apps can coast by with a single `app.R`
 * R functions also help avoid collisions in variable names with general R code
 * Essential for creating non-trivial and extensive workflows
 
-## Module Code Example (Delete me)
+# Module Code Example
 
-TODO: Change code to match LEGO example apps
+::: {.notes}
+Change the example code below to match LEGO data. Delete this note when finished.
+:::
 
 ## Anatomy of a Function (UI) {auto-animate=true}
 

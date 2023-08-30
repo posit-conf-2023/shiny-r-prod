@@ -20,6 +20,10 @@ tbl-colwidths: [5,20,75]
 
 ## Slides
 
+::: callout-warning
+These slides are under construction and will be finalized prior to the workshop date.
+:::
+
 [View slides in full screen](../materials/d1-01-welcome/index.html)
 
 ```{=html}

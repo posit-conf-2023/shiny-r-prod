@@ -2,7 +2,7 @@
 title: "Welcome!"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 author: "Eric Nantz"
-footer: "LINK TBD"
+footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
@@ -17,7 +17,7 @@ format:
 
 ## Welcome to posit::conf(2023)! {background-color="black" background-image="assets/img/bg/rstudioconf_crowd.jpg" background-size="cover"}
 
-## Conference Logistics
+## Conference Logistics {visibility="hidden"}
 
 ::: {.nonincremental}
 1. Identify the exits closes to you in case of emergency
@@ -142,8 +142,8 @@ countdown(minutes = 2, seconds = 0)
 
 Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
 
-* RStudio Connect
-* RStudio Cloud
+* Posit Connect
+* Posit Cloud
 * Account Integrations
 
 # The Beginning ... {background-color="black" background-image="assets/img/bg/beginning.png" background-size="cover"}

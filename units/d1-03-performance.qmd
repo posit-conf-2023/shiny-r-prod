@@ -20,10 +20,13 @@ tbl-colwidths: [5,20,75]
 
 ## Slides
 
+::: callout-warning
+These slides are under construction and will be finalized prior to the workshop date.
+:::
+
+
 [View slides in full screen](../materials/d1-03-performance/index.html)
 
 ```{=html}
 <iframe class="slide-deck" src="../materials/d1-03-performance/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 ```
-
-TODO: Add exercises
