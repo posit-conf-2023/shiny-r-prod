@@ -29,4 +29,7 @@ if (FALSE) {
   library(crew)
   library(shinyloadtest)
   library(usethis)
+  library(devtools)
+  library(covrpage)
+  library(rhub)
 }
