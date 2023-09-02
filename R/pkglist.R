@@ -32,4 +32,5 @@ if (FALSE) {
   library(devtools)
   library(covrpage)
   library(rhub)
+  library(lubridate)
 }

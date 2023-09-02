@@ -1346,6 +1346,19 @@
       ],
       "Hash": "b21ebd652d940f099915221f3328ab7b"
     },
+    "lubridate": {
+      "Package": "lubridate",
+      "Version": "1.9.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "generics",
+        "methods",
+        "timechange"
+      ],
+      "Hash": "e25f18436e3efd42c7c590a1c4c15390"
+    },
     "magrittr": {
       "Package": "magrittr",
       "Version": "2.0.3",
@@ -2367,6 +2380,17 @@
         "withr"
       ],
       "Hash": "79540e5fcd9e0435af547d885f184fd5"
+    },
+    "timechange": {
+      "Package": "timechange",
+      "Version": "0.2.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "cpp11"
+      ],
+      "Hash": "8548b44f79a35ba1791308b61e6012d7"
     },
     "tinytex": {
       "Package": "tinytex",
