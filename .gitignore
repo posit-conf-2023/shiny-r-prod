@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
 
 # container-specific files
 .devcontainer/.rstudio_config/*

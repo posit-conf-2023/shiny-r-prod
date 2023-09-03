@@ -1,0 +1,11 @@
+# Posit Connect Training Server variables
+RSCONNECT_ACCOUNT_ID="your_account_id"
+RSCONNECT_SERVER="rsc.training.rstudio.com"
+RSCONNECT_KEY="changeme"
+LEGO_APP_GUID="changeme"
+
+# Prediction model endpoint URL
+MODEL_ENDPOINT_URL="changeme"
+
+# no changes necessary
+RENV_CONFIG_SANDBOX_ENABLED=FALSE
