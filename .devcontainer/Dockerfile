@@ -16,5 +16,10 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends default-jre-headless \
   && apt-get -y install ./tmp/shinycannon.deb
 
+# add headless chrome to the container
+RUN curl -L https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb
+RUN apt-get update -qq \
+  && apt-get -y install ./tmp/chrome.deb
+
 # install R package dependencies
 RUN install2.r renv httpgd languageserver shiny rmarkdown markdown countdown fontawesome profvis golem rsconnect devtools
