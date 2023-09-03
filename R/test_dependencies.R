@@ -99,3 +99,19 @@ shinyloadtest_report(df, "R/report1.html")
 # run following command in terminal 
 # java -jar utils/shinycannon-1.1.3-dd43f6b.jar -h
 # java -jar utils/shinycannon-1.1.3-dd43f6b.jar R/recording.log https://rsc.training.rstudio.com/bricktest/ --workers 1 --loaded-duration-minutes 5 --output-dir R/run1 --overwrite-output
+
+# test connectapi with posit connect training server
+library(connectapi)
+
+client <- connect(
+  server = paste0("https://", Sys.getenv("RSCONNECT_SERVER")),
+  api_key = Sys.getenv("RSCONNECT_KEY")
+)
+
+content_df <- get_content(client)
+usage_df <- get_usage_shiny(client, limit = 10)
+
+# app guid
+lego_guid <- Sys.getenv("LEGO_APP_GUID")
+
+get_usage_shiny(client, content_guid = lego_guid)
