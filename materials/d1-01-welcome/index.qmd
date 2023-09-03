@@ -199,3 +199,10 @@ The tooling & principles discussed in this workshop will guide you to the destin
 ## Data Viewer {visibility="hidden"}
 
 TODO: Offer tables to explore key data sets used in the prototype application
+
+## Our Journey to Production
+
+* Create a robust infrastructure for application source code
+* Identify and solve performance bottlenecks
+* Ensure app is only doing the "bare minimum" for a snappy user experience
+* Tune deployment to meet demand of potentially many simultaneous users
