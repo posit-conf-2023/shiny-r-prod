@@ -1,7 +1,6 @@
 ---
 title: "Welcome!"
-subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
-author: "Eric Nantz"
+subtitle: "Shiny in Production: Tools & Techniques <br> posit::conf(2023)"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
@@ -10,6 +9,7 @@ format:
     scrollable: true
     incremental: true
     slide-number: c/t # c/t | c | h/v | h.v
+    show-slide-number: print
     slide-tone: false #true
     code-line-numbers: false
     history: false
@@ -182,3 +182,20 @@ Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
 
 The tooling & principles discussed in this workshop will guide you to the destination
 
+# The Challenge
+
+## Rebrickable Inventory Dashboard
+
+* Rebrickable: Portal for LEGO builders to discover what sets they can build with their own inventory
+* A comprehensive database of LEGO items available for free!
+* We will build a Shiny dashboard to explore the inventory and enable users to generate predictions
+
+## {background-image="assets/img/bg/rebrickable_schema.png" background-size="cover"}
+
+::: footer
+
+:::
+
+## Data Viewer {visibility="hidden"}
+
+TODO: Offer tables to explore key data sets used in the prototype application
