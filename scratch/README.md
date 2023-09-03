@@ -1,0 +1,1 @@
+Use this directory for experimenting with various packages and tools. By default the contents of this directory will not be version-controlled.

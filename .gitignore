@@ -11,3 +11,6 @@
 
 /.quarto/
 _site/
+
+scratch/*
+!scratch/README.md
