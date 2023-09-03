@@ -33,4 +33,5 @@ if (FALSE) {
   library(covrpage)
   library(rhub)
   library(lubridate)
+  library(shinytest2)
 }
