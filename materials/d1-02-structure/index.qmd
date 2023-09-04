@@ -444,17 +444,7 @@ set_picker_server <- function(id, sets_rv) {
   moduleServer(
     id,
     function(input, output, session) {
-      set_choices <- reactive({
-        # do something with sets_rv
-      })
-
-      observeEvent(set_choices(), {
-        req(set_choices())
-        updateSelectInput(
-          "set_num",
-          choices = set_choices()
-        )
-      })
+      # ...
 
       set_selection  <- reactive({
         input$set_num
