@@ -1,7 +1,10 @@
 ---
 title: "Application Structure"
+title-slide-attributes: 
+  data-background-image: assets/img/lego_city.jpg
+  data-background-size: contain
+  data-background-opacity: "0.3"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
-author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
@@ -13,8 +16,6 @@ format:
     code-line-numbers: false
     history: false
 ---
-
-# Application Dependencies
 
 ## It's Never Just Shiny
 
@@ -100,7 +101,7 @@ Sticking with `{renv}` will pay off (trust me)
 * Roll back when a package upgrade doesn't play nicely
 * **You** make the call when to update your library!
 
-# Application Structure
+# Application Structure Options
 
 ## A Single Point: `app.R`
 
@@ -158,20 +159,15 @@ Change the example code below to match LEGO data. Delete this note when finished
 
 ::: {.column width="60%"}
 ```r
-artUI <- function() {
+set_picker_ui <- function() {
   tagList(
-    checkboxInput(
-      "input1",
-      "Check Here"
-    ),
     selectInput(
-      "input2",
-      "Select Object",
-      choices = c("jar", "vase"),
-      selected = "jar",
+      inputId = "set_num",
+      label = "Select a set"
+      choices = c("set1", "set2"),
+      selected = "set1",
       multiple = FALSE
-    ),
-    plotOutput("plot1")
+    )
   )
 }
 ```
@@ -190,21 +186,15 @@ artUI <- function() {
 ::: {.column width="60%"}
 
 ```r
-artUI <- function(id) {
+set_picker_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    checkboxInput(
-      ns("input1"),
-      "Check Here"
-    ),
     selectInput(
-      ns("input2"),
-      "Select Object",
-      choices = c("jar", "vase"),
-      selected = "jar",
+      inputId = ns("set_num"),
+      label = "Select a set"
+      choices = c(),
       multiple = FALSE
-    ),
-    plotOutput(ns("plot1"))
+    )
   )
 }
 ```
@@ -223,19 +213,14 @@ artUI <- function(id) {
 ::: {.column width="60%"}
 
 
-```{.r code-line-numbers="1,2,5,9"}
-artUI <- function(id) {
+```{.r code-line-numbers="1,2,5"}
+set_picker_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    checkboxInput(
-      ns("input1"),
-      "Check Here"
-    ),
     selectInput(
-      ns("input2"),
-      "Select Object",
-      choices = c("jar", "vase"),
-      selected = "jar",
+      inputId = ns("set_num"),
+      label = "Select a set"
+      choices = c(),
       multiple = FALSE
     )
   )
@@ -260,14 +245,17 @@ artUI <- function(id) {
 ::: {.column width="75%"}
 
 ```r
-artServer <- function(input, output, session) {
-  df <- reactive({
-    # do something fancy
+set_picker_server <- function(input, output, session, sets_rv) {
+  set_choices <- reactive({
+    # do something with sets_rv
   })
-  
-  output$plot1 <- renderPlot({
-    ggplot(df(), aes(x = x, y = y)) +
-      geom_point()
+
+  observeEvent(set_choices(), {
+    req(set_choices())
+    updateSelectInput(
+      "set_num",
+      choices = set_choices()
+    )
   })
 }
 ```
@@ -287,17 +275,20 @@ artServer <- function(input, output, session) {
 ::: {.column width="75%"}
 
 ```r
-artServer <- function(id) {
+set_picker_server <- function(id, sets_rv) {
   moduleServer(
     id,
     function(input, output, session) {
-      df <- reactive({
-        # do something fancy
+      set_choices <- reactive({
+        # do something with sets_rv
       })
-      
-      output$plot1 <- renderPlot({
-        ggplot(df(), aes(x = x, y = y)) +
-          geom_point()
+
+      observeEvent(set_choices(), {
+        req(set_choices())
+        updateSelectInput(
+          "set_num",
+          choices = set_choices()
+        )
       })
     }
   )
@@ -321,16 +312,20 @@ Minimal changes necessary
 ::: {.column width="70%"}
 
 ```{.r code-line-numbers="1,2"}
-artServer <- function(id) {
-  moduleServer(id,
+set_picker_server <- function(id, sets_rv) {
+  moduleServer(
+    id,
     function(input, output, session) {
-      df <- reactive({
-        # do something fancy
+      set_choices <- reactive({
+        # do something with sets_rv
       })
-      
-      output$plot1 <- renderPlot({
-        ggplot(df(), aes(x = x, y = y)) +
-          geom_point()
+
+      observeEvent(set_choices(), {
+        req(set_choices())
+        updateSelectInput(
+          "set_num",
+          choices = set_choices()
+        )
       })
     }
   )
@@ -352,14 +347,18 @@ artServer <- function(id) {
 ## Invoking Modules
 
 ```{.r}
-ui <- fluidPage(
-  fluidRow(
-    artUI("mod1")
-  )
+library(shiny)
+library(bslib)
+ui <- page_fluid(
+  set_picker_ui("mod1")
 )
 
 server <- function(input, output, session) {
-  artServer("mod1")
+  sets_rv <- reactive({
+    # processing
+  })
+
+  set_picker_server("mod1", sets_rv)
 }
 
 shinyApp(ui, server)
@@ -372,21 +371,15 @@ shinyApp(ui, server)
 ::: {.column width="60%"}
 
 ```r
-artUI <- function(id, choices = c("jar", "vase")) {
+set_picker_ui <- function(id, label = "Select a set") {
   ns <- NS(id)
   tagList(
-    checkboxInput(
-      ns("input1"),
-      "Check Here"
-    ),
     selectInput(
-      ns("input2"),
-      "Select Object",
-      choices = choices,
-      selected = choices[1],
+      inputId = ns("set_num"),
+      label = label,
+      choices = c(),
       multiple = FALSE
-    ),
-    plotOutput(ns("plot1"))
+    )
   )
 }
 ```
@@ -405,20 +398,21 @@ artUI <- function(id, choices = c("jar", "vase")) {
 ## Giving and Receiving 
 
 ```{.r}
-artServer <- function(id, df, title = "My Plot") {
-  moduleServer(id,
+set_picker_server <- function(id, sets_rv) {
+  moduleServer(
+    id,
     function(input, output, session) {
-      user_selections <- reactive({
-        list(input1 = input$input1, input2 = input$input2)
+      set_choices <- reactive({
+        # do something with sets_rv
       })
-      
-      output$plot1 <- renderPlot({
-        ggplot(df(), aes(x = x, y = y)) +
-          geom_point() +
-          ggtitle(title)
+
+      observeEvent(set_choices(), {
+        req(set_choices())
+        updateSelectInput(
+          "set_num",
+          choices = set_choices()
+        )
       })
-      
-      user_selections
     }
   )
 }
@@ -434,12 +428,11 @@ artServer <- function(id, df, title = "My Plot") {
 
 ```{.r}
 # app server
-df <- reactive({
-  art_data |>
-    filter(dept == input$dept)
+sets_rv <- reactive({
+  # processing
 })
 
-artServer("mod1", df)
+set_picker_server("mod1", sets_rv)
 ```
 
 :::
@@ -447,21 +440,27 @@ artServer("mod1", df)
 ::: {.column width="60%"}
 
 ```{.r}
-artServer <- function(id, df, title = "Amazing") {
-  moduleServer(id,
+set_picker_server <- function(id, sets_rv) {
+  moduleServer(
+    id,
     function(input, output, session) {
-      user_selections <- reactive({
-        list(input1 = input$input1,
-             input2 = input$input2)
+      set_choices <- reactive({
+        # do something with sets_rv
       })
-      
-      output$plot1 <- renderPlot({
-        ggplot(df(), aes(x = x, y = y)) +
-          geom_point() +
-          ggtitle(title)
+
+      observeEvent(set_choices(), {
+        req(set_choices())
+        updateSelectInput(
+          "set_num",
+          choices = set_choices()
+        )
       })
-      
-      user_selections
+
+      set_selection  <- reactive({
+        input$set_num
+      })
+
+      set_selection
     }
   )
 }
@@ -471,6 +470,6 @@ artServer <- function(id, df, title = "Amazing") {
 
 ::::
 
-* Reactive parameters reference by **name**: `df`
-* Inside module, **invoke** reactive parameter as you would any other reactive in Shiny: `df()`
-* Any reactive(s) returned by module should also be reference by **name**: `user_selections`,  ~~`user_selections()`~~
+* Reactive parameters reference by **name**: `sets_rv`
+* Inside module, **invoke** reactive parameter as you would any other reactive in Shiny: `sets_rv()`
+* Any reactive(s) returned by module should also be reference by **name**: `set_selection`,  ~~`set_selection()`~~
