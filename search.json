@@ -88,7 +88,28 @@
     "href": "materials/d1-03-performance/index.html#more-to-come",
     "title": "Performance",
     "section": "More to Come",
-    "text": "More to Come\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "More to Come"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#what-is-profvis",
+    "href": "materials/d1-03-performance/index.html#what-is-profvis",
+    "title": "Performance",
+    "section": "What is {profvis}?",
+    "text": "What is {profvis}?\nR package for visualizing how (and how fast/slow) your R code runs\n{profvis} website\n\n\n\nThe package is from Posit"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#working-with-profvis-golem",
+    "href": "materials/d1-03-performance/index.html#working-with-profvis-golem",
+    "title": "Performance",
+    "section": "Working with {profvis} & {golem}",
+    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\nWe can modify the original code…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nrun_app()"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#working-with-profvis-golem-1",
+    "href": "materials/d1-03-performance/index.html#working-with-profvis-golem-1",
+    "title": "Performance",
+    "section": "Working with {profvis} & {golem}",
+    "text": "Working with {profvis} & {golem}\nand wrap run_app() in print(), then profvis()…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
   },
   {
     "objectID": "materials/d1-04-deploy-admin/index.html#more-to-come",
@@ -207,70 +228,70 @@
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-function-ui",
     "title": "Application Structure",
     "section": "Anatomy of a Function (UI)",
-    "text": "Anatomy of a Function (UI)\n\n\nartUI &lt;- function() {\n  tagList(\n    checkboxInput(\n      \"input1\",\n      \"Check Here\"\n    ),\n    selectInput(\n      \"input2\",\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    ),\n    plotOutput(\"plot1\")\n  )\n}"
+    "text": "Anatomy of a Function (UI)\n\n\nset_picker_ui &lt;- function() {\n  tagList(\n    selectInput(\n      inputId = \"set_num\",\n      label = \"Select a set\"\n      choices = c(\"set1\", \"set2\"),\n      selected = \"set1\",\n      multiple = FALSE\n    )\n  )\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
     "title": "Application Structure",
     "section": "Anatomy of a Module (UI)",
-    "text": "Anatomy of a Module (UI)\n\n\nartUI &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    ),\n    plotOutput(ns(\"plot1\"))\n  )\n}"
+    "text": "Anatomy of a Module (UI)\n\n\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
     "title": "Application Structure",
     "section": "Anatomy of a Module (UI)",
-    "text": "Anatomy of a Module (UI)\n\n\nartUI &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = c(\"jar\", \"vase\"),\n      selected = \"jar\",\n      multiple = FALSE\n    )\n  )\n}\n\n\nid: String to use for namespace\nns &lt;- NS(id): Create proper namespace function"
+    "text": "Anatomy of a Module (UI)\n\n\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\nid: String to use for namespace\nns &lt;- NS(id): Create proper namespace function"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nartServer &lt;- function(input, output, session) {\n  df &lt;- reactive({\n    # do something fancy\n  })\n  \n  output$plot1 &lt;- renderPlot({\n    ggplot(df(), aes(x = x, y = y)) +\n      geom_point()\n  })\n}"
+    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(input, output, session, sets_rv) {\n  set_choices &lt;- reactive({\n    # do something with sets_rv\n  })\n\n  observeEvent(set_choices(), {\n    req(set_choices())\n    updateSelectInput(\n      \"set_num\",\n      choices = set_choices()\n    )\n  })\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nartServer &lt;- function(id) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      df &lt;- reactive({\n        # do something fancy\n      })\n      \n      output$plot1 &lt;- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point()\n      })\n    }\n  )\n}\n\nMinimal changes necessary"
+    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\nMinimal changes necessary"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nartServer &lt;- function(id) {\n  moduleServer(id,\n    function(input, output, session) {\n      df &lt;- reactive({\n        # do something fancy\n      })\n      \n      output$plot1 &lt;- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point()\n      })\n    }\n  )\n}\n\n:thinking: id\n\n\n\n`moduleServer(): Encapsulate server-side logic with namespace applied."
+    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\n:thinking: id\n\n\n\n`moduleServer(): Encapsulate server-side logic with namespace applied."
   },
   {
     "objectID": "materials/d1-02-structure/index.html#invoking-modules",
     "href": "materials/d1-02-structure/index.html#invoking-modules",
     "title": "Application Structure",
     "section": "Invoking Modules",
-    "text": "Invoking Modules\nui &lt;- fluidPage(\n  fluidRow(\n    artUI(\"mod1\")\n  )\n)\n\nserver &lt;- function(input, output, session) {\n  artServer(\"mod1\")\n}\n\nshinyApp(ui, server)"
+    "text": "Invoking Modules\nlibrary(shiny)\nlibrary(bslib)\nui &lt;- page_fluid(\n  set_picker_ui(\"mod1\")\n)\n\nserver &lt;- function(input, output, session) {\n  sets_rv &lt;- reactive({\n    # processing\n  })\n\n  set_picker_server(\"mod1\", sets_rv)\n}\n\nshinyApp(ui, server)"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#giving-and-receiving",
     "href": "materials/d1-02-structure/index.html#giving-and-receiving",
     "title": "Application Structure",
     "section": "Giving and Receiving",
-    "text": "Giving and Receiving\n\n\nartUI &lt;- function(id, choices = c(\"jar\", \"vase\")) {\n  ns &lt;- NS(id)\n  tagList(\n    checkboxInput(\n      ns(\"input1\"),\n      \"Check Here\"\n    ),\n    selectInput(\n      ns(\"input2\"),\n      \"Select Object\",\n      choices = choices,\n      selected = choices[1],\n      multiple = FALSE\n    ),\n    plotOutput(ns(\"plot1\"))\n  )\n}\n\n\nReasonable inputs: static values, vectors, flags\nAvoid reactive parameters\nReturn value: tagList() of inputs, output placeholders, and other UI elements"
+    "text": "Giving and Receiving\n\n\nset_picker_ui &lt;- function(id, label = \"Select a set\") {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = label,\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\nReasonable inputs: static values, vectors, flags\nAvoid reactive parameters\nReturn value: tagList() of inputs, output placeholders, and other UI elements"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#giving-and-receiving-1",
     "href": "materials/d1-02-structure/index.html#giving-and-receiving-1",
     "title": "Application Structure",
     "section": "Giving and Receiving",
-    "text": "Giving and Receiving\nartServer &lt;- function(id, df, title = \"My Plot\") {\n  moduleServer(id,\n    function(input, output, session) {\n      user_selections &lt;- reactive({\n        list(input1 = input$input1, input2 = input$input2)\n      })\n      \n      output$plot1 &lt;- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point() +\n          ggtitle(title)\n      })\n      \n      user_selections\n    }\n  )\n}\n\nInput parameters (and return values) can be a mix of static and reactive objects"
+    "text": "Giving and Receiving\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\nInput parameters (and return values) can be a mix of static and reactive objects"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#to-or-not-to",
     "href": "materials/d1-02-structure/index.html#to-or-not-to",
     "title": "Application Structure",
     "section": "To () or not to ()",
-    "text": "To () or not to ()\n\n\n# app server\ndf &lt;- reactive({\n  art_data |&gt;\n    filter(dept == input$dept)\n})\n\nartServer(\"mod1\", df)\n\nartServer &lt;- function(id, df, title = \"Amazing\") {\n  moduleServer(id,\n    function(input, output, session) {\n      user_selections &lt;- reactive({\n        list(input1 = input$input1,\n             input2 = input$input2)\n      })\n      \n      output$plot1 &lt;- renderPlot({\n        ggplot(df(), aes(x = x, y = y)) +\n          geom_point() +\n          ggtitle(title)\n      })\n      \n      user_selections\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: df\nInside module, invoke reactive parameter as you would any other reactive in Shiny: df()\nAny reactive(s) returned by module should also be reference by name: user_selections, user_selections()\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "To () or not to ()\n\n\n# app server\nsets_rv &lt;- reactive({\n  # processing\n})\n\nset_picker_server(\"mod1\", sets_rv)\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n\n      set_selection  &lt;- reactive({\n        input$set_num\n      })\n\n      set_selection\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: sets_rv\nInside module, invoke reactive parameter as you would any other reactive in Shiny: sets_rv()\nAny reactive(s) returned by module should also be reference by name: set_selection, set_selection()\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
   },
   {
     "objectID": "materials/d1-01-welcome/index.html#welcome-to-positconf2023",
@@ -333,7 +354,21 @@
     "href": "materials/d1-01-welcome/index.html#the-journey-ahead",
     "title": "Welcome!",
     "section": "The Journey Ahead",
-    "text": "The Journey Ahead\n\nProduction has more than one meaning for Shiny apps\n\n\nThe tooling & principles discussed in this workshop will guide you to the destination\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "The Journey Ahead\n\nProduction has more than one meaning for Shiny apps\n\n\nThe tooling & principles discussed in this workshop will guide you to the destination"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
+    "href": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
+    "title": "Welcome!",
+    "section": "Rebrickable Inventory Dashboard",
+    "text": "Rebrickable Inventory Dashboard\n\nRebrickable: Portal for LEGO builders to discover what sets they can build with their own inventory\nA comprehensive database of LEGO items available for free!\nWe will build a Shiny dashboard to explore the inventory and enable users to generate predictions"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#our-journey-to-production",
+    "href": "materials/d1-01-welcome/index.html#our-journey-to-production",
+    "title": "Welcome!",
+    "section": "Our Journey to Production",
+    "text": "Our Journey to Production\n\nCreate a robust infrastructure for application source code\nIdentify and solve performance bottlenecks\nEnsure app is only doing the “bare minimum” for a snappy user experience\nTune deployment to meet demand of potentially many simultaneous users\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
   },
   {
     "objectID": "index.html",
