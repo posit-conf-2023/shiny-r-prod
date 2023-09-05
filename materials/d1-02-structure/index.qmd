@@ -1,12 +1,12 @@
 ---
 title: "Application Structure"
-title-slide-attributes: 
+title-slide-attributes:
   data-background-image: assets/img/lego_city.jpg
   data-background-size: contain
   data-background-opacity: "0.3"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
-format: 
+format:
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
@@ -31,7 +31,7 @@ Imagine your application is working great!
 
 <br>
 
-. . . 
+. . .
 
 :::: {.columns .v-center-container}
 
@@ -81,7 +81,7 @@ remotes::install_github("pkg")
 * Next generation of `{packrat}`
 * Isolated package library from rest of your system
 * Transfer projects to different collaborators / platforms
-* **Reproducible** package installation 
+* **Reproducible** package installation
 * Easily create new projects or convert existing projects with RStudio or built-in functions.
 
 ## Under the Hood
@@ -126,7 +126,43 @@ Prototype apps can coast by with a single `app.R`
 * Streamlines deployment on multiple platforms
 
 ::: {.notes}
-Additional content on golem goes here. Remove this note when finished.
+* Developed by Colin Fay & the ThinkR team in France
+* The moral of the stoary is that Shiny apps can get really big, really fast
+  + We need to provide a lot of structure and guardrails; similar to what we do when developing *R packages*
+  + This is why {golem} apps *are* R packages
+* Once you go {golem}, you never go back
+:::
+
+## {golem} project structure
+
+```
+├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   ├── app_config.R
+│   ├── app_server.R
+│   ├── app_ui.R
+│   └── run_app.R
+├── dev
+│   ├── 01_start.R
+│   ├── 02_dev.R
+│   ├── 03_deploy.R
+│   └── run_dev.R
+├── inst
+│   ├── app
+│   │   └── www
+│   │       └── favicon.ico
+│   └── golem-config.yml
+└── man
+    └── run_app.Rd
+```
+
+::: {.notes}
+* Looks a LOT like an R package's structure (because it is one!)
+* I want to just highlight the two directories `dev` and `R`
+  + The scripts in `dev` have functions that safely do other things within the package (create scripts, add dependencies, etc.)
+  + Some scripts in this directory will create other scripts in the `R` directory
+  + The `R` directory is where all of the logic lives (your modules, custom functions, and UI/Server scripts)
 :::
 
 # All About Modules
@@ -364,7 +400,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-## Giving and Receiving 
+## Giving and Receiving
 
 :::: {.columns}
 
@@ -389,13 +425,13 @@ set_picker_ui <- function(id, label = "Select a set") {
 
 * Reasonable inputs: static values, vectors, flags
 * Avoid **reactive** parameters
-* Return value: `tagList()` of inputs, output placeholders, and other UI elements 
+* Return value: `tagList()` of inputs, output placeholders, and other UI elements
 
 :::
 
 ::::
 
-## Giving and Receiving 
+## Giving and Receiving
 
 ```{.r}
 set_picker_server <- function(id, sets_rv) {
