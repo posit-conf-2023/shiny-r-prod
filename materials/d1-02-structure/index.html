@@ -501,7 +501,58 @@
 <li class="fragment">Streamlines deployment on multiple platforms</li>
 </ul>
 <aside class="notes">
-<p>Additional content on golem goes here. Remove this note when finished.</p>
+<ul>
+<li>Developed by Colin Fay &amp; the ThinkR team in France</li>
+<li>The moral of the stoary is that Shiny apps can get really big, really fast
+<ul>
+<li>We need to provide a lot of structure and guardrails; similar to what we do when developing <em>R packages</em></li>
+<li>This is why {golem} apps <em>are</em> R packages</li>
+</ul></li>
+<li>Once you go {golem}, you never go back</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="golem-project-structure" class="slide level2">
+<h2>{golem} project structure</h2>
+<pre><code>├── DESCRIPTION
+├── NAMESPACE
+├── R
+│   ├── app_config.R
+│   ├── app_server.R
+│   ├── app_ui.R
+│   └── run_app.R
+├── dev
+│   ├── 01_start.R
+│   ├── 02_dev.R
+│   ├── 03_deploy.R
+│   └── run_dev.R
+├── inst
+│   ├── app
+│   │   └── www
+│   │       └── favicon.ico
+│   └── golem-config.yml
+└── man
+    └── run_app.Rd</code></pre>
+<aside class="notes">
+<ul>
+<li>Looks a LOT like an R package’s structure (because it is one!)</li>
+<li>I want to just highlight the two directories <code>dev</code> and <code>R</code>
+<ul>
+<li>The scripts in <code>dev</code> have functions that safely do other things within the package (create scripts, add dependencies, etc.)</li>
+<li>Some scripts in this directory will create other scripts in the <code>R</code> directory</li>
+<li>The <code>R</code> directory is where all of the logic lives (your modules, custom functions, and UI/Server scripts)</li>
+</ul></li>
+</ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -559,33 +610,13 @@
 <h2 data-id="quarto-animate-title">Anatomy of a Function (UI)</h2>
 <div class="columns">
 <div class="column" style="width:60%;">
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb2-1" class="hljs-ln-code"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
-<span id="cb2-2" class="hljs-ln-code"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
-<span id="cb2-3" class="hljs-ln-code"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
-<span id="cb2-4" class="hljs-ln-code"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="st">"set_num"</span>,</span>
-<span id="cb2-5" class="hljs-ln-code"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
-<span id="cb2-6" class="hljs-ln-code"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"set1"</span>, <span class="st">"set2"</span>),</span>
-<span id="cb2-7" class="hljs-ln-code"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">selected =</span> <span class="st">"set1"</span>,</span>
-<span id="cb2-8" class="hljs-ln-code"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
-<span id="cb2-9" class="hljs-ln-code"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-10" class="hljs-ln-code"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-11" class="hljs-ln-code"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div><div class="column" style="width:40%;">
-
-</div>
-</div>
-</section>
-<section id="anatomy-of-a-module-ui" class="slide level2" data-auto-animate="true">
-<h2 data-id="quarto-animate-title">Anatomy of a Module (UI)</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb3-1" class="hljs-ln-code"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id) {</span>
-<span id="cb3-2" class="hljs-ln-code"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
-<span id="cb3-3" class="hljs-ln-code"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
-<span id="cb3-4" class="hljs-ln-code"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
-<span id="cb3-5" class="hljs-ln-code"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
-<span id="cb3-6" class="hljs-ln-code"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
-<span id="cb3-7" class="hljs-ln-code"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb3-1" class="hljs-ln-code"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-2" class="hljs-ln-code"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
+<span id="cb3-3" class="hljs-ln-code"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
+<span id="cb3-4" class="hljs-ln-code"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="st">"set_num"</span>,</span>
+<span id="cb3-5" class="hljs-ln-code"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
+<span id="cb3-6" class="hljs-ln-code"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(<span class="st">"set1"</span>, <span class="st">"set2"</span>),</span>
+<span id="cb3-7" class="hljs-ln-code"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">selected =</span> <span class="st">"set1"</span>,</span>
 <span id="cb3-8" class="hljs-ln-code"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
 <span id="cb3-9" class="hljs-ln-code"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-10" class="hljs-ln-code"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span>
@@ -595,21 +626,41 @@
 </div>
 </div>
 </section>
+<section id="anatomy-of-a-module-ui" class="slide level2" data-auto-animate="true">
+<h2 data-id="quarto-animate-title">Anatomy of a Module (UI)</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb4-1" class="hljs-ln-code"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id) {</span>
+<span id="cb4-2" class="hljs-ln-code"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
+<span id="cb4-3" class="hljs-ln-code"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
+<span id="cb4-4" class="hljs-ln-code"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
+<span id="cb4-5" class="hljs-ln-code"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
+<span id="cb4-6" class="hljs-ln-code"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
+<span id="cb4-7" class="hljs-ln-code"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
+<span id="cb4-8" class="hljs-ln-code"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-9" class="hljs-ln-code"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-10" class="hljs-ln-code"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-11" class="hljs-ln-code"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:40%;">
+
+</div>
+</div>
+</section>
 <section id="anatomy-of-a-module-ui-1" class="slide level2">
 <h2>Anatomy of a Module (UI)</h2>
 <div class="columns">
 <div class="column" style="width:60%;">
-<div class="sourceCode" id="cb4" data-code-line-numbers="1,2,5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id) {</span>
-<span id="cb4-2"><a href="#cb4-2"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
-<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">tagList</span>(</span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="fu">selectInput</span>(</span>
-<span id="cb4-5"><a href="#cb4-5"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
-<span id="cb4-6"><a href="#cb4-6"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
-<span id="cb4-8"><a href="#cb4-8"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a>    )</span>
-<span id="cb4-10"><a href="#cb4-10"></a>  )</span>
-<span id="cb4-11"><a href="#cb4-11"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5" data-code-line-numbers="1,2,5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id) {</span>
+<span id="cb5-2"><a href="#cb5-2"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="fu">tagList</span>(</span>
+<span id="cb5-4"><a href="#cb5-4"></a>    <span class="fu">selectInput</span>(</span>
+<span id="cb5-5"><a href="#cb5-5"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
+<span id="cb5-6"><a href="#cb5-6"></a>      <span class="at">label =</span> <span class="st">"Select a set"</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
+<span id="cb5-8"><a href="#cb5-8"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>    )</span>
+<span id="cb5-10"><a href="#cb5-10"></a>  )</span>
+<span id="cb5-11"><a href="#cb5-11"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:40%;">
 <ul>
 <li class="fragment"><code>id</code>: String to use for namespace</li>
@@ -622,19 +673,19 @@
 <h2 data-id="quarto-animate-title">Anatomy of a Module (Server)</h2>
 <div class="columns">
 <div class="column" style="width:75%;">
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb5-1" class="hljs-ln-code"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session, sets_rv) {</span>
-<span id="cb5-2" class="hljs-ln-code"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb5-3" class="hljs-ln-code"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># do something with sets_rv</span></span>
-<span id="cb5-4" class="hljs-ln-code"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb5-5" class="hljs-ln-code"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6" class="hljs-ln-code"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
-<span id="cb5-7" class="hljs-ln-code"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
-<span id="cb5-8" class="hljs-ln-code"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">updateSelectInput</span>(</span>
-<span id="cb5-9" class="hljs-ln-code"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"set_num"</span>,</span>
-<span id="cb5-10" class="hljs-ln-code"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
-<span id="cb5-11" class="hljs-ln-code"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-12" class="hljs-ln-code"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb5-13" class="hljs-ln-code"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb6-1" class="hljs-ln-code"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session, sets_rv) {</span>
+<span id="cb6-2" class="hljs-ln-code"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb6-3" class="hljs-ln-code"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># do something with sets_rv</span></span>
+<span id="cb6-4" class="hljs-ln-code"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb6-5" class="hljs-ln-code"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6" class="hljs-ln-code"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
+<span id="cb6-7" class="hljs-ln-code"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
+<span id="cb6-8" class="hljs-ln-code"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">updateSelectInput</span>(</span>
+<span id="cb6-9" class="hljs-ln-code"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"set_num"</span>,</span>
+<span id="cb6-10" class="hljs-ln-code"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
+<span id="cb6-11" class="hljs-ln-code"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-12" class="hljs-ln-code"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb6-13" class="hljs-ln-code"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:25%;">
 
 </div>
@@ -644,24 +695,24 @@
 <h2 data-id="quarto-animate-title">Anatomy of a Module (Server)</h2>
 <div class="columns">
 <div class="column" style="width:75%;">
-<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb6-1" class="hljs-ln-code"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
-<span id="cb6-2" class="hljs-ln-code"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
-<span id="cb6-3" class="hljs-ln-code"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
-<span id="cb6-4" class="hljs-ln-code"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb6-5" class="hljs-ln-code"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb6-6" class="hljs-ln-code"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># do something with sets_rv</span></span>
-<span id="cb6-7" class="hljs-ln-code"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      })</span>
-<span id="cb6-8" class="hljs-ln-code"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9" class="hljs-ln-code"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
-<span id="cb6-10" class="hljs-ln-code"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
-<span id="cb6-11" class="hljs-ln-code"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">updateSelectInput</span>(</span>
-<span id="cb6-12" class="hljs-ln-code"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">"set_num"</span>,</span>
-<span id="cb6-13" class="hljs-ln-code"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
-<span id="cb6-14" class="hljs-ln-code"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb6-15" class="hljs-ln-code"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      })</span>
-<span id="cb6-16" class="hljs-ln-code"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb6-17" class="hljs-ln-code"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-18" class="hljs-ln-code"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb7-1" class="hljs-ln-code"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
+<span id="cb7-2" class="hljs-ln-code"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
+<span id="cb7-3" class="hljs-ln-code"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
+<span id="cb7-4" class="hljs-ln-code"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb7-5" class="hljs-ln-code"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb7-6" class="hljs-ln-code"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># do something with sets_rv</span></span>
+<span id="cb7-7" class="hljs-ln-code"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb7-8" class="hljs-ln-code"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9" class="hljs-ln-code"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
+<span id="cb7-10" class="hljs-ln-code"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
+<span id="cb7-11" class="hljs-ln-code"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">updateSelectInput</span>(</span>
+<span id="cb7-12" class="hljs-ln-code"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">"set_num"</span>,</span>
+<span id="cb7-13" class="hljs-ln-code"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
+<span id="cb7-14" class="hljs-ln-code"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb7-15" class="hljs-ln-code"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb7-16" class="hljs-ln-code"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-17" class="hljs-ln-code"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-18" class="hljs-ln-code"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:25%;">
 <p>Minimal changes necessary</p>
 </div>
@@ -671,24 +722,24 @@
 <h2 data-id="quarto-animate-title">Anatomy of a Module (Server)</h2>
 <div class="columns">
 <div class="column" style="width:70%;">
-<div class="sourceCode" id="cb7" data-code-line-numbers="1,2"><pre class="sourceCode numberSource r number-lines code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb7-1" class="hljs-ln-code"><a href="#cb7-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
-<span id="cb7-2" class="hljs-ln-code"><a href="#cb7-2"></a>  <span class="fu">moduleServer</span>(</span>
-<span id="cb7-3" class="hljs-ln-code"><a href="#cb7-3"></a>    id,</span>
-<span id="cb7-4" class="hljs-ln-code"><a href="#cb7-4"></a>    <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb7-5" class="hljs-ln-code"><a href="#cb7-5"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb7-6" class="hljs-ln-code"><a href="#cb7-6"></a>        <span class="co"># do something with sets_rv</span></span>
-<span id="cb7-7" class="hljs-ln-code"><a href="#cb7-7"></a>      })</span>
-<span id="cb7-8" class="hljs-ln-code"><a href="#cb7-8"></a></span>
-<span id="cb7-9" class="hljs-ln-code"><a href="#cb7-9"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
-<span id="cb7-10" class="hljs-ln-code"><a href="#cb7-10"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
-<span id="cb7-11" class="hljs-ln-code"><a href="#cb7-11"></a>        <span class="fu">updateSelectInput</span>(</span>
-<span id="cb7-12" class="hljs-ln-code"><a href="#cb7-12"></a>          <span class="st">"set_num"</span>,</span>
-<span id="cb7-13" class="hljs-ln-code"><a href="#cb7-13"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
-<span id="cb7-14" class="hljs-ln-code"><a href="#cb7-14"></a>        )</span>
-<span id="cb7-15" class="hljs-ln-code"><a href="#cb7-15"></a>      })</span>
-<span id="cb7-16" class="hljs-ln-code"><a href="#cb7-16"></a>    }</span>
-<span id="cb7-17" class="hljs-ln-code"><a href="#cb7-17"></a>  )</span>
-<span id="cb7-18" class="hljs-ln-code"><a href="#cb7-18"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8" data-code-line-numbers="1,2"><pre class="sourceCode numberSource r number-lines code-with-copy" data-id="quarto-animate-code"><code class="sourceCode r hljs"><span id="cb8-1" class="hljs-ln-code"><a href="#cb8-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
+<span id="cb8-2" class="hljs-ln-code"><a href="#cb8-2"></a>  <span class="fu">moduleServer</span>(</span>
+<span id="cb8-3" class="hljs-ln-code"><a href="#cb8-3"></a>    id,</span>
+<span id="cb8-4" class="hljs-ln-code"><a href="#cb8-4"></a>    <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb8-5" class="hljs-ln-code"><a href="#cb8-5"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb8-6" class="hljs-ln-code"><a href="#cb8-6"></a>        <span class="co"># do something with sets_rv</span></span>
+<span id="cb8-7" class="hljs-ln-code"><a href="#cb8-7"></a>      })</span>
+<span id="cb8-8" class="hljs-ln-code"><a href="#cb8-8"></a></span>
+<span id="cb8-9" class="hljs-ln-code"><a href="#cb8-9"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
+<span id="cb8-10" class="hljs-ln-code"><a href="#cb8-10"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
+<span id="cb8-11" class="hljs-ln-code"><a href="#cb8-11"></a>        <span class="fu">updateSelectInput</span>(</span>
+<span id="cb8-12" class="hljs-ln-code"><a href="#cb8-12"></a>          <span class="st">"set_num"</span>,</span>
+<span id="cb8-13" class="hljs-ln-code"><a href="#cb8-13"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
+<span id="cb8-14" class="hljs-ln-code"><a href="#cb8-14"></a>        )</span>
+<span id="cb8-15" class="hljs-ln-code"><a href="#cb8-15"></a>      })</span>
+<span id="cb8-16" class="hljs-ln-code"><a href="#cb8-16"></a>    }</span>
+<span id="cb8-17" class="hljs-ln-code"><a href="#cb8-17"></a>  )</span>
+<span id="cb8-18" class="hljs-ln-code"><a href="#cb8-18"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:30%;">
 <p>:thinking: <code>id</code></p>
 </div>
@@ -699,37 +750,37 @@
 </section>
 <section id="invoking-modules" class="slide level2">
 <h2>Invoking Modules</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bslib)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">page_fluid</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_picker_ui</span>(<span class="st">"mod1"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  sets_rv <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># processing</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_picker_server</span>(<span class="st">"mod1"</span>, sets_rv)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(ui, server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bslib)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ui <span class="ot">&lt;-</span> <span class="fu">page_fluid</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_picker_ui</span>(<span class="st">"mod1"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  sets_rv <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># processing</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_picker_server</span>(<span class="st">"mod1"</span>, sets_rv)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">shinyApp</span>(ui, server)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="giving-and-receiving" class="slide level2">
 <h2>Giving and Receiving</h2>
 <div class="columns">
 <div class="column" style="width:60%;">
-<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id, <span class="at">label =</span> <span class="st">"Select a set"</span>) {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> label,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>set_picker_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(id, <span class="at">label =</span> <span class="st">"Select a set"</span>) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  ns <span class="ot">&lt;-</span> <span class="fu">NS</span>(id)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tagList</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">selectInput</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">inputId =</span> <span class="fu">ns</span>(<span class="st">"set_num"</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> label,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">choices =</span> <span class="fu">c</span>(),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">multiple =</span> <span class="cn">FALSE</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:40%;">
 <ul>
 <li class="fragment">Reasonable inputs: static values, vectors, flags</li>
@@ -741,24 +792,24 @@
 </section>
 <section id="giving-and-receiving-1" class="slide level2">
 <h2>Giving and Receiving</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># do something with sets_rv</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      })</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">updateSelectInput</span>(</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">"set_num"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>      })</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      set_choices <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># do something with sets_rv</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">observeEvent</span>(<span class="fu">set_choices</span>(), {</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">req</span>(<span class="fu">set_choices</span>())</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">updateSelectInput</span>(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>          <span class="st">"set_num"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">choices =</span> <span class="fu">set_choices</span>()</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li class="fragment">Input parameters (and return values) can be a mix of static and <strong>reactive</strong> objects</li>
 </ul>
@@ -767,27 +818,27 @@
 <h2>To () or not to ()</h2>
 <div class="columns">
 <div class="column" style="width:40%;">
-<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># app server</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sets_rv <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># processing</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set_picker_server</span>(<span class="st">"mod1"</span>, sets_rv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># app server</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>sets_rv <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># processing</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set_picker_server</span>(<span class="st">"mod1"</span>, sets_rv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:60%;">
-<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      <span class="co"># ...</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>      set_selection  <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        input<span class="sc">$</span>set_num</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>      })</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>      set_selection</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>set_picker_server <span class="ot">&lt;-</span> <span class="cf">function</span>(id, sets_rv) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">moduleServer</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    id,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      <span class="co"># ...</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      set_selection  <span class="ot">&lt;-</span> <span class="fu">reactive</span>({</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        input<span class="sc">$</span>set_num</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      })</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>      set_selection</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <ul>
