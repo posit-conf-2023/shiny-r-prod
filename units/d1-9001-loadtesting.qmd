@@ -1,0 +1,32 @@
+---
+title: "Load Testing"
+subtitle: "TBD"
+author: "Eric Nantz & Michael Thomas"
+date: "2023-09-18"
+listing:
+  - id: exercises
+    contents:
+      - ../materials/d1-9001-loadtesting/ex-*.qmd
+    type: table
+    fields: [subtitle, title]
+    field-display-names: 
+      subtitle: "Exercise"
+    sort: [filename]
+    sort-ui: false
+    filter-ui: false
+    image-placeholder: assets/img/placeholder.png
+tbl-colwidths: [5,20,75]
+---
+
+## Slides
+
+::: callout-warning
+These slides are under construction and will be finalized prior to the workshop date.
+:::
+
+[View slides in full screen](../materials/d1-9001-loadtesting/index.html)
+
+```{=html}
+<iframe class="slide-deck" src="../materials/d1-9001-loadtesting/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
+```
+

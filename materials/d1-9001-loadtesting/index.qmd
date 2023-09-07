@@ -1,0 +1,38 @@
+---
+title: "Load Testing with `{shinyloadtest}`"
+subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
+author: "TBD"
+footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
+format: 
+  revealjs:
+    theme: [default, ../slides.scss] # moon= teal bg  |  dark
+    scrollable: true
+    incremental: true
+    slide-number: c/t # c/t | c | h/v | h.v
+    slide-tone: false #true
+    code-line-numbers: false
+    history: false
+---
+
+## One to Many
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![single-user](assets/img/lego_single_user_computer.png)
+:::
+
+::: {.column width="50%"}
+![crowd](assets/img/lego_crowd.jpg)
+:::
+
+::::
+
+## Optimization Loop Method
+
+![](assets/img/loop.svg)
+
+::: footer
+[rstudio.github.io/shinyloadtest/articles/case-study-scaling.html](https://rstudio.github.io/shinyloadtest/articles/case-study-scaling.html)
+:::
+
