@@ -30,7 +30,7 @@ recording_file <- "R/recording.log"
 
 shinyloadtest::record_session(
   app_link, 
-  output_file = "R/recording.log",
+  output_file = recording_file,
   connect_api_key = Sys.getenv("RSCONNECT_KEY")
 )
 
@@ -54,6 +54,18 @@ exec_wait(
     "--overwrite-output"
   )
 )
+
+df <- load_runs("Run 1" = "R/run1")
+
+shinyloadtest_report(
+  df, 
+  output = "R/report_test.html"
+)
+
+# experiment with creating single plots
+dur_plot <- slt_session_duration(df)
+plotly::ggplotly(dur_plot)
+
 
 # comparison run (3 workers)
 exec_wait(
