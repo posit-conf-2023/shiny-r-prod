@@ -123,8 +123,8 @@ shinyloadtest_report(df, "R/report1.html")
 library(connectapi)
 
 client <- connect(
-  server = paste0("https://", Sys.getenv("RSCONNECT_SERVER")),
-  api_key = Sys.getenv("RSCONNECT_KEY")
+  server = paste0("https://", Sys.getenv("CONNECT_SERVER")),
+  api_key = Sys.getenv("CONNECT_API_KEY")
 )
 
 content_df <- get_content(client)
