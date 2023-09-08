@@ -1,5 +1,5 @@
 ---
-title: "Load Testing with `{shinyloadtest}`"
+title: "Load Testing"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
@@ -35,4 +35,85 @@ format:
 ::: footer
 [rstudio.github.io/shinyloadtest/articles/case-study-scaling.html](https://rstudio.github.io/shinyloadtest/articles/case-study-scaling.html)
 :::
+
+## Double the (Load-Testing) Fun
+
+#### `{shinyloadtest}`
+
+* Record the events of a Shiny application session
+* Process and analyze metrics associated with application runs
+
+#### `shinycannon`
+
+* Command-line utility to launch multiple application sessions and collect event-based metrics
+* Cross-platform (built with Kotlin)
+
+## Hosting Requirements
+
+* Application deployed to a server supporting [SockJS](https://github.com/sockjs/sockjs-client) (Posit Connect, Shiny Server)
+* If authentication required for app on Posit Connect, you'll need an API key
+
+## Recording a Session
+
+```{r}
+#| eval: false
+#| echo: true
+
+library(shinyloadtest)
+record_session("https://my-lego-app.me", output_file = "recording.log")
+```
+
+## Recorder Tips
+
+* Emulate a real-world usage of your application
+* Avoid rapid clicks / selections of your inputs
+
+## The log
+
+```
+# version: 1
+# target_url: https://my-lego-app.me/
+# target_type: RStudio Server Connect
+# rscApiKeyRequired: false
+{"type":"REQ_HOME","begin":"2023-09-07T13:03:39.042Z","end":"2023-09-07T13:03:40.138Z","status":200,"url":"/"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.332Z","end":"2023-09-07T13:03:40.502Z","status":200,"url":"/_w_${WORKER}/shiny-sass-1.7.5/shiny-sass.css"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.517Z","end":"2023-09-07T13:03:40.678Z","status":200,"url":"/_w_${WORKER}/bslib-grid-styles-0.5.1/grid.css"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.692Z","end":"2023-09-07T13:03:40.886Z","status":200,"url":"/_w_${WORKER}/bootstrap-5.2.2/bootstrap.min.css"}
+...
+...
+{"type":"WS_SEND","begin":"2023-09-07T13:04:17.805Z","message":"[\"D#0|m|{\\\"method\\\":\\\"update\\\",\\\"data\\\":{\\\"n_parts_display\\\":\\\"20\\\"}}\"]"}
+{"type":"WS_CLOSE","begin":"2023-09-07T13:04:35.561Z"}
+```
+
+. . .
+
+![](assets/img/confused_minifig.jpg){.absolute top=50 right=250 width="500px" height="500px"}
+
+## Loading the (shiny) cannon
+
+Command-line:
+
+```
+java -jar shinycannon-1.1.3-dd43f6b.jar \
+  recording.log \
+  https://my-lego-app.me \
+  --output-dir run1
+```
+
+Custom R function:
+
+```{r}
+#| eval: false
+#| echo: true
+
+source(file.path(here::here(), "R", "shinycannon.R"))
+
+shinycannon(
+  "shinycannon-1.1.3-dd43f6b.jar",
+  "recording.log",
+  "https://my-lego-app.me",
+  output_dir = "R/run1"
+)
+```
+
 

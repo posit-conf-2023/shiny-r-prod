@@ -25,7 +25,7 @@ library(sys)
 
 
 # define paths and constants
-app_link <- "https://rsc.training.rstudio.com/bricktest/"
+app_url <- "https://rsc.training.rstudio.com/bricktest/"
 recording_file <- "R/recording.log"
 
 shinyloadtest::record_session(
@@ -36,6 +36,13 @@ shinyloadtest::record_session(
 
 # use the exec_wait function from sys
 shinycannon_path <- "utils/shinycannon-1.1.3-dd43f6b.jar"
+
+shinycannon(
+  shinycannon_path,
+  recording_file,
+  app_url,
+  output_dir = "R/run1"
+)
 
 # baseline run
 exec_wait(
