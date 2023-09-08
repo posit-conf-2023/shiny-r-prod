@@ -217,6 +217,27 @@
     "text": "{golem} project structure\n├── DESCRIPTION\n├── NAMESPACE\n├── R\n│   ├── app_config.R\n│   ├── app_server.R\n│   ├── app_ui.R\n│   └── run_app.R\n├── dev\n│   ├── 01_start.R\n│   ├── 02_dev.R\n│   ├── 03_deploy.R\n│   └── run_dev.R\n├── inst\n│   ├── app\n│   │   └── www\n│   │       └── favicon.ico\n│   └── golem-config.yml\n└── man\n    └── run_app.Rd\n\n\nLooks a LOT like an R package’s structure (because it is one!)\nI want to just highlight the two directories dev and R\n\nThe scripts in dev have functions that safely do other things within the package (create scripts, add dependencies, etc.)\nSome scripts in this directory will create other scripts in the R directory\nThe R directory is where all of the logic lives (your modules, custom functions, and UI/Server scripts)"
   },
   {
+    "objectID": "materials/d1-02-structure/index.html#getting-started-with-golem",
+    "href": "materials/d1-02-structure/index.html#getting-started-with-golem",
+    "title": "Application Structure",
+    "section": "Getting Started with {golem}",
+    "text": "Getting Started with {golem}\nUse helper functions in dev/01_start.R to…\n\nCreate DESCRIPTION, README, LICENSE (etc.) files\nUse git, tests\nAdd your own favicon 🚀\n\n\n\nThis file and the functions it includes help you manage things at the project-level"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#developing-with-golem",
+    "href": "materials/d1-02-structure/index.html#developing-with-golem",
+    "title": "Application Structure",
+    "section": "Developing with {golem}",
+    "text": "Developing with {golem}\nUse the helper functions in dev/02_dev.R to…\n\nAdd R package dependencies\nCreate custom functions\nAdd Shiny modules\n\n\nAnd use dev/run_dev.R to run your app\n\n\nAs you run these functions and watch in awe as your DESCRIPTION file changes automatically, as new .R files magically appear out of thin air that have already handled all of the tricky parts for you, you too will realize that {golem} is the ChatGPT of Shiny development"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#deploying-with-golem",
+    "href": "materials/d1-02-structure/index.html#deploying-with-golem",
+    "title": "Application Structure",
+    "section": "Deploying with {golem}",
+    "text": "Deploying with {golem}\nUse the helper functions in dev/03_deploy.R to…\n\nCheck your R package ( devtools::check() )\nBuild your R package ( R CMD build mypackage )\nGenerate deployment files for\n\nRStudio Connect\nShinyapps.io\nYour own Shiny Server\nDockerized deployments (e.g., ShinyProxy)"
+  },
+  {
     "objectID": "materials/d1-02-structure/index.html#what-are-modules",
     "href": "materials/d1-02-structure/index.html#what-are-modules",
     "title": "Application Structure",
