@@ -7,11 +7,13 @@ format:
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
-    incremental: true
+    incremental: false
     slide-number: c/t # c/t | c | h/v | h.v
     slide-tone: false #true
-    code-line-numbers: false
+    code-line-numbers: true
     history: false
+revealjs-plugins:
+  - codewindow
 ---
 
 ## One to Many
@@ -91,17 +93,24 @@ record_session("https://my-lego-app.me", output_file = "recording.log")
 
 ## Loading the (shiny) cannon
 
-Command-line:
-
-```
+::: {.codewindow}
+bash
+```{bash}
+#| eval: false
+#| echo: true
 java -jar shinycannon-1.1.3-dd43f6b.jar \
   recording.log \
   https://my-lego-app.me \
+  --loaded-duration-minutes 2 \
+  --workers 1 \
   --output-dir run1
 ```
+:::
 
-Custom R function:
+. . .
 
+::: {.codewindow .r}
+run_shinycannon.R
 ```{r}
 #| eval: false
 #| echo: true
@@ -112,8 +121,59 @@ shinycannon(
   "shinycannon-1.1.3-dd43f6b.jar",
   "recording.log",
   "https://my-lego-app.me",
-  output_dir = "R/run1"
+  loaded_duration_minutes = 2,
+  workers = 1,
+  output_dir = "run1"
 )
 ```
+:::
+
+## Metrics
+
+```{css echo=FALSE}
+.smaller-output{
+  font-size: 80%;
+}
+```
+
+::: {.codewindow .r}
+analyze_recording.R
+```{r}
+#| eval: false
+#| echo: true
+library(shinyloadtest)
+df <- load_runs("Run 1" = "run1")
+```
+:::
 
 
+::: {.smaller-output}
+```{r}
+#| eval: true
+#| echo: false
+
+shinyloadtest::load_runs("Run 1" = file.path(here::here(), "R", "run1"))
+
+```
+:::
+
+## But Wait .. There's More
+
+::: {.codewindow .r}
+gen_report.R
+```{r}
+#| eval: false
+#| echo: true
+library(shinyloadtest)
+df <- load_runs("Run 1" = "run1")
+shinyloadtest_report(df, output = "report_test.html")
+```
+:::
+
+::: {.callout-warning title="TODO"}
+Add screenshot of HTML report with hyperlink
+:::
+
+# `r fontawesome::fa("people-carry", "white")` Code-Along {background-color="#17395c"}
+
+Code-Along 1: Record and analyze a baseline application session
