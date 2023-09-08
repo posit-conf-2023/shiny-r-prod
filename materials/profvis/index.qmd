@@ -33,8 +33,6 @@ R package for visualizing how (and how fast/slow) your R code runs
 
 Our `dev/run_dev.R` script is where we can profile our app interactively.
 
-We can modify the original code...
-
 ```{.r}
 options(golem.app.prod = FALSE)
 
@@ -44,10 +42,9 @@ golem::document_and_reload()
 
 run_app()
 ```
-
 ## Working with {profvis} & {golem} {auto-animate=true}
 
-and wrap `run_app()` in `print()`, then `profvis()`...
+Our `dev/run_dev.R` script is where we can profile our app interactively.
 
 ```{.r}
 options(golem.app.prod = FALSE)
