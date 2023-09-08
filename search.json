@@ -130,14 +130,14 @@
     "href": "materials/profvis/index.html#working-with-profvis-golem",
     "title": "Improving Performance by Profiling Your R Code",
     "section": "Working with {profvis} & {golem}",
-    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\nWe can modify the original code…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nrun_app()"
+    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nrun_app()"
   },
   {
     "objectID": "materials/profvis/index.html#working-with-profvis-golem-1",
     "href": "materials/profvis/index.html#working-with-profvis-golem-1",
     "title": "Improving Performance by Profiling Your R Code",
     "section": "Working with {profvis} & {golem}",
-    "text": "Working with {profvis} & {golem}\nand wrap run_app() in print(), then profvis()…\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()\n\n\n\nshinyprod.com"
+    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()\n\n\n\nshinyprod.com"
   },
   {
     "objectID": "materials/setup-resources/index.html#section-12",
