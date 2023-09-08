@@ -165,6 +165,46 @@ Prototype apps can coast by with a single `app.R`
   + The `R` directory is where all of the logic lives (your modules, custom functions, and UI/Server scripts)
 :::
 
+## Getting Started with {golem}
+
+Use helper functions in `dev/01_start.R` to...
+
+* Create `DESCRIPTION`, `README`, `LICENSE` (etc.) files
+* Use git, tests
+* Add your own favicon 🚀
+
+::: {.notes}
+- This file and the functions it includes help you manage things at the *project*-level
+:::
+
+## Developing with {golem}
+
+Use the helper functions in `dev/02_dev.R` to...
+
+* Add R package dependencies
+* Create custom functions
+* Add Shiny modules
+
+. . .
+
+And use `dev/run_dev.R` to run your app
+
+::: {.notes}
+- As you run these functions and watch in awe as your `DESCRIPTION` file changes automatically, as new .R files magically appear out of thin air that have already handled all of the tricky parts for you, you too will realize that {golem} is the ChatGPT of Shiny development
+:::
+
+## Deploying with {golem}
+
+Use the helper functions in `dev/03_deploy.R` to...
+
+* Check your R package ( `devtools::check()` )
+* Build your R package ( `R CMD build mypackage` )
+* Generate deployment files for
+  + RStudio Connect
+  + Shinyapps.io
+  + Your own Shiny Server
+  + Dockerized deployments (e.g., ShinyProxy)
+
 # All About Modules
 
 ## What are Modules?
