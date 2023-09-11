@@ -123,7 +123,7 @@
     "href": "materials/profvis/index.html#what-is-profvis",
     "title": "Improving Performance by Profiling Your R Code",
     "section": "What is {profvis}?",
-    "text": "What is {profvis}?\nR package for visualizing how (and how fast/slow) your R code runs\n{profvis} website\n\n\n\nThe package is from RStudio"
+    "text": "What is {profvis}?\nR package for visualizing how (and how fast/slow) your R code runs\n{profvis} website\n\n\n\nThe package is from RStudio\nHelp you understand the bottlenecks in your R code\nand, you guessed it, it works with Shiny too"
   },
   {
     "objectID": "materials/profvis/index.html#working-with-profvis-golem",
@@ -137,7 +137,14 @@
     "href": "materials/profvis/index.html#working-with-profvis-golem-1",
     "title": "Improving Performance by Profiling Your R Code",
     "section": "Working with {profvis} & {golem}",
-    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()\n\n\n\nshinyprod.com"
+    "text": "Working with {profvis} & {golem}\nOur dev/run_dev.R script is where we can profile our app interactively.\noptions(golem.app.prod = FALSE)\n\ngolem::detach_all_attached()\n\ngolem::document_and_reload()\n\nprofvis::profvis({\n  print(run_app())\n})\n\nYou need to wrap the run_app() function in print(), before passing it to profvis::profvis()"
+  },
+  {
+    "objectID": "materials/profvis/index.html#demo",
+    "href": "materials/profvis/index.html#demo",
+    "title": "Improving Performance by Profiling Your R Code",
+    "section": "Demo!",
+    "text": "Demo!\n\n\n\nShow how to change the dev/run_dev.R script to enable {profvis} profiling\nLaunch the app, navigate to the “Overview” page, and change a filter\nStop the app, and wait for the report to load\nDescribe the flamegraph, change the filters to only show events that took time\nNavigate to the ‘data’ tab and discuss what took the most time\n\n\n\n\nshinyprod.com"
   },
   {
     "objectID": "materials/setup-resources/index.html#section-12",
