@@ -25,6 +25,7 @@ format:
     #css: styles.css
     toc: true
     link-external-newwindow: true
+    code-line-numbers: true
 
 execute: 
   freeze: auto

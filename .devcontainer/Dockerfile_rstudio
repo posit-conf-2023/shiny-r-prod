@@ -1,5 +1,10 @@
 FROM ghcr.io/rocker-org/devcontainer/tidyverse:4.3
 
+ENV QUARTO_VERSION=prerelease
+
+# install preview version of quarto
+RUN /rocker_scripts/install_quarto.sh
+
 # key dependencies for utilities
 RUN apt-get update -qq \
   && export DEBIAN_FRONTEND=noninteractive \
@@ -23,3 +28,4 @@ RUN apt-get update -qq \
 
 # install R package dependencies
 RUN install2.r renv httpgd languageserver shiny rmarkdown markdown countdown fontawesome profvis golem rsconnect devtools 
+

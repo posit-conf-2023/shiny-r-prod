@@ -1,0 +1,179 @@
+---
+title: "Load Testing"
+subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
+author: "TBD"
+footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
+format: 
+  revealjs:
+    theme: [default, ../slides.scss] # moon= teal bg  |  dark
+    scrollable: true
+    incremental: false
+    slide-number: c/t # c/t | c | h/v | h.v
+    slide-tone: false #true
+    code-line-numbers: true
+    history: false
+revealjs-plugins:
+  - codewindow
+---
+
+## One to Many
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![single-user](assets/img/lego_single_user_computer.png)
+:::
+
+::: {.column width="50%"}
+![crowd](assets/img/lego_crowd.jpg)
+:::
+
+::::
+
+## Optimization Loop Method
+
+![](assets/img/loop.svg)
+
+::: footer
+[rstudio.github.io/shinyloadtest/articles/case-study-scaling.html](https://rstudio.github.io/shinyloadtest/articles/case-study-scaling.html)
+:::
+
+## Double the (Load-Testing) Fun
+
+#### `{shinyloadtest}`
+
+* Record the events of a Shiny application session
+* Process and analyze metrics associated with application runs
+
+#### `shinycannon`
+
+* Command-line utility to launch multiple application sessions and collect event-based metrics
+* Cross-platform (built with Kotlin)
+
+## Hosting Requirements
+
+* Application deployed to a server supporting [SockJS](https://github.com/sockjs/sockjs-client) (Posit Connect, Shiny Server)
+* If authentication required for app on Posit Connect, you'll need an API key
+
+## Recording a Session
+
+```{r}
+#| eval: false
+#| echo: true
+
+library(shinyloadtest)
+record_session("https://my-lego-app.me", output_file = "recording.log")
+```
+
+## Recorder Tips
+
+* Emulate a real-world usage of your application
+* Avoid rapid clicks / selections of your inputs
+
+## The log
+
+```
+# version: 1
+# target_url: https://my-lego-app.me/
+# target_type: RStudio Server Connect
+# rscApiKeyRequired: false
+{"type":"REQ_HOME","begin":"2023-09-07T13:03:39.042Z","end":"2023-09-07T13:03:40.138Z","status":200,"url":"/"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.332Z","end":"2023-09-07T13:03:40.502Z","status":200,"url":"/_w_${WORKER}/shiny-sass-1.7.5/shiny-sass.css"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.517Z","end":"2023-09-07T13:03:40.678Z","status":200,"url":"/_w_${WORKER}/bslib-grid-styles-0.5.1/grid.css"}
+{"type":"REQ_GET","begin":"2023-09-07T13:03:40.692Z","end":"2023-09-07T13:03:40.886Z","status":200,"url":"/_w_${WORKER}/bootstrap-5.2.2/bootstrap.min.css"}
+...
+...
+{"type":"WS_SEND","begin":"2023-09-07T13:04:17.805Z","message":"[\"D#0|m|{\\\"method\\\":\\\"update\\\",\\\"data\\\":{\\\"n_parts_display\\\":\\\"20\\\"}}\"]"}
+{"type":"WS_CLOSE","begin":"2023-09-07T13:04:35.561Z"}
+```
+
+. . .
+
+![](assets/img/confused_minifig.jpg){.absolute top=50 right=250 width="500px" height="500px"}
+
+## Loading the (shiny) cannon
+
+::: {.codewindow}
+bash
+```{bash}
+#| eval: false
+#| echo: true
+java -jar shinycannon-1.1.3-dd43f6b.jar \
+  recording.log \
+  https://my-lego-app.me \
+  --loaded-duration-minutes 2 \
+  --workers 1 \
+  --output-dir run1
+```
+:::
+
+. . .
+
+::: {.codewindow .r}
+run_shinycannon.R
+```{r}
+#| eval: false
+#| echo: true
+
+source(file.path(here::here(), "R", "shinycannon.R"))
+
+shinycannon(
+  "shinycannon-1.1.3-dd43f6b.jar",
+  "recording.log",
+  "https://my-lego-app.me",
+  loaded_duration_minutes = 2,
+  workers = 1,
+  output_dir = "run1"
+)
+```
+:::
+
+## Metrics
+
+```{css echo=FALSE}
+.smaller-output{
+  font-size: 80%;
+}
+```
+
+::: {.codewindow .r}
+analyze_recording.R
+```{r}
+#| eval: false
+#| echo: true
+library(shinyloadtest)
+df <- load_runs("Run 1" = "run1")
+```
+:::
+
+
+::: {.smaller-output}
+```{r}
+#| eval: true
+#| echo: false
+
+shinyloadtest::load_runs("Run 1" = file.path(here::here(), "R", "run1"))
+
+```
+:::
+
+## But Wait .. There's More
+
+::: {.codewindow .r}
+gen_report.R
+```{r}
+#| eval: false
+#| echo: true
+library(shinyloadtest)
+df <- load_runs("Run 1" = "run1")
+shinyloadtest_report(df, output = "report_test.html")
+```
+:::
+
+::: {.callout-warning title="TODO"}
+Add screenshot of HTML report with hyperlink
+:::
+
+# `r fontawesome::fa("people-carry", "white")` Code-Along {background-color="#17395c"}
+
+Code-Along 1: Record and analyze a baseline application session
