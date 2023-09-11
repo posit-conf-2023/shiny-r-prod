@@ -8,13 +8,15 @@ format:
 
 ## Overview 
 
+:::{.callout-tip collapse="true" title="Watch the video!"}
 ```{=html}
+<br />
 <div class="embed-youtube">
     <iframe src="https://www.youtube.com/embed/MlRwhDYI5Ec" width="750" height="563"></iframe>
 </div>
 ```
-
 <br />
+:::
 
 Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine.  In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience.  
 
