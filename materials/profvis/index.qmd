@@ -27,6 +27,8 @@ R package for visualizing how (and how fast/slow) your R code runs
 
 ::: {.notes}
 * The package is from RStudio
+* Help you understand the bottlenecks in your R code
+* and, you guessed it, it works with Shiny too
 :::
 
 ## Working with {profvis} & {golem} {auto-animate=true}
@@ -60,4 +62,16 @@ profvis::profvis({
 
 ::: {.notes}
 You need to wrap the `run_app()` function in `print()`, before passing it to `profvis::profvis()`
+:::
+
+## Demo!
+
+![](www/myspace_meme.png)
+
+::: {.notes}
+- Show how to change the `dev/run_dev.R` script to enable {profvis} profiling
+- Launch the app, navigate to the "Overview" page, and change a filter
+- Stop the app, and wait for the report to load
+- Describe the flamegraph, change the filters to only show events that took time
+- Navigate to the 'data' tab and discuss what took the most time
 :::
