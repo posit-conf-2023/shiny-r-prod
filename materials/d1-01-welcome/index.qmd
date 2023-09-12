@@ -7,7 +7,7 @@ format:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     css: assets/web/postit.css
     scrollable: true
-    incremental: true
+    incremental: false
     slide-number: c/t # c/t | c | h/v | h.v
     show-slide-number: print
     slide-tone: false #true
@@ -196,9 +196,141 @@ The tooling & principles discussed in this workshop will guide you to the destin
 
 :::
 
-## Data Viewer {visibility="hidden"}
+## Applied Example {background-image="https://cdn.rebrickable.com/media/sets/42138-1.jpg" background-size="contain"}
 
-TODO: Offer tables to explore key data sets used in the prototype application
+## Raw Data
+
+```{r}
+#| label: example-brick-data
+library(dplyr)
+library(reactable)
+library(reactablefmtr)
+
+options(reactable.theme = reactableTheme(
+    tableStyle = list(fontSize = 14),
+    headerStyle = list(fontSize = 16),
+    paginationStyle = list(fontSize = 12)
+))
+
+df_sets <- readRDS("../../data_examples/df_sets.rds")
+df_inventories <- readRDS("../../data_examples/df_inventories.rds")
+df_inventory_parts <- readRDS("../../data_examples/df_inventory_parts.rds")
+df_parts <- readRDS("../../data_examples/df_parts.rds")
+```
+
+::: {.panel-tabset}
+
+### sets
+
+```{r}
+#| label: example-df-sets
+
+# filter for set_num == "42138-1" (Ford Mustang Shelby GT500)
+df_sets <- df_sets |> 
+  filter(set_num == "42138-1")
+reactable(
+    df_sets, 
+    compact = TRUE,
+    columns = list(
+        set_num = colDef(
+            maxWidth = 100
+        ),
+        name = colDef(
+            maxWidth = 200
+        ),
+        year = colDef(
+            maxWidth = 100
+        ),
+        theme_id = colDef(
+            maxWidth = 100
+        ),
+        num_parts = colDef(
+            maxWidth = 90
+        ),
+        img_url = colDef(
+            maxWidth = 400
+        )
+    )
+)
+```
+
+### inventories
+
+```{r}
+#| label: example-df-inventories
+
+# filter for set_num == "42138-1" (Ford Mustang Shelby GT500)
+df_inventories <-  df_inventories |> 
+  filter(set_num == "42138-1")
+reactable(
+    df_inventories, 
+    compact = TRUE
+)
+```
+
+### inventory parts
+
+```{r}
+#| label: example-df-inventory-parts
+
+# filter for inventory_id == "118871" 
+df_inventory_parts <- df_inventory_parts |> 
+  filter(inventory_id == 118871)
+reactable(
+    df_inventory_parts, 
+    compact = TRUE,
+    columns = list(
+        inventory_id = colDef(
+            maxWidth = 100
+        ),
+        part_num = colDef(
+            maxWidth = 100
+        ),
+        color_id = colDef(
+            maxWidth = 100
+        ),
+        quantity = colDef(
+            maxWidth = 100
+        ),
+        is_spare = colDef(
+            maxWidth = 90
+        ),
+        img_url = colDef(
+            maxWidth = 400
+        )
+    )
+)
+```
+
+### parts
+
+```{r}
+#| label: example-df-parts
+
+df_parts <- df_parts |> 
+  filter(part_num %in% unique(df_inventory_parts$part_num))
+
+reactable(
+    df_parts, 
+    compact = TRUE,
+    columns = list(
+        part_num = colDef(
+            maxWidth = 100
+        ),
+        name = colDef(
+            maxWidth = 400
+        ),
+        part_cat_id = colDef(
+            maxWidth = 100
+        ),
+        part_material = colDef(
+            maxWidth = 200
+        )
+    )
+)
+```
+
+:::
 
 ## Our Journey to Production
 

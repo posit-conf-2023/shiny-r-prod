@@ -8,13 +8,15 @@ format:
 
 ## Overview 
 
+:::{.callout-tip collapse="true" title="Watch the video!"}
 ```{=html}
+<br />
 <div class="embed-youtube">
     <iframe src="https://www.youtube.com/embed/MlRwhDYI5Ec" width="750" height="563"></iframe>
 </div>
 ```
-
 <br />
+:::
 
 Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine.  In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience.  
 
@@ -35,16 +37,76 @@ This course assumes intermediate knowledge of building Shiny applications in R a
 
 You can find complete details on the required pre-work and setup instructions at the [setup](setup.qmd) tab. 
 
-## Meet the Workshop Team
+## Workshop Instructors
 
-### Instructors
+### Eric Nantz
 
-![](images/enantz.jpg){style="float:right;padding: 0 0 0 10px;" fig-alt="{{< var people.enantz.name >}}" width="200"}
-**{{< var people.enantz.name >}}** is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the [R-Podcast](https://r-podcast.org) that he launched in 2012. Eric is also the creator of the [Shiny Developer Series](https://shinydevseries.com) where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his [Twitch channel](https://twitch.tv/rpodcast). In addition, Eric is a curator for the [RWeekly project](https://rweekly.org) and co-host of the [RWeekly Highlights podcast](https://rweekly.fireside.fm) which accompanies every issue.
+:::: {.columns}
 
-![](images/mthomas.jpeg){style="float:right;padding: 0 0 0 10px;" fig-alt="{{< var people.mthomas.name >}}" width="200"}
-**{{< var people.mthomas.name >}}** is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the [RWeekly Highlights Podcast](https://rweekly.fireside.fm).
+::: {.column}
+![](images/enantz.jpg){width=80%}
+:::
 
-### Teaching Assistants
+::: {.column}
+Eric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the [R-Podcast](https://r-podcast.org) that he launched in 2012. Eric is also the creator of the [Shiny Developer Series](https://shinydevseries.com) where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his [Twitch channel](https://twitch.tv/rpodcast). In addition, Eric is a curator for the [RWeekly project](https://rweekly.org) and co-host of the [RWeekly Highlights podcast](https://rweekly.fireside.fm) which accompanies every issue.
+:::
 
-TBD
+::::
+
+### Mike Thomas
+
+:::: {.columns}
+
+::: {.column}
+![](images/mthomas.jpeg)
+:::
+
+::: {.column}
+Mike Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the [RWeekly Highlights Podcast](https://rweekly.fireside.fm).
+:::
+
+::::
+
+## Workshop TAs
+
+### Joe Cheng
+
+:::: {.columns}
+
+::: {.column}
+![](images/jcheng.jpg){width=80%}
+:::
+
+::: {.column}
+Joe Cheng is the Chief Technology Officer at Posit and was the original creator of the Shiny web framework, and continues to work on packages at the intersection of R and the web.
+:::
+
+::::
+
+### David Granjon
+
+:::: {.columns}
+
+::: {.column}
+![](images/dgranjon.jpg){width=65%}
+:::
+
+::: {.column}
+David Granjon works as a Lead Shiny Developer at Cynkra. He is the founder and maintainer of the open source [__RinteRface__](https://rinterface.com/) organisation. He wrote __Outstanding User Interfaces with Shiny__, a CRC press [book](https://www.routledge.com/Outstanding-User-Interfaces-with-Shiny/Granjon/p/book/9780367643652), available [online](https://unleash-shiny.rinterface.com/).
+:::
+
+::::
+
+### Ryan Johnson
+
+:::: {.columns}
+
+::: {.column}
+![](images/rjohnson.jpeg){width=65%}
+:::
+
+::: {.column}
+Ryan Johnson was previously a research microbiologist and now is a data scientist at Posit. After years of working with high-throughput genomic data, he transitioned into a data science advisory role with Posit PBC. He lead workshops, webinars, and content creation to help data enthusiasts worldwide improve their workflows.
+:::
+
+::::
