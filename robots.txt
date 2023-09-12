@@ -1,1 +1,1 @@
-Sitemap: https://github.com/posit-conf-2023/shiny-r-prod/sitemap.xml
+Sitemap: https://posit-conf-2023.github.io/shiny-r-prod/sitemap.xml

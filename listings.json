@@ -8,6 +8,10 @@
     "items": []
   },
   {
+    "listing": "/units/d1-04-deploy-admin.html",
+    "items": []
+  },
+  {
     "listing": "/schedule.html",
     "items": [
       "/units/d1-01-welcome.html",
@@ -16,11 +20,12 @@
       "/units/d1-03-performance.html",
       "/units/d1-03b-lunch.html",
       "/units/d1-04-deploy-admin.html",
-      "/units/d1-04b-break.html"
+      "/units/d1-04b-break.html",
+      "/units/d1-9001-loadtesting.html"
     ]
   },
   {
-    "listing": "/units/d1-04-deploy-admin.html",
+    "listing": "/units/d1-9001-loadtesting.html",
     "items": []
   },
   {

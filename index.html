@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.358">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -48,6 +48,12 @@ ul.task-list li input[type="checkbox"] {
   "panel-placement": "end",
   "type": "overlay",
   "limit": 20,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -65,9 +71,8 @@ ul.task-list li input[type="checkbox"] {
 
 <link rel="stylesheet" href="youtube.css">
 <meta property="og:title" content="Shiny in Production - Shiny in Production: Tools and Techniques">
-<meta property="og:description" content="">
-<meta property="og:image" content="https://github.com/posit-conf-2023/shiny-r-prod/images/enantz.jpg">
-<meta property="og:site-name" content="Shiny in Production">
+<meta property="og:description" content="Website for the posit::conf(2023) workshop ‘Shiny in Production: Tools and Techniques’">
+<meta property="og:site_name" content="Shiny in Production">
 </head>
 
 <body class="nav-fixed">
@@ -76,7 +81,7 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Shiny in Production</span>
     </a>
@@ -88,22 +93,22 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./schedule.html" rel="" target="">
- <span class="menu-text">Schedule</span></a>
+    <a class="nav-link" href="./schedule.html"> 
+<span class="menu-text">Schedule</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./setup.html" rel="" target="">
- <span class="menu-text">Setup</span></a>
+    <a class="nav-link" href="./setup.html"> 
+<span class="menu-text">Setup</span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools ms-auto">
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -120,13 +125,19 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#logistics" id="toc-logistics" class="nav-link" data-scroll-target="#logistics">Logistics</a></li>
   <li><a href="#is-this-workshop-for-me" id="toc-is-this-workshop-for-me" class="nav-link" data-scroll-target="#is-this-workshop-for-me">Is this workshop for me?</a></li>
   <li><a href="#prework-setup" id="toc-prework-setup" class="nav-link" data-scroll-target="#prework-setup">Prework &amp; Setup</a></li>
-  <li><a href="#meet-the-workshop-team" id="toc-meet-the-workshop-team" class="nav-link" data-scroll-target="#meet-the-workshop-team">Meet the Workshop Team</a>
+  <li><a href="#workshop-instructors" id="toc-workshop-instructors" class="nav-link" data-scroll-target="#workshop-instructors">Workshop Instructors</a>
   <ul class="collapse">
-  <li><a href="#instructors" id="toc-instructors" class="nav-link" data-scroll-target="#instructors">Instructors</a></li>
-  <li><a href="#teaching-assistants" id="toc-teaching-assistants" class="nav-link" data-scroll-target="#teaching-assistants">Teaching Assistants</a></li>
+  <li><a href="#eric-nantz" id="toc-eric-nantz" class="nav-link" data-scroll-target="#eric-nantz">Eric Nantz</a></li>
+  <li><a href="#mike-thomas" id="toc-mike-thomas" class="nav-link" data-scroll-target="#mike-thomas">Mike Thomas</a></li>
+  </ul></li>
+  <li><a href="#workshop-tas" id="toc-workshop-tas" class="nav-link" data-scroll-target="#workshop-tas">Workshop TAs</a>
+  <ul class="collapse">
+  <li><a href="#joe-cheng" id="toc-joe-cheng" class="nav-link" data-scroll-target="#joe-cheng">Joe Cheng</a></li>
+  <li><a href="#david-granjon" id="toc-david-granjon" class="nav-link" data-scroll-target="#david-granjon">David Granjon</a></li>
+  <li><a href="#ryan-johnson" id="toc-ryan-johnson" class="nav-link" data-scroll-target="#ryan-johnson">Ryan Johnson</a></li>
   </ul></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/index.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -146,14 +157,31 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
+
 </header>
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<div class="callout callout-style-default callout-tip callout-titled" title="Watch the video!">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Watch the video!
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<br>
 <div class="embed-youtube">
     <iframe src="https://www.youtube.com/embed/MlRwhDYI5Ec" width="750" height="563"></iframe>
 </div>
 <p><br></p>
+</div>
+</div>
+</div>
 <p>Shiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience.</p>
 </section>
 <section id="logistics" class="level2">
@@ -174,16 +202,60 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="prework-setup">Prework &amp; Setup</h2>
 <p>You can find complete details on the required pre-work and setup instructions at the <a href="./setup.html">setup</a> tab.</p>
 </section>
-<section id="meet-the-workshop-team" class="level2">
-<h2 class="anchored" data-anchor-id="meet-the-workshop-team">Meet the Workshop Team</h2>
-<section id="instructors" class="level3">
-<h3 class="anchored" data-anchor-id="instructors">Instructors</h3>
-<p><img src="images/enantz.jpg" class="img-fluid" style="float:right;padding: 0 0 0 10px;" alt="{{< var people.enantz.name >}}" width="200"> <strong>Eric Nantz</strong> is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the <a href="https://r-podcast.org">R-Podcast</a> that he launched in 2012. Eric is also the creator of the <a href="https://shinydevseries.com">Shiny Developer Series</a> where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his <a href="https://twitch.tv/rpodcast">Twitch channel</a>. In addition, Eric is a curator for the <a href="https://rweekly.org">RWeekly project</a> and co-host of the <a href="https://rweekly.fireside.fm">RWeekly Highlights podcast</a> which accompanies every issue.</p>
-<p><img src="images/mthomas.jpeg" class="img-fluid" style="float:right;padding: 0 0 0 10px;" alt="{{< var people.mthomas.name >}}" width="200"> <strong>Michael Thomas</strong> is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression &amp; time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the <a href="https://rweekly.fireside.fm">RWeekly Highlights Podcast</a>.</p>
+<section id="workshop-instructors" class="level2">
+<h2 class="anchored" data-anchor-id="workshop-instructors">Workshop Instructors</h2>
+<section id="eric-nantz" class="level3">
+<h3 class="anchored" data-anchor-id="eric-nantz">Eric Nantz</h3>
+<div class="columns">
+<div class="column">
+<p><img src="images/enantz.jpg" class="img-fluid" style="width:80.0%"></p>
+</div><div class="column">
+<p>Eric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the <a href="https://r-podcast.org">R-Podcast</a> that he launched in 2012. Eric is also the creator of the <a href="https://shinydevseries.com">Shiny Developer Series</a> where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his <a href="https://twitch.tv/rpodcast">Twitch channel</a>. In addition, Eric is a curator for the <a href="https://rweekly.org">RWeekly project</a> and co-host of the <a href="https://rweekly.fireside.fm">RWeekly Highlights podcast</a> which accompanies every issue.</p>
+</div>
+</div>
 </section>
-<section id="teaching-assistants" class="level3">
-<h3 class="anchored" data-anchor-id="teaching-assistants">Teaching Assistants</h3>
-<p>TBD</p>
+<section id="mike-thomas" class="level3">
+<h3 class="anchored" data-anchor-id="mike-thomas">Mike Thomas</h3>
+<div class="columns">
+<div class="column">
+<p><img src="images/mthomas.jpeg" class="img-fluid"></p>
+</div><div class="column">
+<p>Mike Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression &amp; time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the <a href="https://rweekly.fireside.fm">RWeekly Highlights Podcast</a>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="workshop-tas" class="level2">
+<h2 class="anchored" data-anchor-id="workshop-tas">Workshop TAs</h2>
+<section id="joe-cheng" class="level3">
+<h3 class="anchored" data-anchor-id="joe-cheng">Joe Cheng</h3>
+<div class="columns">
+<div class="column">
+<p><img src="images/jcheng.jpg" class="img-fluid" style="width:80.0%"></p>
+</div><div class="column">
+<p>Joe Cheng is the Chief Technology Officer at Posit and was the original creator of the Shiny web framework, and continues to work on packages at the intersection of R and the web.</p>
+</div>
+</div>
+</section>
+<section id="david-granjon" class="level3">
+<h3 class="anchored" data-anchor-id="david-granjon">David Granjon</h3>
+<div class="columns">
+<div class="column">
+<p><img src="images/dgranjon.jpg" class="img-fluid" style="width:65.0%"></p>
+</div><div class="column">
+<p>David Granjon works as a Lead Shiny Developer at Cynkra. He is the founder and maintainer of the open source <a href="https://rinterface.com/"><strong>RinteRface</strong></a> organisation. He wrote <strong>Outstanding User Interfaces with Shiny</strong>, a CRC press <a href="https://www.routledge.com/Outstanding-User-Interfaces-with-Shiny/Granjon/p/book/9780367643652">book</a>, available <a href="https://unleash-shiny.rinterface.com/">online</a>.</p>
+</div>
+</div>
+</section>
+<section id="ryan-johnson" class="level3">
+<h3 class="anchored" data-anchor-id="ryan-johnson">Ryan Johnson</h3>
+<div class="columns">
+<div class="column">
+<p><img src="images/rjohnson.jpeg" class="img-fluid" style="width:65.0%"></p>
+</div><div class="column">
+<p>Ryan Johnson was previously a research microbiologist and now is a data scientist at Posit. After years of working with high-throughput genomic data, he transitioned into a data science advisory role with Posit PBC. He lead workshops, webinars, and content creation to help data enthusiasts worldwide improve their workflows.</p>
+</div>
+</div>
 
 
 </section>
@@ -231,6 +303,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       } else {
         el.classList.add('notransition');
       }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
     }
   }
   const toggleColorMode = (alternate) => {
@@ -299,13 +398,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  let localAlternateSentinel = 'default';
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {
     // Read the current dark / light value 
     let toAlternate = !hasAlternateSentinel();
     toggleColorMode(toAlternate);
     setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
   };
   // Ensure there is a toggle, if there isn't float one in the top right
   if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -384,10 +485,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -397,8 +497,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -411,6 +520,81 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        for (let i = 0; i < 2; i++) {
+          container.appendChild(note.children[i].cloneNode(true));
+        }
+        return container.innerHTML
+      } else {
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      return note.innerHTML;
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -454,6 +638,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -479,6 +664,33 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        console.log("RESIZE");
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -537,12 +749,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var filterRegex = new RegExp("https:\/\/github\.com\/posit-conf-2023\/shiny-r-prod");
+      var filterRegex = new RegExp("https:\/\/posit-conf-2023\.github\.io\/shiny-r-prod\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):(.quarto-navigation-tool)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -553,6 +765,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+
 
 
 
