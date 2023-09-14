@@ -102,7 +102,7 @@
     "href": "index.html#logistics",
     "title": "Shiny in Production: Tools and Techniques",
     "section": "Logistics",
-    "text": "Logistics\nThe workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at posit-conf-2023.github.io/shiny-r-prod and hosted on GitHub at github.com/posit-conf-2023/shiny-r-prod. For real-time messaging, we will be using a specific channel within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop."
+    "text": "Logistics\nThe workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at posit-conf-2023.github.io/shiny-r-prod and hosted on GitHub at github.com/posit-conf-2023/shiny-r-prod. For real-time messaging, we will be using the shiny-in-production-tools-and-techniques within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop."
   },
   {
     "objectID": "index.html#is-this-workshop-for-me",
