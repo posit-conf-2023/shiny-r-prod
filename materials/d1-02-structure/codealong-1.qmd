@@ -1,0 +1,59 @@
+---
+title: Modules for LEGO attribute selections
+---
+
+As you make the transition to building production Shiny applications, Shiny modules are a very important tool to improve code organization and overall flow of your application. We will work together to build Shiny modules that let the user filter the underlying LEGO metadata based on a key variables in the overall data.
+
+## Requirements
+
+Creste three inputs for the user to subset the LEGO metadata by the following key variables:
+
+* Theme(s) associated with sets. Default should be all sets, but let the user customize selections with a search box.
+* Year range for when set was created. Give the user a visual cue of how many sets are present in each year.
+* Pre-defined ranges for how many parts are present in each set. Ranges are the following:
+    + Small (1-50 parts)
+    + Medium (51-200 parts)
+    + Large (201 or more parts)
+    + All sizes
+
+## Data
+
+The following data sets included in the application contain the variables needed for the requirements (note that these snippets are a reduced sample of each source data set).
+
+### `sets`
+
+```{r}
+#| echo: true
+#| eval: false
+dplyr::glimpse(sets)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+sets <- readRDS("../../data_examples/df_sets.rds")
+dplyr::glimpse(sets)
+```
+
+### `themes`
+
+```{r}
+#| echo: true
+#| eval: false
+dplyr::glimpse(themes)
+```
+
+```{r}
+#| echo: false
+#| eval: true
+themes <- readRDS("../../data_examples/df_themes.rds")
+dplyr::glimpse(themes)
+```
+
+
+## Plan
+
+1. Create a new module R script (and possible a supporting R script) by using `golem::add_module()` in the `dev/02_dev.R` script.
+1. Pick a Shiny input type that matches our requirements.
+1. Ensure the server-side portion of the module returns the result of the selection, with additional post-processing if necessary.
+1. Plug in the UI and server-side portions of the module in the main `app_ui.R` and `app_server.R` files, respectively.

@@ -15,6 +15,17 @@ listing:
     sort-ui: false
     filter-ui: false
     image-placeholder: assets/img/placeholder.png
+  - id: code-along
+    contents:
+      - ../materials/d1-02-structure/codealong-*.qmd
+    type: table
+    fields: [subtitle, title]
+    field-display-names: 
+      subtitle: "Code-Along"
+    sort: [filename]
+    sort-ui: false
+    filter-ui: false
+    image-placeholder: assets/img/placeholder.png
 tbl-colwidths: [5,20,75]
 ---
 
@@ -29,4 +40,13 @@ These slides are under construction and will be finalized prior to the workshop 
 ```{=html}
 <iframe class="slide-deck" src="../materials/d1-02-structure/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 ```
+## Code-Along Examples
+
+::: {#code-along}
+:::
+
+## Exercises
+
+::: {#exercises}
+:::
 

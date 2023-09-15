@@ -1,0 +1,50 @@
+---
+title: "Value Metrics Module"
+---
+
+## Access Instructions
+
+The project used for this particular exercise is hosted on [Posit Cloud](https://posit.cloud) in this [space](https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7). The project for this exercise is called **modules-exercise1**.
+
+## Exercise Instructions
+
+Your task is to create a new Shiny module that displays three important metrics to the user: 
+
+* Total number of sets
+* Total number of parts among the sets
+* Total number of mini-figures
+
+Note that these quantities are dependent on the user selections from the inputs contained in the left sidebar (theme, year, and parts range). 
+
+Keeping with the overall user interface style, you are recommended to use the [`value_box`](https://rstudio.github.io/bslib/reference/value_box.html) function from the [`{bslib}`](https://rstudio.github.io/bslib/) package. The metrics can be derived using the function below. In the application code, you will find reactive data frames called `sets_rv` and `part_meta_rv` which can be used in the parameters of the function below.
+
+```r
+#' Derive key LEGO data set metrics
+#' 
+#' @param sets_rv data frame containing sets information
+#' @param part_meta_rv data frame containing parts metadata information
+#' 
+#' @import dplyr
+derive_widget_metrics <- function(sets_rv, part_meta_rv) {
+  # number of sets
+  n_sets <- length(unique(sets_rv$set_num))
+
+  # number of parts
+  n_parts <- sum(sets_rv$num_parts, na.rm = TRUE)
+
+  # number of minifigs
+  n_minifigs <- part_meta_rv |>
+    summarize(total_minifigs = sum(minifig_ind)) |>
+    collect() |>
+    pull(total_minifigs)
+
+  return(
+    list(
+      n_sets = n_sets,
+      n_parts = n_parts,
+      n_minifigs = n_minifigs
+    )
+  )
+}
+```
+
