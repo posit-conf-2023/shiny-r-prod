@@ -1,14 +1,14 @@
 [
   {
-    "listing": "/units/d1-03-performance.html",
-    "items": []
-  },
-  {
-    "listing": "/units/d1-02-structure.html",
+    "listing": "/units/d1-01-welcome.html",
     "items": []
   },
   {
     "listing": "/units/d1-04-deploy-admin.html",
+    "items": []
+  },
+  {
+    "listing": "/units/d1-02-structure.html",
     "items": []
   },
   {
@@ -25,11 +25,11 @@
     ]
   },
   {
-    "listing": "/units/d1-9001-loadtesting.html",
+    "listing": "/units/d1-03-performance.html",
     "items": []
   },
   {
-    "listing": "/units/d1-01-welcome.html",
+    "listing": "/units/d1-9001-loadtesting.html",
     "items": []
   }
 ]

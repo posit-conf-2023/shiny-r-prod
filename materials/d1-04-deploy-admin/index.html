@@ -8,9 +8,8 @@
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.358">
+  <meta name="generator" content="quarto-1.4.366">
 
-  <meta name="author" content="TBD">
   <title>Shiny in Production - Deployment &amp; Administration</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,11 +28,77 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-codewindow/codewindow.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
@@ -334,21 +399,277 @@
   <p class="subtitle">posit::conf(2023) <br> Shiny in Production: Tools &amp; Techniques</p>
 
 <div class="quarto-title-authors">
-<div class="quarto-title-author">
-<div class="quarto-title-author-name">
-TBD 
-</div>
-</div>
 </div>
 
 </section>
-<section id="more-to-come" class="slide level2">
-<h2>More to come</h2>
+<section class="slide level2">
+
+<div class="cell">
+<style type="text/css">
+.centerheading h2 {
+  text-align: center;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 1.4em;
+}
+
+.center-xy {
+  margin: 0;
+  position: absolute;
+  top: 25%;
+  left: 0%;
+  -ms-transform: translateY(-50%), translateX(-50%);
+  transform: translateY(-50%), translateX(-50%);
+}
+</style>
+</div>
+</section>
+<section id="choose-your-adventure" class="slide level2">
+<h2>Choose your Adventure</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="posit-connect">Posit Connect</h3>
+</div><div class="column" style="width:50%;">
+<h3 id="containers">Containers</h3>
+</div>
+</div>
+<aside class="notes">
+<p>TODO: Find pictures demonstrating the “App &amp; Packages Only” (Posit Connect, Shinyapps.io) versus “The whole environment” (Containers)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="deployment-checklist" class="slide level2">
+<h2>Deployment Checklist</h2>
+<p>✅ Create <code>app.R</code> in directory</p>
+<p>✅ Take note of any custom environment variables</p>
+<p>✅ Ensure <code>DESCRIPTION</code> is up-to-date with required packages</p>
+<p>✅ Remove outdated functions / scripts</p>
+</section>
+<section id="section" class="slide level2 center-xy">
+<h2></h2>
+<div class="mono">
+<div class="codewindow r">
+<p>03_deploy.R</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="do">## RStudio ----</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="do">## If you want to deploy on RStudio related platforms</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>golem<span class="sc">::</span><span class="fu">add_rstudioconnect_file</span>()</span>
+<span id="cb1-4"><a href="#cb1-4"></a>golem<span class="sc">::</span><span class="fu">add_shinyappsio_file</span>()</span>
+<span id="cb1-5"><a href="#cb1-5"></a>golem<span class="sc">::</span><span class="fu">add_shinyserver_file</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<h1><svg aria-hidden="true" role="img" viewbox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:white;overflow:visible;position:relative;"><path d="M80 48a48 48 0 1 1 96 0A48 48 0 1 1 80 48zm64 193.7v65.1l51 51c7.1 7.1 11.8 16.2 13.4 26.1l15.2 90.9c2.9 17.4-8.9 33.9-26.3 36.8s-33.9-8.9-36.8-26.3l-14.3-85.9L66.8 320C54.8 308 48 291.7 48 274.7V186.6c0-32.4 26.2-58.6 58.6-58.6c24.1 0 46.5 12 59.9 32l47.4 71.1 10.1 5V160c0-17.7 14.3-32 32-32H384c17.7 0 32 14.3 32 32v76.2l10.1-5L473.5 160c13.3-20 35.8-32 59.9-32c32.4 0 58.6 26.2 58.6 58.6v88.1c0 17-6.7 33.3-18.7 45.3l-79.4 79.4-14.3 85.9c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l15.2-90.9c1.6-9.9 6.3-19 13.4-26.1l51-51V241.7l-19 28.5c-4.6 7-11 12.6-18.5 16.3l-59.6 29.8c-2.4 1.3-4.9 2.2-7.6 2.8c-2.6 .6-5.3 .9-7.9 .8H256.7c-2.5 .1-5-.2-7.5-.7c-2.9-.6-5.6-1.6-8.1-3l-59.5-29.8c-7.5-3.7-13.8-9.4-18.5-16.3l-19-28.5zM2.3 468.1L50.1 348.6l49.2 49.2-37.6 94c-6.6 16.4-25.2 24.4-41.6 17.8S-4.3 484.5 2.3 468.1zM512 0a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm77.9 348.6l47.8 119.5c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8l-37.6-94 49.2-49.2z"></path></svg> Code-Along</h1>
+<p>Push-Button Deployment to Posit Connect</p>
+</section>
+<section class="slide level2">
+
+<div class="mono">
+<div class="codewindow r" width="1000px">
+<p>03_deploy.R</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>rsconnect<span class="sc">::</span><span class="fu">deployApp</span>(</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="at">appName =</span> <span class="st">"legobricksapp"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>  <span class="at">appTitle =</span> desc<span class="sc">::</span><span class="fu">desc_get_field</span>(<span class="st">"Package"</span>),</span>
+<span id="cb2-4"><a href="#cb2-4"></a>  <span class="at">appFiles =</span> <span class="fu">c</span>(</span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="st">"R/"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="st">"inst/"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="st">"data/"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="st">"NAMESPACE"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9"></a>    <span class="st">"DESCRIPTION"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10"></a>    <span class="st">"app.R"</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a>  ),</span>
+<span id="cb2-12"><a href="#cb2-12"></a>  <span class="at">appId =</span> rsconnect<span class="sc">::</span><span class="fu">deployments</span>(<span class="st">"."</span>)<span class="sc">$</span>appId,</span>
+<span id="cb2-13"><a href="#cb2-13"></a>  <span class="at">lint =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-14"><a href="#cb2-14"></a>  <span class="at">forceUpdate =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="balancing-act" class="slide level2 centerheading">
+<h2>Balancing Act</h2>
+<div class="columns">
+<div class="column" style="width:33%;">
+<p>🔼 Max Processes</p>
+<ul>
+<li>More resources dedicated to particular application</li>
+<li>Potential for server overload</li>
+</ul>
+</div><div class="column" style="width:33%;">
+<p><img data-src="assets/img/teeter_totter.png"></p>
+</div><div class="column" style="width:33%;">
+<p>🔼 Min Processes</p>
+<ul>
+<li>Resources dedicated even when app is idle</li>
+<li>Potentially wasteful if app is not used concurrently often</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="business-talk" class="slide level2" data-background-image="assets/img/lego_boss_office.jpg" data-background-size="cover" data-background-color="black">
+<h2>Business Talk</h2>
+</section>
+<section id="you-might-be-asked" class="slide level2">
+<h2>You Might be Asked …</h2>
+<div class="fragment">
+<p>“How many people used your app last year?”</p>
+</div>
+<div class="fragment">
+<p>“How long are users on the app at a given time?”</p>
+</div>
+<div class="fragment">
+<div class="fragment strike">
+<p>“What is the return on investment (ROI) this app is bringing the company?”</p>
+</div>
+</div>
+<div class="fragment">
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><img data-src="assets/img/daniel-bryan-no.gif" style="width:90.0%"></p>
+</div><div class="column" style="width:30%;">
+<h3 id="not-today">NOT TODAY!</h3>
+</div>
+</div>
+</div>
+</section>
+<section id="introducing-connectapi" class="slide level2">
+<h2>📦 Introducing <a href="https://pkgs.rstudio.com/connectapi/"><code>{connectapi}</code></a></h2>
+<blockquote>
+<p>R client for the <a href="https://docs.posit.co/connect/api/">Posit Connect Server API</a> as well as helpful functions that utilize the client</p>
+</blockquote>
+<p>Checklist:</p>
+<p>✅ Create API key for your Posit Connect account</p>
+<p>✅ Create <code>.Renviron</code> with following variables: <code>CONNECT_SERVER</code>, <code>CONNECT_API_KEY</code></p>
+</section>
+<section id="introduce-yourself" class="slide level2">
+<h2>Introduce Yourself</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(connectapi)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>client <span class="ot">&lt;-</span> <span class="fu">connect</span>(</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="at">server =</span> <span class="fu">Sys.getenv</span>(<span class="st">"CONNECT_SERVER"</span>),</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="at">api_key =</span> <span class="fu">Sys.getenv</span>(<span class="st">"CONNECT_API_KEY"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a>client</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Posit Connect API Client: 
+  Posit Connect Server: https://rsc.training.rstudio.com
+  Posit Connect API Key: ***********FWxW</code></pre>
+</div>
+</div>
+<ul>
+<li><code>client</code> is an R6 object representing the API client</li>
+<li>Required parameter for many convenience functions</li>
+</ul>
+</section>
+<section id="know-yourself" class="slide level2">
+<h2>Know Yourself</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>my_guid <span class="ot">&lt;-</span> <span class="fu">user_guid_from_username</span>(client, <span class="st">"rpodcast"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>my_guid</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "47e1338f-54a8-4b0e-9b3c-e4380611b30f"</code></pre>
+</div>
+</div>
+<ul>
+<li>All content/users have a <strong>unique indentifier (guid)</strong></li>
+</ul>
+</section>
+<section id="obtain-your-shiny-apps" class="slide level2">
+<h2>Obtain (Your) Shiny Apps</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>meta_df <span class="ot">&lt;-</span> <span class="fu">get_content</span>(client) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="fu">filter</span>(owner_guid <span class="sc">==</span> my_guid) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>  <span class="fu">select</span>(guid, name, title)</span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a>meta_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 3
+   guid                                 name            title          
+   &lt;chr&gt;                                &lt;chr&gt;           &lt;chr&gt;          
+ 1 40dd2969-5d67-4940-89c4-08fe31fd1c74 brickapp        brickapp       
+ 2 fba6896e-49e4-45c6-856f-03a3bc4f498f legobricksapp   legobricks.app 
+ 3 626d6bb1-f36d-4c9b-bc9e-5cb44f46e698 hellogolem22    hellogolem2    
+ 4 6f8116dc-eabf-4a64-aacb-4aeffbb4eaa4 golembrochure2  golembrochure  
+ 5 a4e6809f-4858-4888-a848-94925d3df4a0 golembrochure   golembrochure  
+ 6 f268d424-a286-41b9-91f1-ae458797e64a golemhellolocal golemhellolocal
+ 7 4d9124a0-158b-4bd9-9b65-07b877db0906 test            test           
+ 8 c60de16e-0b29-4267-a2c5-0eb6815d7999 hellogolem3     hellogolem     
+ 9 2aec4c5b-144f-4a6c-8abf-7d07a17d78b2 hellogolem      hellogolem     
+10 344b9f1b-ddbe-4145-a1f0-eb6608662f08 hellogolem2     hellogolem     
+# ℹ 17 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="usage-metrics" class="slide level2">
+<h2>Usage Metrics</h2>
+<p>Session durations for the <code>legobricksapp</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>app_guid <span class="ot">&lt;-</span> <span class="st">"fba6896e-49e4-45c6-856f-03a3bc4f498f"</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="fu">get_usage_shiny</span>(</span>
+<span id="cb9-4"><a href="#cb9-4"></a>  client,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="at">content_guid =</span> app_guid,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>  <span class="at">limit =</span> <span class="dv">5</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(ended)) <span class="sc">|&gt;</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>  <span class="fu">mutate</span>(<span class="at">session_duration =</span> ended <span class="sc">-</span> started) <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>  <span class="fu">select</span>(user_guid, session_duration)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  user_guid                            session_duration
+  &lt;chr&gt;                                &lt;drtn&gt;          
+1 47e1338f-54a8-4b0e-9b3c-e4380611b30f 10.933333 mins  
+2 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.216667 mins  
+3 47e1338f-54a8-4b0e-9b3c-e4380611b30f  4.733333 mins  
+4 47e1338f-54a8-4b0e-9b3c-e4380611b30f  6.766667 mins  
+5 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.183333 mins  </code></pre>
+</div>
+</div>
+</section>
+<section id="usage-metrics-1" class="slide level2">
+<h2>Usage Metrics</h2>
+<p>How many users visited <code>legobricksapp</code> in last 28 days?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>app_guid <span class="ot">&lt;-</span> <span class="st">"fba6896e-49e4-45c6-856f-03a3bc4f498f"</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>time_start <span class="ot">&lt;-</span> <span class="fu">Sys.Date</span>() <span class="sc">-</span> lubridate<span class="sc">::</span><span class="fu">days</span>(<span class="dv">28</span>)</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="fu">get_usage_shiny</span>(</span>
+<span id="cb11-4"><a href="#cb11-4"></a>  client,</span>
+<span id="cb11-5"><a href="#cb11-5"></a>  <span class="at">content_guid =</span> app_guid,</span>
+<span id="cb11-6"><a href="#cb11-6"></a>  <span class="at">limit =</span> <span class="dv">100</span>,</span>
+<span id="cb11-7"><a href="#cb11-7"></a>  <span class="at">from =</span> time_start</span>
+<span id="cb11-8"><a href="#cb11-8"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a>  <span class="fu">pull</span>(user_guid) <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a>  <span class="fu">unique</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>  <span class="fu">length</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 
@@ -359,6 +680,7 @@ TBD
   <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-codewindow/codewindow.js"></script>
   <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -550,7 +872,7 @@ TBD
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealCodewindow, QuartoSupport,
 
           RevealMath,
           RevealNotes,
@@ -559,6 +881,44 @@ TBD
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
