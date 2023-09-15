@@ -1,17 +1,269 @@
 ---
 title: "Deployment & Administration"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
-author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
-    incremental: true
+    incremental: false
     slide-number: c/t # c/t | c | h/v | h.v
     slide-tone: false #true
-    code-line-numbers: false
+    code-line-numbers: true
     history: false
+revealjs-plugins:
+  - codewindow
 ---
 
-## More to come
+```{css}
+.centerheading h2 {
+  text-align: center;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 1.4em;
+}
+
+.center-xy {
+  margin: 0;
+  position: absolute;
+  top: 25%;
+  left: 0%;
+  -ms-transform: translateY(-50%), translateX(-50%);
+  transform: translateY(-50%), translateX(-50%);
+}
+```
+
+## Choose your Adventure
+
+::: columns
+::: {.column width="50%"}
+### Posit Connect
+:::
+
+::: {.column width="50%"}
+### Containers
+:::
+:::
+
+::: notes
+TODO: Find pictures demonstrating the "App & Packages Only" (Posit Connect, Shinyapps.io) versus "The whole environment" (Containers)
+:::
+
+## Deployment Checklist
+
+✅ Create `app.R` in directory
+
+✅ Take note of any custom environment variables
+
+✅ Ensure `DESCRIPTION` is up-to-date with required packages
+
+✅ Remove outdated functions / scripts
+
+
+
+## {.center-xy}
+
+::: mono
+::: {.codewindow .r}
+03_deploy.R
+
+```{r}
+#| eval: false
+#| echo: true
+## RStudio ----
+## If you want to deploy on RStudio related platforms
+golem::add_rstudioconnect_file()
+golem::add_shinyappsio_file()
+golem::add_shinyserver_file()
+```
+:::
+:::
+
+# `r fontawesome::fa("people-carry", "white")` Code-Along {background-color="#17395c"}
+
+Push-Button Deployment to Posit Connect
+
+---
+
+::: mono
+::: {.codewindow .r width="1000px"}
+03_deploy.R
+```{r}
+#| eval: false
+#| echo: true
+rsconnect::deployApp(
+  appName = "legobricksapp",
+  appTitle = desc::desc_get_field("Package"),
+  appFiles = c(
+    "R/",
+    "inst/",
+    "data/",
+    "NAMESPACE",
+    "DESCRIPTION",
+    "app.R"
+  ),
+  appId = rsconnect::deployments(".")$appId,
+  lint = FALSE,
+  forceUpdate = TRUE
+)
+```
+:::
+:::
+
+## Balancing Act {.centerheading}
+
+:::: {.columns}
+
+::: {.column width="33%"}
+
+🔼 Max Processes
+
+* More resources dedicated to particular application
+* Potential for server overload
+
+:::
+
+::: {.column width="33%"}
+
+![](assets/img/teeter_totter.png)
+
+:::
+
+::: {.column width="33%"}
+
+🔼 Min Processes
+
+* Resources dedicated even when app is idle
+* Potentially wasteful if app is not used concurrently often
+
+:::
+
+::::
+
+## Business Talk {background-image="assets/img/lego_boss_office.jpg" background-size="cover" background-color="black"}
+
+## You Might be Asked ...
+
+::: {.fragment}
+
+"How many people used your app last year?"
+
+:::
+
+::: {.fragment}
+
+"How long are users on the app at a given time?"
+
+:::
+
+::: {.fragment}
+::: {.fragment .strike}
+"What is the return on investment (ROI) this app is bringing the company?"
+:::
+:::
+
+::: {.fragment}
+
+:::: {.columns}
+
+::: {.column width="55%"}
+![](assets/img/daniel-bryan-no.gif){width=90%}
+:::
+
+::: {.column width="30%"}
+### NOT TODAY!
+:::
+
+::::
+
+:::
+
+## 📦 Introducing [`{connectapi}`](https://pkgs.rstudio.com/connectapi/)
+
+> R client for the [Posit Connect Server API](https://docs.posit.co/connect/api/) as well as helpful functions that utilize the client
+
+Checklist:
+
+✅ Create API key for your Posit Connect account
+
+✅ Create `.Renviron` with following variables: `CONNECT_SERVER`, `CONNECT_API_KEY`
+
+## Introduce Yourself
+
+```{r}
+#| echo: true
+library(connectapi)
+
+client <- connect(
+  server = Sys.getenv("CONNECT_SERVER"),
+  api_key = Sys.getenv("CONNECT_API_KEY")
+)
+
+client
+```
+
+* `client` is an R6 object representing the API client
+* Required parameter for many convenience functions
+
+## Know Yourself
+
+```{r}
+#| echo: true
+my_guid <- user_guid_from_username(client, "rpodcast")
+
+my_guid
+```
+
+* All content/users have a **unique indentifier (guid)**
+
+## Obtain (Your) Shiny Apps
+
+```{r}
+#| echo: true
+library(dplyr)
+
+meta_df <- get_content(client) |>
+  filter(owner_guid == my_guid) |>
+  select(guid, name, title)
+
+meta_df
+```
+
+## Usage Metrics
+
+Session durations for the `legobricksapp`:
+
+```{r}
+#| echo: true
+app_guid <- "fba6896e-49e4-45c6-856f-03a3bc4f498f"
+
+get_usage_shiny(
+  client,
+  content_guid = app_guid,
+  limit = 5
+  ) |>
+  filter(!is.na(ended)) |>
+  mutate(session_duration = ended - started) |>
+  select(user_guid, session_duration)
+```
+
+## Usage Metrics
+
+How many users visited `legobricksapp` in last 28 days?
+
+```{r}
+#| echo: true
+app_guid <- "fba6896e-49e4-45c6-856f-03a3bc4f498f"
+time_start <- Sys.Date() - lubridate::days(28)
+get_usage_shiny(
+  client,
+  content_guid = app_guid,
+  limit = 100,
+  from = time_start
+  ) |>
+  pull(user_guid) |>
+  unique() |>
+  length()
+```
