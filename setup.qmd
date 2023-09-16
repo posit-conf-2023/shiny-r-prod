@@ -21,7 +21,7 @@ In the first session of the workshop, we will allocate time for everyone to conf
 
 ## Local Clone of Repository
 
-If we encounter any technical issues with the cloud-based environments, it is a good idea to have a clone of this repository on your local laptop as a backup. 
+If we encounter any technical issues with the cloud-based environments, it is a good idea to have a clone of the workshop repository on your local laptop as a backup. If you already have Git installed, you can clone the repository from <https://github.com/posit-conf-2023/shiny-r-prod>, or without Git you can download the repository using [this link](https://github.com/posit-conf-2023/shiny-r-prod/archive/refs/heads/main.zip).  
 
 ## Environment Configuration
 
@@ -37,7 +37,7 @@ Please view the information in the callouts below for step-by-step instructions 
 <iframe class="slide-deck" src="materials/setup-resources/#/create-posit-connect-account" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 ```
 
-1. Create an account on the workshop RStudio Connect server by visiting [{{< var rsconnect_url >}}]({{< var rsconnect_url >}}) and clicking the **login** link in the upper right corner.
+1. Create an account on the workshop Posit Connect server by visiting [{{< var rsconnect_url >}}]({{< var rsconnect_url >}}) and clicking the **login** link in the upper right corner.
 1. You will see a window that asks for either an email/password or to use a GitHub account. Please choose the GitHub option and follow the instructions to authorize Posit Connect to your GitHub account.
 1. You should now be logged in to Posit Connect. Please create an API key for your account by following the Posit Connect User Guide instructions on [creating an API key](https://docs.posit.co/connect/user/api-keys/). Save it to a secure place as you will need it for account integration.
 
@@ -80,8 +80,13 @@ You can workshop materials using the following procedure:
 
 ## Docker Container with Visual Studio Code & RStudio 
 
-The repository for this workshop also gives you the ability to create custom Docker containers to encapsulate a complete R development environment tailored to this workshop. 
+The repository for this workshop also gives you the ability to create custom Docker containers to encapsulate a complete R development environment tailored to this workshop. This workshop repository uses a similar container definition as found at <https://github.com/rpodcast/r_dev_projects>. At a high level, you will need an installation of Visual Studio Code with the Remote Development extension.
 
+1. Visit the workshop repository at <https://github.com/posit-conf-2023/shiny-r-prod> and either clone to your local machine with Git or download a `zip` archive of the materials. A direct link to the archive is [here](https://github.com/posit-conf-2023/shiny-r-prod/archive/refs/heads/main.zip).
+1. Within the `.devcontainer` subdirectory, create a new file called `.env` based on the template provided at `.env.example`. In this file, change the value of the environment variable `RENV_PATHS_CACHE_HOST` to the deisred directory on your system. 
+1. Launch Visual Studio Code and open the folder of your local copy of the workshop repository.
+1. You will be prompted to re-open the folder to begin the container build process. Note that this process can take a few minutes depending on your computer's hardware specifications and network bandwidth.
+1. Once the development container is built, you are free to continue using Visual Studio Code or use a container version of the RStudio open source server by visiting `localhost:4567` in your web browser.
 * If using visual studio code, the user needs to add the renv library path to their `r.libPaths` setting in the R extension. Details at https://github.com/REditorSupport/vscode-R/wiki/Working-with-renv-enabled-projects .
 
 :::

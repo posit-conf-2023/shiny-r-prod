@@ -16,25 +16,29 @@ format:
 
 # Create Posit Connect Account
 
-## {background-image="assets/screenshots/rsconnect_login_1.png" background-size="contain"}
+## {background-image="assets/screenshots/psconnect_login_1.png" background-size="contain"}
 
-## {background-image="assets/screenshots/rsconnect_login_2.png" background-size="contain"}
+## {background-image="assets/screenshots/psconnect_login_2.png" background-size="contain"}
+
+## {background-image="assets/screenshots/psconnect_login_3.png" background-size="contain"}
 
 # Create Posit Connect API Key 
 
-## {background-image="assets/screenshots/rsconnect_apikey_1.png" background-size="contain"}
+## {background-image="assets/screenshots/psconnect_apikey_1.png" background-size="contain"}
 
-## {background-image="assets/screenshots/rsconnect_apikey_2.png" background-size="contain"}
+## {background-image="assets/screenshots/psconnect_apikey_2.png" background-size="contain"}
 
-## {background-image="assets/screenshots/rsconnect_apikey_3.png" background-size="contain"}
+## {background-image="assets/screenshots/psconnect_apikey_3.png" background-size="contain"}
 
 # Posit Cloud Setup
 
-## {background-image="assets/screenshots/rscloud_1.png" background-size="contain"}
+## {background-image="assets/screenshots/pscloud_1.png" background-size="contain"}
 
-## {background-image="assets/screenshots/rscloud_2.png" background-size="contain"}
+## {background-image="assets/screenshots/pscloud_2.png" background-size="contain"}
 
-## {background-image="assets/screenshots/rscloud_3.png" background-size="contain"}
+## {background-image="assets/screenshots/pscloud_3.png" background-size="contain"}
+
+## {background-image="assets/screenshots/pscloud_4.png" background-size="contain"}
 
 # Account Integrations
 
@@ -47,3 +51,5 @@ format:
 ## {background-image="assets/screenshots/account_integrate_4.png" background-size="contain"}
 
 ## {background-image="assets/screenshots/account_integrate_5.png" background-size="contain"}
+
+## {background-image="assets/screenshots/account_integrate_6.png" background-size="contain"}
