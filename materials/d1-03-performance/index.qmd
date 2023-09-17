@@ -6,11 +6,13 @@ format:
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
-    incremental: true
+    incremental: false
     slide-number: c/t # c/t | c | h/v | h.v
     slide-tone: false #true
     code-line-numbers: false
     history: false
+revealjs-plugins:
+  - codewindow
 ---
 
 ## Performance Agenda
@@ -113,3 +115,83 @@ You need to wrap the `run_app()` function in `print()`, before passing it to `pr
 - {arrow} let's you use {dplyr} verbs against a single parquet file (or, perhaps more importantly, a *set* of parquet files) to query the data in those files
 - When it comes to building Shiny apps, we should look for easy places where we can gain efficiency & speed to improve our user experience (you don't want users waiting 20 seconds for your data prep logic to run against a single massive csv); it's very likely that the combination of .parquet + {arrow} + {dplyr} can meet your app performance needs (it does for at least 95% of my use cases -- there are very few cases where I have to go beyond that and start looking into other engines for faster data manipulation)
 :::
+
+# Async Processing
+
+## Single (threaded) Line {background-image="assets/img/lego_line_pay.jpg" background-size="cover"}
+
+* A single R process managing the different tasks in a Shiny application
+* Executed one-by-one
+
+# Should I care?
+
+## It Depends ...
+
+If you are the __only__ user for a quick and efficient app: Likely not
+
+::: {.notes}
+TODO: Find a way to center the sentence vertically in the slide
+:::
+
+## Crowd Pleaser
+
+Multiple users accessing the app __concurrently__: 
+
+* Single-threaded R process serving multiple users in typical deployments
+
+## Asynchronous Processing (circa 2018)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### 📦 [`{promises}`](https://rstudio.github.io/promises/index.html)
+
+Handle objects representing the (eventual) result of an async operation
+
+:::
+
+::: {.column width="50%"}
+
+### 📦 [`{future}`](https://future.futureverse.org/)
+
+Launch tasks without blocking current R session
+
+:::
+
+::::
+
+::: footer
+[Using promises with Shiny](https://rstudio.github.io/promises/articles/promises_06_shiny.html)
+:::
+
+## Introducing [`{crew}`](https://wlandau.github.io/crew/)
+
+> A distributed worker launcher for asynchronous tasks
+
+* Extends use of the [mirai](https://github.com/shikokuchuo/mirai) task scheduler to multiple computing backends
+* Central controller object manages tasks (scales on fly)
+* Supports multiple [controller groups](https://wlandau.github.io/crew/articles/controller_groups.html) for specialized worker types
+* Fits nicely with [`{targets}`](https://docs.ropensci.org/targets/) and ...
+
+. . .
+
+![](assets/img/shiny.png){.absolute top=0 left=200}
+
+## Watch-Along {background-color="#17395c"}
+
+Using `{crew}` inside a Shiny application:
+
+* Vignette: <https://wlandau.github.io/crew/articles/shiny.html>
+* Application: <https://wlandau.shinyapps.io/crew-shiny>
+
+## Setting up for Success
+
+1. Create functions for long-running tasks
+1. Create multiple [`reactiveVal`](https://shiny.posit.co/r/reference/shiny/latest/reactiveval) objects for bookkeeping
+1. Set up a `{crew}` controller 
+1. Establish an event-driven push of task to the controller with monitoring of worker status
+
+# Code-Along {background-color="#17395c"}
+
+[Code-Along 1](codealong-1.html){target="_blank"}: Asynchronous calls of a web API

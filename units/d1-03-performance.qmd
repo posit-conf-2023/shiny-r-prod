@@ -15,15 +15,21 @@ listing:
     sort-ui: false
     filter-ui: false
     image-placeholder: assets/img/placeholder.png
+  - id: code-along
+    contents:
+      - ../materials/d1-03-performance/codealong-*.qmd
+    type: table
+    fields: [subtitle, title]
+    field-display-names: 
+      subtitle: "Code-Along"
+    sort: [filename]
+    sort-ui: false
+    filter-ui: false
+    image-placeholder: assets/img/placeholder.png
 tbl-colwidths: [5,20,75]
 ---
 
 ## Slides
-
-::: callout-warning
-These slides are under construction and will be finalized prior to the workshop date.
-:::
-
 
 [View slides in full screen](../materials/d1-03-performance/index.html)
 
