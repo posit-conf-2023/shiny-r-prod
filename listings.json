@@ -8,6 +8,12 @@
     "items": []
   },
   {
+    "listing": "/units/d1-9002-async.html",
+    "items": [
+      "/materials/d1-9002-async/codealong-1.html"
+    ]
+  },
+  {
     "listing": "/schedule.html",
     "items": [
       "/units/d1-01-welcome.html",
@@ -17,7 +23,8 @@
       "/units/d1-03b-lunch.html",
       "/units/d1-04-deploy-admin.html",
       "/units/d1-04b-break.html",
-      "/units/d1-9001-loadtesting.html"
+      "/units/d1-9001-loadtesting.html",
+      "/units/d1-9002-async.html"
     ]
   },
   {
