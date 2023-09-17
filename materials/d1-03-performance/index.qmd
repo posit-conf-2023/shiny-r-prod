@@ -1,7 +1,6 @@
 ---
 title: "Performance"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
-author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format:
   revealjs:
@@ -13,6 +12,14 @@ format:
     code-line-numbers: false
     history: false
 ---
+
+## Performance Agenda
+
+* Profiling your Shiny app with {profvis}
+* Lightning-quick data loading/querying with {arrow} & *.parquet* files
+* Asynchronous processes with {crew}
+
+# {profvis}: an R package for profiling R code <br>(including Shiny apps)
 
 ## What is {profvis}?
 
@@ -71,4 +78,38 @@ You need to wrap the `run_app()` function in `print()`, before passing it to `pr
 - Stop the app, and wait for the report to load
 - Describe the flamegraph, change the filters to only show events that took time
 - Navigate to the 'data' tab and discuss what took the most time
+:::
+
+# {arrow} & the *.parquet* file format
+
+## What are *.parquet* files?
+
+* *.parquet* is a *columnar* storage format
+* *.parquet* files not only store data, but they also store metadata about your data (i.e., data types for each column, number of rows in the file, etc.)
+* Smaller files
+* Faster read speed
+
+::: {.notes}
+- HOT TAKE INCOMING: parquet is the new csv
+- parquet files typically are the data structure that lives behind projects like the open source Delta Lake
+- faster across pretty much all benchmarks
+:::
+
+## What is the {arrow} R package?
+
+* Part of the larger Apache Arrow project
+* Connect to your data with {arrow}...
+* ... and query it with {dplyr}
+
+. . .
+
+[Apache Arrow Homepage](https://arrow.apache.org/)
+
+[Shiny + Arrow Article](https://posit.co/blog/shiny-and-arrow/)
+
+::: {.notes}
+- "multi-language toolbox for accelerated data interchange and in-memory processing"
+- I.e., a set of data manipulation standards (particularly against parquet files) that has been implemented in a bunch of languages including R, Python, Rust, Go, and more
+- {arrow} let's you use {dplyr} verbs against a single parquet file (or, perhaps more importantly, a *set* of parquet files) to query the data in those files
+- When it comes to building Shiny apps, we should look for easy places where we can gain efficiency & speed to improve our user experience (you don't want users waiting 20 seconds for your data prep logic to run against a single massive csv); it's very likely that the combination of .parquet + {arrow} + {dplyr} can meet your app performance needs (it does for at least 95% of my use cases -- there are very few cases where I have to go beyond that and start looking into other engines for faster data manipulation)
 :::
