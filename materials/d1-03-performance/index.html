@@ -98,6 +98,7 @@
   <link href="../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../site_libs/revealjs/plugin/reveal-codewindow/codewindow.css" rel="stylesheet">
   <link href="../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
@@ -404,9 +405,9 @@
 <section id="performance-agenda" class="slide level2">
 <h2>Performance Agenda</h2>
 <ul>
-<li class="fragment">Profiling your Shiny app with {profvis}</li>
-<li class="fragment">Lightning-quick data loading/querying with {arrow} &amp; <em>.parquet</em> files</li>
-<li class="fragment">Asynchronous processes with {crew}</li>
+<li>Profiling your Shiny app with {profvis}</li>
+<li>Lightning-quick data loading/querying with {arrow} &amp; <em>.parquet</em> files</li>
+<li>Asynchronous processes with {crew}</li>
 </ul>
 </section>
 <section>
@@ -505,10 +506,10 @@
 <section id="what-are-.parquet-files" class="slide level2">
 <h2>What are <em>.parquet</em> files?</h2>
 <ul>
-<li class="fragment"><em>.parquet</em> is a <em>columnar</em> storage format</li>
-<li class="fragment"><em>.parquet</em> files not only store data, but they also store metadata about your data (i.e., data types for each column, number of rows in the file, etc.)</li>
-<li class="fragment">Smaller files</li>
-<li class="fragment">Faster read speed</li>
+<li><em>.parquet</em> is a <em>columnar</em> storage format</li>
+<li><em>.parquet</em> files not only store data, but they also store metadata about your data (i.e., data types for each column, number of rows in the file, etc.)</li>
+<li>Smaller files</li>
+<li>Faster read speed</li>
 </ul>
 <aside class="notes">
 <ul>
@@ -531,9 +532,9 @@
 <section id="what-is-the-arrow-r-package" class="slide level2">
 <h2>What is the {arrow} R package?</h2>
 <ul>
-<li class="fragment">Part of the larger Apache Arrow project</li>
-<li class="fragment">Connect to your data with {arrow}…</li>
-<li class="fragment">… and query it with {dplyr}</li>
+<li>Part of the larger Apache Arrow project</li>
+<li>Connect to your data with {arrow}…</li>
+<li>… and query it with {dplyr}</li>
 </ul>
 <div class="fragment">
 <p><a href="https://arrow.apache.org/">Apache Arrow Homepage</a></p>
@@ -556,12 +557,110 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="async-processing" class="title-slide slide level1 center">
+<h1>Async Processing</h1>
+
+</section>
+<section id="single-threaded-line" class="slide level2" data-background-image="assets/img/lego_line_pay.jpg" data-background-size="cover">
+<h2>Single (threaded) Line</h2>
+<ul>
+<li>A single R process managing the different tasks in a Shiny application</li>
+<li>Executed one-by-one</li>
+</ul>
+</section></section>
+<section>
+<section id="should-i-care" class="title-slide slide level1 center">
+<h1>Should I care?</h1>
+
+</section>
+<section id="it-depends" class="slide level2">
+<h2>It Depends …</h2>
+<p>If you are the <strong>only</strong> user for a quick and efficient app: Likely not</p>
+<aside class="notes">
+<p>TODO: Find a way to center the sentence vertically in the slide</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="crowd-pleaser" class="slide level2">
+<h2>Crowd Pleaser</h2>
+<p>Multiple users accessing the app <strong>concurrently</strong>:</p>
+<ul>
+<li>Single-threaded R process serving multiple users in typical deployments</li>
+</ul>
+</section>
+<section id="asynchronous-processing-circa-2018" class="slide level2">
+<h2>Asynchronous Processing (circa 2018)</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="promises">📦 <a href="https://rstudio.github.io/promises/index.html"><code>{promises}</code></a></h3>
+<p>Handle objects representing the (eventual) result of an async operation</p>
+</div><div class="column" style="width:50%;">
+<h3 id="future">📦 <a href="https://future.futureverse.org/"><code>{future}</code></a></h3>
+<p>Launch tasks without blocking current R session</p>
+</div>
+</div>
+<div class="footer">
+<p><a href="https://rstudio.github.io/promises/articles/promises_06_shiny.html">Using promises with Shiny</a></p>
+</div>
+</section>
+<section id="introducing-crew" class="slide level2">
+<h2>Introducing <a href="https://wlandau.github.io/crew/"><code>{crew}</code></a></h2>
+<blockquote>
+<p>A distributed worker launcher for asynchronous tasks</p>
+</blockquote>
+<ul>
+<li>Extends use of the <a href="https://github.com/shikokuchuo/mirai">mirai</a> task scheduler to multiple computing backends</li>
+<li>Central controller object manages tasks (scales on fly)</li>
+<li>Supports multiple <a href="https://wlandau.github.io/crew/articles/controller_groups.html">controller groups</a> for specialized worker types</li>
+<li>Fits nicely with <a href="https://docs.ropensci.org/targets/"><code>{targets}</code></a> and …</li>
+</ul>
+<div class="fragment">
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-3" class="absolute quarto-figure quarto-figure-center" data-left="200" data-top="0" style="top: 0px; left: 200px; ">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/shiny.png" id="fig-539a35d47e664c97a50115a146a7f1bd-3" class="absolute" style="top: 0px; left: 200px; ">
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="watch-along" class="slide level2" data-background-color="#17395c">
+<h2>Watch-Along</h2>
+<p>Using <code>{crew}</code> inside a Shiny application:</p>
+<ul>
+<li>Vignette: <a href="https://wlandau.github.io/crew/articles/shiny.html" class="uri">https://wlandau.github.io/crew/articles/shiny.html</a></li>
+<li>Application: <a href="https://wlandau.shinyapps.io/crew-shiny" class="uri">https://wlandau.shinyapps.io/crew-shiny</a></li>
+</ul>
+</section>
+<section id="setting-up-for-success" class="slide level2">
+<h2>Setting up for Success</h2>
+<ol type="1">
+<li>Create functions for long-running tasks</li>
+<li>Create multiple <a href="https://shiny.posit.co/r/reference/shiny/latest/reactiveval"><code>reactiveVal</code></a> objects for bookkeeping</li>
+<li>Set up a <code>{crew}</code> controller</li>
+<li>Establish an event-driven push of task to the controller with monitoring of worker status</li>
+</ol>
+</section></section>
+<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<h1>Code-Along</h1>
+<p><a href="codealong-1.html" target="_blank">Code-Along 1</a>: Asynchronous calls of a web API</p>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>
 </div>
-</div>
-</section></section>
+</section>
     </div>
   </div>
 
@@ -572,6 +671,7 @@
   <script src="../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../site_libs/revealjs/plugin/reveal-codewindow/codewindow.js"></script>
   <script src="../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -763,7 +863,7 @@
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealCodewindow, QuartoSupport,
 
           RevealMath,
           RevealNotes,

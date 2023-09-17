@@ -1,16 +1,17 @@
 [
   {
-    "listing": "/units/d1-9001-loadtesting.html",
+    "listing": "/units/d1-01-welcome.html",
     "items": []
   },
   {
-    "listing": "/units/d1-03-performance.html",
+    "listing": "/units/d1-04-deploy-admin.html",
     "items": []
   },
   {
-    "listing": "/units/d1-9002-async.html",
+    "listing": "/units/d1-02-structure.html",
     "items": [
-      "/materials/d1-9002-async/codealong-1.html"
+      "/materials/d1-02-structure/ex-1.html",
+      "/materials/d1-02-structure/codealong-1.html"
     ]
   },
   {
@@ -23,23 +24,17 @@
       "/units/d1-03b-lunch.html",
       "/units/d1-04-deploy-admin.html",
       "/units/d1-04b-break.html",
-      "/units/d1-9001-loadtesting.html",
-      "/units/d1-9002-async.html"
+      "/units/d1-9001-loadtesting.html"
     ]
   },
   {
-    "listing": "/units/d1-02-structure.html",
+    "listing": "/units/d1-03-performance.html",
     "items": [
-      "/materials/d1-02-structure/ex-1.html",
-      "/materials/d1-02-structure/codealong-1.html"
+      "/materials/d1-03-performance/codealong-1.html"
     ]
   },
   {
-    "listing": "/units/d1-04-deploy-admin.html",
-    "items": []
-  },
-  {
-    "listing": "/units/d1-01-welcome.html",
+    "listing": "/units/d1-9001-loadtesting.html",
     "items": []
   }
 ]

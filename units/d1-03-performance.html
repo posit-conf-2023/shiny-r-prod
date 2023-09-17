@@ -99,6 +99,34 @@ ul.task-list li input[type="checkbox"] {
       window['quarto-listing-loaded']();
     }
   })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-code-along .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-subtitle','listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-code-along'] = new List('listing-code-along', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
   </script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -195,19 +223,6 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="slides" class="level2">
 <h2 class="anchored" data-anchor-id="slides">Slides</h2>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>These slides are under construction and will be finalized prior to the workshop date.</p>
-</div>
-</div>
 <p><a href="../materials/d1-03-performance/index.html">View slides in full screen</a></p>
 <iframe class="slide-deck" src="../materials/d1-03-performance/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 
@@ -228,6 +243,32 @@ Title
 </tr>
 </thead>
 <tbody class="list">
+</tbody>
+</table>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div><div class="quarto-listing quarto-listing-container-table" id="listing-code-along">
+<table class="quarto-listing-table table">
+<thead>
+<tr>
+<th>
+Code-Along
+</th>
+<th>
+Title
+</th>
+</tr>
+</thead>
+<tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1694925456297" data-listing-reading-time-sort="3" data-listing-word-count-sort="465" data-listing-title-sort="Asynchronous Processing of LEGO Model Prediction" data-listing-filename-sort="codealong-1.qmd">
+<td>
+<span class="listing-subtitle">&nbsp;</span>
+</td>
+<td>
+<a href="../materials/d1-03-performance/codealong-1.html" class="title listing-title">Asynchronous Processing of LEGO Model Prediction</a>
+</td>
+</tr>
 </tbody>
 </table>
 <div class="listing-no-matching d-none">
