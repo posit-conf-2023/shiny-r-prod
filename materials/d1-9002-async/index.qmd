@@ -76,9 +76,20 @@ Launch tasks without blocking current R session
 
 ![](assets/img/shiny.png){.absolute top=0 left=200}
 
+### Watch-Along {background-color="#17395c"}
+
+Using `{crew}` inside a Shiny application:
+
+* Vignette: <https://wlandau.github.io/crew/articles/shiny.html>
+* Application: <https://wlandau.shinyapps.io/crew-shiny>
+
 ## Setting up for Success
 
 1. Create functions for long-running tasks
 1. Create multiple [`reactiveVal`](https://shiny.posit.co/r/reference/shiny/latest/reactiveval) objects for bookkeeping
 1. Set up a `{crew}` controller 
 1. Establish an event-driven push of task to the controller with monitoring of worker status
+
+# Code-Along {background-color="#17395c"}
+
+[Code-Along 1](codealong-1.html){target="_blank"}: Asynchronous calls of a web API

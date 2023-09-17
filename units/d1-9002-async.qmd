@@ -4,13 +4,13 @@ subtitle: "TBD"
 author: "Eric Nantz & Michael Thomas"
 date: "2023-09-18"
 listing:
-  - id: exercises
+  - id: code-along
     contents:
-      - ../materials/d1-9002-async/ex-*.qmd
+      - ../materials/d1-9002-async/codealong-*.qmd
     type: table
     fields: [subtitle, title]
     field-display-names: 
-      subtitle: "Exercise"
+      subtitle: "Code-Along"
     sort: [filename]
     sort-ui: false
     filter-ui: false
