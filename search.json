@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "materials/d1-03-performance/index.html#performance-agenda",
+    "href": "materials/d1-03-performance/index.html#performance-agenda",
+    "title": "Performance",
+    "section": "Performance Agenda",
+    "text": "Performance Agenda\n\nProfiling your Shiny app with {profvis}\nLightning-quick data loading/querying with {arrow} & .parquet files\nAsynchronous processes with {crew}"
+  },
+  {
     "objectID": "materials/d1-03-performance/index.html#what-is-profvis",
     "href": "materials/d1-03-performance/index.html#what-is-profvis",
     "title": "Performance",
@@ -25,7 +32,21 @@
     "href": "materials/d1-03-performance/index.html#demo",
     "title": "Performance",
     "section": "Demo!",
-    "text": "Demo!\n\n\n\nShow how to change the dev/run_dev.R script to enable {profvis} profiling\nLaunch the app, navigate to the “Overview” page, and change a filter\nStop the app, and wait for the report to load\nDescribe the flamegraph, change the filters to only show events that took time\nNavigate to the ‘data’ tab and discuss what took the most time\n\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "Demo!\n\n\n\nShow how to change the dev/run_dev.R script to enable {profvis} profiling\nLaunch the app, navigate to the “Overview” page, and change a filter\nStop the app, and wait for the report to load\nDescribe the flamegraph, change the filters to only show events that took time\nNavigate to the ‘data’ tab and discuss what took the most time"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#what-are-.parquet-files",
+    "href": "materials/d1-03-performance/index.html#what-are-.parquet-files",
+    "title": "Performance",
+    "section": "What are .parquet files?",
+    "text": "What are .parquet files?\n\n.parquet is a columnar storage format\n.parquet files not only store data, but they also store metadata about your data (i.e., data types for each column, number of rows in the file, etc.)\nSmaller files\nFaster read speed\n\n\n\nHOT TAKE INCOMING: parquet is the new csv\nparquet files typically are the data structure that lives behind projects like the open source Delta Lake\nfaster across pretty much all benchmarks"
+  },
+  {
+    "objectID": "materials/d1-03-performance/index.html#what-is-the-arrow-r-package",
+    "href": "materials/d1-03-performance/index.html#what-is-the-arrow-r-package",
+    "title": "Performance",
+    "section": "What is the {arrow} R package?",
+    "text": "What is the {arrow} R package?\n\nPart of the larger Apache Arrow project\nConnect to your data with {arrow}…\n… and query it with {dplyr}\n\n\nApache Arrow Homepage\nShiny + Arrow Article\n\n\n“multi-language toolbox for accelerated data interchange and in-memory processing”\nI.e., a set of data manipulation standards (particularly against parquet files) that has been implemented in a bunch of languages including R, Python, Rust, Go, and more\n{arrow} let’s you use {dplyr} verbs against a single parquet file (or, perhaps more importantly, a set of parquet files) to query the data in those files\nWhen it comes to building Shiny apps, we should look for easy places where we can gain efficiency & speed to improve our user experience (you don’t want users waiting 20 seconds for your data prep logic to run against a single massive csv); it’s very likely that the combination of .parquet + {arrow} + {dplyr} can meet your app performance needs (it does for at least 95% of my use cases – there are very few cases where I have to go beyond that and start looking into other engines for faster data manipulation)\n\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
   },
   {
     "objectID": "materials/d1-02-structure/codealong-1.html",

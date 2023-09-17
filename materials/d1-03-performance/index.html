@@ -10,7 +10,6 @@
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.369">
 
-  <meta name="author" content="TBD">
   <title>Shiny in Production - Performance</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -399,12 +398,20 @@
   <p class="subtitle">posit::conf(2023) <br> Shiny in Production: Tools &amp; Techniques</p>
 
 <div class="quarto-title-authors">
-<div class="quarto-title-author">
-<div class="quarto-title-author-name">
-TBD 
 </div>
-</div>
-</div>
+
+</section>
+<section id="performance-agenda" class="slide level2">
+<h2>Performance Agenda</h2>
+<ul>
+<li class="fragment">Profiling your Shiny app with {profvis}</li>
+<li class="fragment">Lightning-quick data loading/querying with {arrow} &amp; <em>.parquet</em> files</li>
+<li class="fragment">Asynchronous processes with {crew}</li>
+</ul>
+</section>
+<section>
+<section id="profvis-an-r-package-for-profiling-r-code-including-shiny-apps" class="title-slide slide level1 center">
+<h1>{profvis}: an R package for profiling R code <br>(including Shiny apps)</h1>
 
 </section>
 <section id="what-is-profvis" class="slide level2">
@@ -489,11 +496,72 @@ TBD
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</section></section>
+<section>
+<section id="arrow-the-.parquet-file-format" class="title-slide slide level1 center">
+<h1>{arrow} &amp; the <em>.parquet</em> file format</h1>
+
+</section>
+<section id="what-are-.parquet-files" class="slide level2">
+<h2>What are <em>.parquet</em> files?</h2>
+<ul>
+<li class="fragment"><em>.parquet</em> is a <em>columnar</em> storage format</li>
+<li class="fragment"><em>.parquet</em> files not only store data, but they also store metadata about your data (i.e., data types for each column, number of rows in the file, etc.)</li>
+<li class="fragment">Smaller files</li>
+<li class="fragment">Faster read speed</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>HOT TAKE INCOMING: parquet is the new csv</li>
+<li>parquet files typically are the data structure that lives behind projects like the open source Delta Lake</li>
+<li>faster across pretty much all benchmarks</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-is-the-arrow-r-package" class="slide level2">
+<h2>What is the {arrow} R package?</h2>
+<ul>
+<li class="fragment">Part of the larger Apache Arrow project</li>
+<li class="fragment">Connect to your data with {arrow}…</li>
+<li class="fragment">… and query it with {dplyr}</li>
+</ul>
+<div class="fragment">
+<p><a href="https://arrow.apache.org/">Apache Arrow Homepage</a></p>
+<p><a href="https://posit.co/blog/shiny-and-arrow/">Shiny + Arrow Article</a></p>
+<aside class="notes">
+<ul>
+<li>“multi-language toolbox for accelerated data interchange and in-memory processing”</li>
+<li>I.e., a set of data manipulation standards (particularly against parquet files) that has been implemented in a bunch of languages including R, Python, Rust, Go, and more</li>
+<li>{arrow} let’s you use {dplyr} verbs against a single parquet file (or, perhaps more importantly, a <em>set</em> of parquet files) to query the data in those files</li>
+<li>When it comes to building Shiny apps, we should look for easy places where we can gain efficiency &amp; speed to improve our user experience (you don’t want users waiting 20 seconds for your data prep logic to run against a single massive csv); it’s very likely that the combination of .parquet + {arrow} + {dplyr} can meet your app performance needs (it does for at least 95% of my use cases – there are very few cases where I have to go beyond that and start looking into other engines for faster data manipulation)</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>
 </div>
-</section>
+</div>
+</section></section>
     </div>
   </div>
 
