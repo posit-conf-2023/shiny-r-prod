@@ -405,9 +405,9 @@
 <h2>It’s Never Just Shiny</h2>
 <p>… at least for production-quality apps!</p>
 <ul>
-<li class="fragment">External data sources</li>
-<li class="fragment">Connections to other execution backends</li>
-<li class="fragment">Additional R packages!</li>
+<li>External data sources</li>
+<li>Connections to other execution backends</li>
+<li>Additional R packages!</li>
 </ul>
 </section>
 <section id="turned-upside-down" class="slide level2">
@@ -461,30 +461,30 @@
 <p>Create <strong>r</strong>eproducible <strong>env</strong>ironments for your R projects.</p>
 </blockquote>
 <ul>
-<li class="fragment">Next generation of <code>{packrat}</code></li>
-<li class="fragment">Isolated package library from rest of your system</li>
-<li class="fragment">Transfer projects to different collaborators / platforms</li>
-<li class="fragment"><strong>Reproducible</strong> package installation</li>
-<li class="fragment">Easily create new projects or convert existing projects with RStudio or built-in functions.</li>
+<li>Next generation of <code>{packrat}</code></li>
+<li>Isolated package library from rest of your system</li>
+<li>Transfer projects to different collaborators / platforms</li>
+<li><strong>Reproducible</strong> package installation</li>
+<li>Easily create new projects or convert existing projects with RStudio or built-in functions.</li>
 </ul>
 </section>
 <section id="under-the-hood" class="slide level2">
 <h2>Under the Hood</h2>
 <p>Upon initializing a project:</p>
 <ol type="1">
-<li class="fragment">Project-level <code>.Rprofile</code> to activate custom package library on startup</li>
-<li class="fragment">Lockfile <code>renv.lock</code> to describe state of project library</li>
-<li class="fragment"><code>renv/library</code> to hold private project library</li>
-<li class="fragment"><code>renv/activate.R</code> performs activation</li>
+<li>Project-level <code>.Rprofile</code> to activate custom package library on startup</li>
+<li>Lockfile <code>renv.lock</code> to describe state of project library</li>
+<li><code>renv/library</code> to hold private project library</li>
+<li><code>renv/activate.R</code> performs activation</li>
 </ol>
 </section>
 <section id="develop-a-routine" class="slide level2">
 <h2>Develop a Routine</h2>
 <p>Sticking with <code>{renv}</code> will pay off (trust me)</p>
 <ul>
-<li class="fragment">Fair play to mix packages from CRAN, GitHub, and proprietary sources</li>
-<li class="fragment">Roll back when a package upgrade doesn’t play nicely</li>
-<li class="fragment"><strong>You</strong> make the call when to update your library!</li>
+<li>Fair play to mix packages from CRAN, GitHub, and proprietary sources</li>
+<li>Roll back when a package upgrade doesn’t play nicely</li>
+<li><strong>You</strong> make the call when to update your library!</li>
 </ul>
 </section>
 <section>
@@ -496,17 +496,17 @@
 <h2>A Single Point: <code>app.R</code></h2>
 <p>Prototype apps can coast by with a single <code>app.R</code></p>
 <ul>
-<li class="fragment">More inputs, visualizations, modules, tabs …</li>
-<li class="fragment">Eventually the <code>app.R</code> almost explodes</li>
-<li class="fragment">Difficult to collaborate without conflicts</li>
+<li>More inputs, visualizations, modules, tabs …</li>
+<li>Eventually the <code>app.R</code> almost explodes</li>
+<li>Difficult to collaborate without conflicts</li>
 </ul>
 </section>
 <section id="r-directory" class="slide level2">
 <h2><code>R</code> Directory</h2>
 <ul>
-<li class="fragment">Shiny supports auto-loading scripts in an <code>R</code> directory</li>
-<li class="fragment">Nested directories not supported</li>
-<li class="fragment">More information on the <a href="https://shiny.rstudio.com/articles/app-formats.html">App Formats</a> article</li>
+<li>Shiny supports auto-loading scripts in an <code>R</code> directory</li>
+<li>Nested directories not supported</li>
+<li>More information on the <a href="https://shiny.rstudio.com/articles/app-formats.html">App Formats</a> article</li>
 </ul>
 </section>
 <section id="enter-the-golem" class="slide level2">
@@ -515,9 +515,9 @@
 <p>Opinionated framework for building production-grade Shiny applications as <strong>R packages</strong></p>
 </blockquote>
 <ul>
-<li class="fragment">Scripts guide you with first steps akin to <code>{usethis}</code> &amp; <code>{devtools}</code></li>
-<li class="fragment">Encourages Shiny best practices (especially <strong>modules</strong>)</li>
-<li class="fragment">Streamlines deployment on multiple platforms</li>
+<li>Scripts guide you with first steps akin to <code>{usethis}</code> &amp; <code>{devtools}</code></li>
+<li>Encourages Shiny best practices (especially <strong>modules</strong>)</li>
+<li>Streamlines deployment on multiple platforms</li>
 </ul>
 <aside class="notes">
 <ul>
@@ -588,9 +588,9 @@
 <h2>Getting Started with {golem}</h2>
 <p>Use helper functions in <code>dev/01_start.R</code> to…</p>
 <ul>
-<li class="fragment">Create <code>DESCRIPTION</code>, <code>README</code>, <code>LICENSE</code> (etc.) files</li>
-<li class="fragment">Use git, tests</li>
-<li class="fragment">Add your own favicon 🚀</li>
+<li>Create <code>DESCRIPTION</code>, <code>README</code>, <code>LICENSE</code> (etc.) files</li>
+<li>Use git, tests</li>
+<li>Add your own favicon 🚀</li>
 </ul>
 <aside class="notes">
 <ul>
@@ -612,9 +612,9 @@
 <h2>Developing with {golem}</h2>
 <p>Use the helper functions in <code>dev/02_dev.R</code> to…</p>
 <ul>
-<li class="fragment">Add R package dependencies</li>
-<li class="fragment">Create custom functions</li>
-<li class="fragment">Add Shiny modules</li>
+<li>Add R package dependencies</li>
+<li>Create custom functions</li>
+<li>Add Shiny modules</li>
 </ul>
 <div class="fragment">
 <p>And use <code>dev/run_dev.R</code> to run your app</p>
@@ -639,14 +639,14 @@
 <h2>Deploying with {golem}</h2>
 <p>Use the helper functions in <code>dev/03_deploy.R</code> to…</p>
 <ul>
-<li class="fragment">Check your R package ( <code>devtools::check()</code> )</li>
-<li class="fragment">Build your R package ( <code>R CMD build mypackage</code> )</li>
-<li class="fragment">Generate deployment files for
+<li>Check your R package ( <code>devtools::check()</code> )</li>
+<li>Build your R package ( <code>R CMD build mypackage</code> )</li>
+<li>Generate deployment files for
 <ul>
-<li class="fragment">RStudio Connect</li>
-<li class="fragment">Shinyapps.io</li>
-<li class="fragment">Your own Shiny Server</li>
-<li class="fragment">Dockerized deployments (e.g., ShinyProxy)</li>
+<li>RStudio Connect</li>
+<li>Shinyapps.io</li>
+<li>Your own Shiny Server</li>
+<li>Dockerized deployments (e.g., ShinyProxy)</li>
 </ul></li>
 </ul>
 </section></section>
@@ -660,18 +660,18 @@
 <div class="fragment">
 <h3 id="building-blocks-to-compose-any-shiny-app-out-of-smaller-more-understandable-pieces">Building blocks to compose any Shiny app out of smaller, more understandable pieces</h3>
 <ul>
-<li class="fragment">Avoids namespace collisions when using same widget across different areas of your app</li>
-<li class="fragment">Allow you to encapsulate distinct app interfaces</li>
-<li class="fragment">Organize code into logical and easy-to-understand components</li>
-<li class="fragment">Facilitate collaboration</li>
+<li>Avoids namespace collisions when using same widget across different areas of your app</li>
+<li>Allow you to encapsulate distinct app interfaces</li>
+<li>Organize code into logical and easy-to-understand components</li>
+<li>Facilitate collaboration</li>
 </ul>
 </div>
 </section>
 <section id="sound-familiar" class="slide level2">
 <h2>Sound familiar?</h2>
 <ul>
-<li class="fragment">R functions also help avoid collisions in variable names with general R code</li>
-<li class="fragment">Essential for creating non-trivial and extensive workflows</li>
+<li>R functions also help avoid collisions in variable names with general R code</li>
+<li>Essential for creating non-trivial and extensive workflows</li>
 </ul>
 </section></section>
 <section>
@@ -748,8 +748,8 @@
 <span id="cb5-11"><a href="#cb5-11"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:40%;">
 <ul>
-<li class="fragment"><code>id</code>: String to use for namespace</li>
-<li class="fragment"><code>ns &lt;- NS(id)</code>: Create proper namespace function</li>
+<li><code>id</code>: String to use for namespace</li>
+<li><code>ns &lt;- NS(id)</code>: Create proper namespace function</li>
 </ul>
 </div>
 </div>
@@ -830,7 +830,7 @@
 </div>
 </div>
 <ul>
-<li class="fragment">`<code>moduleServer()</code>: Encapsulate server-side logic with namespace applied.</li>
+<li>`<code>moduleServer()</code>: Encapsulate server-side logic with namespace applied.</li>
 </ul>
 </section>
 <section id="invoking-modules" class="slide level2">
@@ -868,9 +868,9 @@
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column" style="width:40%;">
 <ul>
-<li class="fragment">Reasonable inputs: static values, vectors, flags</li>
-<li class="fragment">Avoid <strong>reactive</strong> parameters</li>
-<li class="fragment">Return value: <code>tagList()</code> of inputs, output placeholders, and other UI elements</li>
+<li>Reasonable inputs: static values, vectors, flags</li>
+<li>Avoid <strong>reactive</strong> parameters</li>
+<li>Return value: <code>tagList()</code> of inputs, output placeholders, and other UI elements</li>
 </ul>
 </div>
 </div>
@@ -896,7 +896,7 @@
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li class="fragment">Input parameters (and return values) can be a mix of static and <strong>reactive</strong> objects</li>
+<li>Input parameters (and return values) can be a mix of static and <strong>reactive</strong> objects</li>
 </ul>
 </section>
 <section id="to-or-not-to" class="slide level2 smaller">
@@ -927,10 +927,19 @@
 </div>
 </div>
 <ul>
-<li class="fragment">Reactive parameters reference by <strong>name</strong>: <code>sets_rv</code></li>
-<li class="fragment">Inside module, <strong>invoke</strong> reactive parameter as you would any other reactive in Shiny: <code>sets_rv()</code></li>
-<li class="fragment">Any reactive(s) returned by module should also be reference by <strong>name</strong>: <code>set_selection</code>, <del><code>set_selection()</code></del></li>
+<li>Reactive parameters reference by <strong>name</strong>: <code>sets_rv</code></li>
+<li>Inside module, <strong>invoke</strong> reactive parameter as you would any other reactive in Shiny: <code>sets_rv()</code></li>
+<li>Any reactive(s) returned by module should also be reference by <strong>name</strong>: <code>set_selection</code>, <del><code>set_selection()</code></del></li>
 </ul>
+</section></section>
+<section>
+<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<h1>Code-Along</h1>
+<p>Code-Along 1: Add a new Shiny module to pick themes</p>
+</section>
+<section id="your-turn-exercise-1" class="slide level2">
+<h2>Your Turn: <a href="ex-1.html" target="_blank">Exercise 1</a></h2>
+<p>Create a new Shiny module with LEGO data metrics!</p>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>

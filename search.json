@@ -676,7 +676,14 @@
     "href": "materials/d1-02-structure/index.html#to-or-not-to",
     "title": "Application Structure",
     "section": "To () or not to ()",
-    "text": "To () or not to ()\n\n\n# app server\nsets_rv &lt;- reactive({\n  # processing\n})\n\nset_picker_server(\"mod1\", sets_rv)\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      # ...\n\n      set_selection  &lt;- reactive({\n        input$set_num\n      })\n\n      set_selection\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: sets_rv\nInside module, invoke reactive parameter as you would any other reactive in Shiny: sets_rv()\nAny reactive(s) returned by module should also be reference by name: set_selection, set_selection()\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "To () or not to ()\n\n\n# app server\nsets_rv &lt;- reactive({\n  # processing\n})\n\nset_picker_server(\"mod1\", sets_rv)\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      # ...\n\n      set_selection  &lt;- reactive({\n        input$set_num\n      })\n\n      set_selection\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: sets_rv\nInside module, invoke reactive parameter as you would any other reactive in Shiny: sets_rv()\nAny reactive(s) returned by module should also be reference by name: set_selection, set_selection()"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#your-turn-exercise-1",
+    "href": "materials/d1-02-structure/index.html#your-turn-exercise-1",
+    "title": "Application Structure",
+    "section": "Your Turn: Exercise 1",
+    "text": "Your Turn: Exercise 1\nCreate a new Shiny module with LEGO data metrics!\n\n\nposit-conf-2023.github.io/shiny-r-prod"
   },
   {
     "objectID": "materials/d1-02-structure/codealong-1.html",
