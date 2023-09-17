@@ -1,5 +1,8 @@
 ---
 title: Modules for LEGO attribute selections
+format:
+  html:
+   code-line-numbers: false
 ---
 
 As you make the transition to building production Shiny applications, Shiny modules are a very important tool to improve code organization and overall flow of your application. We will work together to build Shiny modules that let the user filter the underlying LEGO metadata based on a key variables in the overall data.
@@ -50,10 +53,74 @@ themes <- readRDS("../../data_examples/df_themes.rds")
 dplyr::glimpse(themes)
 ```
 
-
 ## Plan
 
 1. Create a new module R script (and possible a supporting R script) by using `golem::add_module()` in the `dev/02_dev.R` script.
 1. Pick a Shiny input type that matches our requirements.
 1. Ensure the server-side portion of the module returns the result of the selection, with additional post-processing if necessary.
 1. Plug in the UI and server-side portions of the module in the main `app_ui.R` and `app_server.R` files, respectively.
+
+## Solution (Theme Picker)
+
+Create the module file with the following snippet:
+
+```{r}
+#| echo: true
+#| eval: false
+golem::add_module(name = "theme_picker", with_test = FALSE)
+```
+
+While we could choose a `selectInput` that displays the name of the theme as the choices and allow multiple to be selected, we want to incorporate a search box with snappy performance. The [`virtualSelectInput`](https://dreamrs.github.io/shinyWidgets/reference/virtualSelectInput.html) from the [`{shinyWidgets}`](https://dreamrs.github.io/shinyWidgets/index.html) package is an excellent solution.
+
+Since we have the `themes` data set available, we can also leverage the supporting function `shinyWidgets::prepare_choices()` to get the possible choices ready for the input. The module will simply return the selection as a reactive variable.
+
+```{r}
+#| echo: true
+#| eval: false
+
+# UI portion
+mod_theme_picker_ui <- function(id, label = NULL) {
+  ns <- NS(id)
+
+  themes <- dplyr::arrange(themes, name)
+
+  choices_list <- shinyWidgets::prepare_choices(
+    themes,
+    label = name,
+    value = theme_id
+  )
+
+  tagList(
+    virtualSelectInput(
+      ns("virt_theme_id"),
+      label = label,
+      choices = choices_list,
+      selected = themes$theme_id,
+      multiple = TRUE,
+      search = TRUE
+    )
+  )
+}
+
+# server portion
+mod_theme_picker_server <- function(id){
+  moduleServer( id, function(input, output, session){
+    ns <- session$ns
+
+    return(reactive(input$virt_theme_id))
+  })
+}
+```
+
+At the bottom of the module script, `{golem}` automatically includes commented code for referencing the module UI and server blocks in your main Shiny application. We can copy them into the `app_ui.R` and `app_server.R` files.
+
+```{r}
+#| echo: true
+#| eval: false
+
+# app_ui.R
+mod_theme_picker_ui("theme_picker_1")
+
+# app_server.R
+input_theme_ids <- mod_theme_picker_server("theme_picker_1")
+```
