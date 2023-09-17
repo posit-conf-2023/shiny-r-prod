@@ -3,7 +3,7 @@ title: "Performance"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
 author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
-format: 
+format:
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
@@ -13,8 +13,6 @@ format:
     code-line-numbers: false
     history: false
 ---
-
-## More to Come
 
 ## What is {profvis}?
 
@@ -26,13 +24,13 @@ R package for visualizing how (and how fast/slow) your R code runs
 
 ::: {.notes}
 * The package is from Posit
+* Help you understand the bottlenecks in your R code
+* and, you guessed it, it works with Shiny too
 :::
 
 ## Working with {profvis} & {golem} {auto-animate=true}
 
 Our `dev/run_dev.R` script is where we can profile our app interactively.
-
-We can modify the original code...
 
 ```{.r}
 options(golem.app.prod = FALSE)
@@ -43,10 +41,9 @@ golem::document_and_reload()
 
 run_app()
 ```
-
 ## Working with {profvis} & {golem} {auto-animate=true}
 
-and wrap `run_app()` in `print()`, then `profvis()`...
+Our `dev/run_dev.R` script is where we can profile our app interactively.
 
 ```{.r}
 options(golem.app.prod = FALSE)
@@ -62,4 +59,16 @@ profvis::profvis({
 
 ::: {.notes}
 You need to wrap the `run_app()` function in `print()`, before passing it to `profvis::profvis()`
+:::
+
+## Demo!
+
+![](assets/img/myspace_meme.png)
+
+::: {.notes}
+- Show how to change the `dev/run_dev.R` script to enable {profvis} profiling
+- Launch the app, navigate to the "Overview" page, and change a filter
+- Stop the app, and wait for the report to load
+- Describe the flamegraph, change the filters to only show events that took time
+- Navigate to the 'data' tab and discuss what took the most time
 :::
