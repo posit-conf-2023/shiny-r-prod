@@ -81,13 +81,41 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-subtitle','listing-title',{ data: ['index'] },{ data: ['categories'] }],
+      valueNames: ['listing-subtitle','listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
       
-      searchColumns: [],
+      searchColumns: ["listing-title","listing-author"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
     window['quarto-listings']['listing-exercises'] = new List('listing-exercises', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-code-along .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-subtitle','listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-code-along'] = new List('listing-code-along', options);
 
     if (window['quarto-listing-loaded']) {
       window['quarto-listing-loaded']();
@@ -156,6 +184,8 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#slides" id="toc-slides" class="nav-link active" data-scroll-target="#slides">Slides</a></li>
+  <li><a href="#code-along-examples" id="toc-code-along-examples" class="nav-link" data-scroll-target="#code-along-examples">Code-Along Examples</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises">Exercises</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/units/d1-02-structure.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -210,12 +240,40 @@ Warning
 </div>
 <p><a href="../materials/d1-02-structure/index.html">View slides in full screen</a></p>
 <iframe class="slide-deck" src="../materials/d1-02-structure/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
-
-
-
 </section>
-
-<div class="quarto-listing quarto-listing-container-table" id="listing-exercises">
+<section id="code-along-examples" class="level2">
+<h2 class="anchored" data-anchor-id="code-along-examples">Code-Along Examples</h2>
+<div id="listing-code-along" class="quarto-listing quarto-listing-container-table">
+<table class="quarto-listing-table table">
+<thead>
+<tr>
+<th>
+Code-Along
+</th>
+<th>
+Title
+</th>
+</tr>
+</thead>
+<tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1694914311699" data-listing-reading-time-sort="3" data-listing-word-count-sort="528" data-listing-title-sort="Modules for LEGO attribute selections" data-listing-filename-sort="codealong-1.qmd">
+<td>
+<span class="listing-subtitle">&nbsp;</span>
+</td>
+<td>
+<a href="../materials/d1-02-structure/codealong-1.html" class="title listing-title">Modules for LEGO attribute selections</a>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div>
+</section>
+<section id="exercises" class="level2">
+<h2 class="anchored" data-anchor-id="exercises">Exercises</h2>
+<div id="listing-exercises" class="quarto-listing quarto-listing-container-table">
 <table class="quarto-listing-table table">
 <thead>
 <tr>
@@ -228,12 +286,26 @@ Title
 </tr>
 </thead>
 <tbody class="list">
+<tr data-index="0" data-listing-file-modified-sort="1694914311699" data-listing-reading-time-sort="2" data-listing-word-count-sort="244" data-listing-title-sort="Value Metrics Module" data-listing-filename-sort="ex-1.qmd">
+<td>
+<span class="listing-subtitle">&nbsp;</span>
+</td>
+<td>
+<a href="../materials/d1-02-structure/ex-1.html" class="title listing-title">Value Metrics Module</a>
+</td>
+</tr>
 </tbody>
 </table>
 <div class="listing-no-matching d-none">
 No matching items
 </div>
-</div></main> <!-- /main -->
+</div>
+
+
+
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -9,7 +9,10 @@
   },
   {
     "listing": "/units/d1-02-structure.html",
-    "items": []
+    "items": [
+      "/materials/d1-02-structure/ex-1.html",
+      "/materials/d1-02-structure/codealong-1.html"
+    ]
   },
   {
     "listing": "/schedule.html",

@@ -2,78 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-03-performance/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.534Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.699Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-04-deploy-admin/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.554Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.739Z</lastmod>
+  </url>
+  <url>
+    <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-02-structure/ex-1.html</loc>
+    <lastmod>2023-09-17T01:31:51.699Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/setup-resources/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.602Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.787Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-01-welcome/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.518Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.683Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-01-welcome.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-04-deploy-admin.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-02-structure.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-02b-break.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/schedule.html</loc>
-    <lastmod>2023-09-17T00:18:30.602Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.787Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.494Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.659Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/LICENSE.html</loc>
-    <lastmod>2023-09-17T00:18:30.430Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.599Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-03b-lunch.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-04b-break.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-03-performance.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/units/d1-9001-loadtesting.html</loc>
-    <lastmod>2023-09-17T00:18:30.606Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.791Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/setup.html</loc>
-    <lastmod>2023-09-17T00:18:30.602Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.787Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-9001-loadtesting/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.566Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.751Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-02-structure/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.534Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.699Z</lastmod>
+  </url>
+  <url>
+    <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/d1-02-structure/codealong-1.html</loc>
+    <lastmod>2023-09-17T01:31:51.699Z</lastmod>
   </url>
   <url>
     <loc>https://posit-conf-2023.github.io/shiny-r-prod/materials/profvis/index.html</loc>
-    <lastmod>2023-09-17T00:18:30.566Z</lastmod>
+    <lastmod>2023-09-17T01:31:51.751Z</lastmod>
   </url>
 </urlset>
