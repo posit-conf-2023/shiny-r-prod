@@ -10,7 +10,7 @@ format:
   revealjs:
     theme: [default, ../slides.scss] # moon= teal bg  |  dark
     scrollable: true
-    incremental: true
+    incremental: false
     slide-number: c/t # c/t | c | h/v | h.v
     slide-tone: false #true
     code-line-numbers: false
@@ -539,3 +539,11 @@ set_picker_server <- function(id, sets_rv) {
 * Reactive parameters reference by **name**: `sets_rv`
 * Inside module, **invoke** reactive parameter as you would any other reactive in Shiny: `sets_rv()`
 * Any reactive(s) returned by module should also be reference by **name**: `set_selection`,  ~~`set_selection()`~~
+
+# Code-Along {background-color="#17395c"}
+
+Code-Along 1: Add a new Shiny module to pick themes
+
+## Your Turn: [Exercise 1](ex-1.html){target="_blank"}
+
+Create a new Shiny module with LEGO data metrics!
