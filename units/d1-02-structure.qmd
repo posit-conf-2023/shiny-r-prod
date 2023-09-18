@@ -8,9 +8,9 @@ listing:
     contents:
       - ../materials/d1-02-structure/ex-*.qmd
     type: table
-    fields: [subtitle, title]
+    fields: [title]
     field-display-names: 
-      subtitle: "Exercise"
+      title: "Code-along Title"
     sort: [filename]
     sort-ui: false
     filter-ui: false
@@ -19,9 +19,9 @@ listing:
     contents:
       - ../materials/d1-02-structure/codealong-*.qmd
     type: table
-    fields: [subtitle, title]
+    fields: [title]
     field-display-names: 
-      subtitle: "Code-Along"
+      title: "Exercise Title"
     sort: [filename]
     sort-ui: false
     filter-ui: false
@@ -30,10 +30,6 @@ tbl-colwidths: [5,20,75]
 ---
 
 ## Slides
-
-::: callout-warning
-These slides are under construction and will be finalized prior to the workshop date.
-:::
 
 [View slides in full screen](../materials/d1-02-structure/index.html)
 

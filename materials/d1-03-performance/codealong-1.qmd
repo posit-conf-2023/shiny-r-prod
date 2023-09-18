@@ -1,5 +1,5 @@
 ---
-title: Asynchronous Processing of LEGO Model Prediction
+title: Using `.parquet` files in Shiny
 format:
   html:
    code-line-numbers: false
@@ -10,98 +10,33 @@ format:
 
 ## Requirements
 
-The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the [`{httr2}`](https://httr2.r-lib.org/) package. Here is the function wrapping the API execution:
-
-```{r}
-#' @importFrom httr2 request req_body_json req_perform resp_body_json
-run_prediction <- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {
-  # create request object
-  req <- request(endpoint_url)
-
-  # perform request
-  resp <- req |>
-    req_body_json(df) |>
-    req_perform()
-
-  # extract predictions from response
-  pred_values <- resp_body_json(resp)$.pred |> unlist()
-
-  # back-transform log10 value of predicted number of parts if requested
-  if (back_transform) {
-    pred_values <- 10 ^ pred_values
-  }
-
-  # round result up to nearest integer if requested
-  if (round_result) pred_values <- ceiling(pred_values)
-
-  # append predictions to supplied data frame
-  dplyr::mutate(df, predicted_num_parts = pred_values)
-}
-```
-
-Unfortunately, the prediction API call takes a bit of time to execute due to some **extremely sophisticated processing** 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from *synchronous* to *asynchronous* using `{crew}`
+The current version of our Shiny application performs additional data processing to generate part summaries that are utilized by reactive data frames. The custom function is called `gen_part_metaset()` which is located in the `R/fct_data_processing.R` script. For the purposes of this exercise, we are not going to try and optimize this specific function (certainly you are welcome to try after the workshop), instead we are going to see if we can more efficiently utilize the results of the function inside our Shiny application.
 
 ## Plan
 
-1. Establish reactive values for tracking the status of the prediction calls
-1. Create a new controller to launch new R processes when new prediction tasks are launched
-1. Modify the existing `observeEvent` to push the prediction task to the controller, ensuring the key objects and required packages are passed on to the controller.
-1. Create a poll that's invalidated every 100 milliseconds to query the status of the submitted tasks in the controller and update the prediction result reactive value when complete.
+Upon closer inspection, we see that the calls to `gen_part_metaset()` do not take any dynamic parameters when used in the application. In addition, the function is called multiple times inside a set of `reactive` expressions. A first attempt at removing the bottleneck would be to move this function call to the beginning of the `app_server.R` logic and feeding the resulting object directly into the reactives that consume it.
 
-## Solution 
-
-First we create the following `reactiveVal` objects to keep track of the prediction state:
+Knowing that the processing function is not leveraging any dynamic parameters, we can do even better. In our mission to ensure the Shiny application performs only the data processing that it absolutely needs to do, we can instead run this function outside of the application, and save the result of the processing as a `.parquet` file inside the `inst/extdata` directory using the [`{arrow}`](https://arrow.apache.org/docs/r/) package.
 
 ```{r}
-pred_status <- reactiveVal("No prediction submitted yet.")
-pred_poll <- reactiveVal(FALSE)
-```
+#| echo: true
+#| eval: false
+library(dplyr)
+library(arrow)
+part_meta_df <- gen_part_metaset(min_set_parts = 1)
 
-Next we set up a new controller:
-
-```{r}
-# establish async processing with crew
-controller <- crew_controller_local(workers = 4, seconds_idle = 10)
-controller$start()
-
-# make sure to terminate the controller on stop #NEW
-onStop(function() controller$terminate())
-```
-
-Inside the `observeEvent` for the user clicking the prediction button, we update the logic to push the prediction task to the controller:
-
-```{r}
-controller$push(
-  command = run_prediction(df),
-  data = list(
-    run_prediction = run_prediction,
-    df = pred_data_rv$data
-  ),
-  packages = c("httr2", "dplyr")
+write_parquet(
+  part_meta_df,
+  "inst/extdata/part_meta_df.parquet")
 )
-
-pred_poll(TRUE)
 ```
 
-Lastly, we create a new `observe` block that periodically checks whether the running `{crew}` tasks have completed, ensuring that this is only executed when a prediction has been launched:
+With the processed data set available in the app infrastructure, we can utilize it inside the application with the following:
 
 ```{r}
-observe({
-  req(pred_poll())
-
-  invalidateLater(millis = 100)
-  result <- controller$pop()$result
-
-  if (!is.null(result)) {
-    pred_data_rv$data <- result[[1]]
-    print(controller$summary()) 
-  }
-
-  if (isFALSE(controller$nonempty())) {
-    pred_status("Prediction Complete")
-    pred_poll(controller$nonempty())
-    removeNotification(id = "pred_message")
-  }
-})
+part_meta_df <- arrow::read_parquet(app_sys("extdata", "part_meta_df.parquet"), as_data_frame = FALSE)
 ```
 
+Why do set the parameter `as_data_frame` to `FALSE` in the call above? This ensures the contents of the data file are not read into R's memory right away, and we can perform data processing on this file in a tidyverse-like pipeline and `collect()` the results at the end of the pipeline to minimize overhead.
+
+We could add this call to the top of our `app_server.R` logic, which would already lead to decreased processing time. For an application that is being used very infrequently, that might be good enough. But if we have an application that is going to be used concurrently by multiple users, we may be able to increase performance by ensuring this data file is read in R once for each process launched that servers the application, instead of once for each R **session** corresponding to different user's Shiny sessions. More to come later in the workshop on how we can accomplish this with `{golem}`!

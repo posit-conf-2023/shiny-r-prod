@@ -1,7 +1,6 @@
 ---
 title: "Load Testing"
 subtitle: "posit::conf(2023) <br> Shiny in Production: Tools & Techniques"
-author: "TBD"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
   revealjs:
@@ -21,11 +20,11 @@ revealjs-plugins:
 :::: {.columns}
 
 ::: {.column width="50%"}
-![single-user](assets/img/lego_single_user_computer.png)
+![](assets/img/lego_single_user_computer.png)
 :::
 
 ::: {.column width="50%"}
-![crowd](assets/img/lego_crowd.jpg)
+![](assets/img/lego_crowd.jpg)
 :::
 
 ::::
@@ -57,6 +56,8 @@ revealjs-plugins:
 
 ## Recording a Session
 
+::: {.codewindow .r}
+shinyloadtest_recording.R
 ```{r}
 #| eval: false
 #| echo: true
@@ -64,15 +65,16 @@ revealjs-plugins:
 library(shinyloadtest)
 record_session("https://my-lego-app.me", output_file = "recording.log")
 ```
-
-## Recorder Tips
+:::
 
 * Emulate a real-world usage of your application
 * Avoid rapid clicks / selections of your inputs
 
 ## The log
 
-```
+::: {.codewindow}
+recording.log
+```.bash
 # version: 1
 # target_url: https://my-lego-app.me/
 # target_type: RStudio Server Connect
@@ -86,6 +88,7 @@ record_session("https://my-lego-app.me", output_file = "recording.log")
 {"type":"WS_SEND","begin":"2023-09-07T13:04:17.805Z","message":"[\"D#0|m|{\\\"method\\\":\\\"update\\\",\\\"data\\\":{\\\"n_parts_display\\\":\\\"20\\\"}}\"]"}
 {"type":"WS_CLOSE","begin":"2023-09-07T13:04:35.561Z"}
 ```
+:::
 
 . . .
 
@@ -120,7 +123,7 @@ source(file.path(here::here(), "R", "shinycannon.R"))
 shinycannon(
   "shinycannon-1.1.3-dd43f6b.jar",
   "recording.log",
-  "https://my-lego-app.me",
+  "https://rsc.training.posit.co/brickapp-sync/",
   loaded_duration_minutes = 2,
   workers = 1,
   output_dir = "run1"
@@ -170,10 +173,10 @@ shinyloadtest_report(df, output = "report_test.html")
 ```
 :::
 
-::: {.callout-warning title="TODO"}
-Add screenshot of HTML report with hyperlink
-:::
+![](assets/img/report_screenshot.png)
 
-# `r fontawesome::fa("people-carry", "white")` Code-Along {background-color="#17395c"}
+# Code-Along {background-color="#17395c"}
 
-Code-Along 1: Record and analyze a baseline application session
+Record and analyze load-testing sessions with `shinyCannon` and `{shinyloadtest}`
+
+* Application URL: <https://rsc.training.posit.co/brickapp-sync/>

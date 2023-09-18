@@ -6,11 +6,10 @@ listing:
     contents:
       - units/d1-*.qmd
     type: table
-    fields: [subtitle, title, author]
+    fields: [subtitle, title]
     field-display-names: 
       subtitle: "Time"
-      title: "Module"
-      author: "Presenter"
+      title: "Workshop Module"
     date-format: "MMMM DD YYYY"
     sort: [filename]
     sort-ui: false
@@ -18,8 +17,4 @@ listing:
 tbl-colwidths: [20, 50, 25]
 format: html
 ---
-
-::: callout-warning
-This page is under construction and will be updated as the materials are posted online. Ordering of topics is subject to change.
-:::
 

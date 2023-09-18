@@ -1,0 +1,26 @@
+---
+title: "Profile the LEGO Bricks App"
+---
+
+## Access Instructions
+
+The project used for this particular exercise is hosted on [Posit Cloud](https://posit.cloud) in this [space](https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7). The project for this exercise is called **performance-exercise1**.
+
+## Setup
+
+Using what you just learned about the [`{profvis}`](http://rstudio.github.io/profvis/examples.html#example-3---profiling-a-shiny-application), your task is to run the profiler for the LEGO Bricks application contained in this project. Recall that to run the profiler in a Shiny app created with `{golem}`, change the `run_app()` call at the end of the `dev/run_dev.R` script to the following:
+
+```{r}
+#| echo: true
+#| eval: false
+profvis::profvis({
+  print(run_app())
+})
+```
+
+Once the application is open, try changing a couple of the inputs contained in the sidebar. Once the outputs in the app refresh, close the profiler by stopping the R process in the R console. You should now see the `{profvis}` report appear as a new tab in your web browser.
+
+## Questions
+
+* Are you able to identify any performance bottlenecks in the application?
+* If so, can you think of ways to fix the issues?

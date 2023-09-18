@@ -1,6 +1,6 @@
 ---
 title: "Performance"
-subtitle: "TBD"
+subtitle: "11:00 - 12:30"
 author: "Eric Nantz & Michael Thomas"
 date: "2023-09-18"
 listing:
@@ -8,9 +8,9 @@ listing:
     contents:
       - ../materials/d1-03-performance/ex-*.qmd
     type: table
-    fields: [subtitle, title]
+    fields: [title]
     field-display-names: 
-      subtitle: "Exercise"
+      title: "Exercise Title"
     sort: [filename]
     sort-ui: false
     filter-ui: false
@@ -19,9 +19,9 @@ listing:
     contents:
       - ../materials/d1-03-performance/codealong-*.qmd
     type: table
-    fields: [subtitle, title]
+    fields: [title]
     field-display-names: 
-      subtitle: "Code-Along"
+      title: "Code-along Title"
     sort: [filename]
     sort-ui: false
     filter-ui: false

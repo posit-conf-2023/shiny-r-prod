@@ -15,6 +15,8 @@ revealjs-plugins:
   - codewindow
 ---
 
+## Choose your Adventure
+
 ```{css}
 .centerheading h2 {
   text-align: center;
@@ -35,21 +37,23 @@ revealjs-plugins:
 }
 ```
 
-## Choose your Adventure
-
-::: columns
+:::: columns
 ::: {.column width="50%"}
 ### Posit Connect
+
+![](assets/img/shiny.png){width="80%"}
+
 :::
 
 ::: {.column width="50%"}
 ### Containers
-:::
-:::
 
-::: notes
-TODO: Find pictures demonstrating the "App & Packages Only" (Posit Connect, Shinyapps.io) versus "The whole environment" (Containers)
+![](assets/img/Rlogo.png){width="50%"}
+
+![](assets/img/linux.png){width="50%"}
+
 :::
+::::
 
 ## Deployment Checklist
 
@@ -81,10 +85,6 @@ golem::add_shinyserver_file()
 :::
 :::
 
-# `r fontawesome::fa("people-carry", "white")` Code-Along {background-color="#17395c"}
-
-Push-Button Deployment to Posit Connect
-
 ---
 
 ::: mono
@@ -111,6 +111,14 @@ rsconnect::deployApp(
 ```
 :::
 :::
+
+# Code-Along {background-color="#17395c"}
+
+Deploy your application(s) to Posit Connect:
+
+* Use any of the applications from a previous exercise
+* Attempt both deployment types (push-button & `{rsconnect}`)
+* Explore application settings in Posit Connect
 
 ## Balancing Act {.centerheading}
 
@@ -141,6 +149,19 @@ rsconnect::deployApp(
 :::
 
 ::::
+
+## Containers for Shiny Deployment
+
+* Anyone with a container runtime can execute your container **without R on their system**
+    + Popular container runtimes: Docker, Podman, LXC
+
+* A multitude of web services offer *serverless* app deployments with containers
+    + Bring your container image, they take care of the rest
+    + Terrific reviews available at [hosting.analythium.io](https://hosting.analythium.io)
+
+. . . 
+
+**Coming soon**: Container support for Posit Connect
 
 ## Business Talk {background-image="assets/img/lego_boss_office.jpg" background-size="cover" background-color="black"}
 
@@ -267,3 +288,53 @@ get_usage_shiny(
   unique() |>
   length()
 ```
+
+## Your Turn
+
+Obtain metadata for your deployed application(s) on Posit Connect
+
+* Explore the data as you like!
+
+```{r}
+#| label: timer-connect-metrics
+library(countdown)
+countdown(minutes = 5, seconds = 0)
+```
+
+
+## Going Further with Metrics
+
+Collection of interesting use cases available at [github.com/sol-eng/connect-usage](https://github.com/sol-eng/connect-usage)
+
+* Most-viewed content in last 30 days
+* [Interactive dashboard](https://colorado.posit.co/rsc/usage-interactive/) of usage metrics
+* [`{connectViz}`](https://github.com/RinteRface/connectViz): Collection of customizable functions for visualizing content usage for an organization
+
+## Our Journey is Complete!
+
+:::: {.columns}
+
+::: {.column width="70%"}
+
+![](assets/img/lego_victory.jpg)
+
+:::
+
+::: {.column width="30%"}
+
+::: {style="font-size: 70%"}
+* Robust app infrastructure with `{golem}`
+* Profiling your app with `{profvis}`
+* Solving performance bottlenecks
+* Assessing your app under high user load
+* Efficient app deployments and tuning
+* Obtaining usage metrics
+:::
+
+:::
+
+::::
+
+::: footer
+[pos.it/conf-workshop-survey](https://pos.it/conf-workshop-survey)
+:::

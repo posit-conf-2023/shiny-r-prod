@@ -1,0 +1,16 @@
+---
+title: "Deployment & Administration"
+subtitle: "15:30 - 17:00"
+author: "Eric Nantz & Michael Thomas"
+date: "2023-09-18"
+tbl-colwidths: [5,20,75]
+---
+
+## Slides
+
+[View slides in full screen](../materials/d1-05-deploy-admin/index.html)
+
+```{=html}
+<iframe class="slide-deck" src="../materials/d1-05-deploy-admin/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
+```
+

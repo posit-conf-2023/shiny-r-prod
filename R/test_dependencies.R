@@ -25,40 +25,46 @@ library(sys)
 
 
 # define paths and constants
-app_url <- "https://rsc.training.rstudio.com/bricktest/"
+app_url <- "https://rsc.training.posit.co/brickapp_shell/"
 recording_file <- "R/recording.log"
 
 shinyloadtest::record_session(
-  app_link, 
-  output_file = recording_file,
-  connect_api_key = Sys.getenv("RSCONNECT_KEY")
+  app_url, 
+  output_file = recording_file
+  #connect_api_key = Sys.getenv("RSCONNECT_KEY")
 )
 
 # use the exec_wait function from sys
 shinycannon_path <- "utils/shinycannon-1.1.3-dd43f6b.jar"
 
+source(file.path(here::here(), "R", "shinycannon.R"))
+
 shinycannon(
   shinycannon_path,
   recording_file,
   app_url,
-  output_dir = "R/run1"
+  output_dir = "R/run1",
+  loaded_duration_minutes = 1,
+  log_level = "debug"
 )
 
-# baseline run
-exec_wait(
-  cmd = "java",
-  args = c(
-    "-jar",
-    shinycannon_path,
-    recording_file,
-    app_link,
-    "--workers",
-    1,
-    "--loaded-duration-minutes",
-    3,
-    "--output-dir",
-    "R/run1",
-    "--overwrite-output"
+shinyloadtest::record_session(
+  # baseline run
+  exec_wait(
+    cmd = "java",
+    args = c(
+      "-jar",
+      shinycannon_path,
+      recording_file,
+      app_link,
+      "--workers",
+      1,
+      "--loaded-duration-minutes",
+      3,
+      "--output-dir",
+      "R/run1",
+      "--overwrite-output"
+    )
   )
 )
 

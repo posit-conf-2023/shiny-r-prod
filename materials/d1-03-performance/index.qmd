@@ -82,6 +82,20 @@ You need to wrap the `run_app()` function in `print()`, before passing it to `pr
 - Navigate to the 'data' tab and discuss what took the most time
 :::
 
+## Your Turn: [Exercise 1](ex-1.html){target="_blank"}
+
+Profile the LEGO Bricks app!
+
+* [Details](ex-1.html){target="_blank"}
+* Posit Cloud project: **Performance Exercise 1**
+
+```{r}
+#| label: timer-profile1
+library(countdown)
+countdown(minutes = 5, seconds = 0)
+```
+
+
 # {arrow} & the *.parquet* file format
 
 ## What are *.parquet* files?
@@ -116,6 +130,13 @@ You need to wrap the `run_app()` function in `print()`, before passing it to `pr
 - When it comes to building Shiny apps, we should look for easy places where we can gain efficiency & speed to improve our user experience (you don't want users waiting 20 seconds for your data prep logic to run against a single massive csv); it's very likely that the combination of .parquet + {arrow} + {dplyr} can meet your app performance needs (it does for at least 95% of my use cases -- there are very few cases where I have to go beyond that and start looking into other engines for faster data manipulation)
 :::
 
+# Code-Along {background-color="#17395c"}
+
+Using `.parquet` in the LEGO Bricks Shiny app
+
+* [Details](codealong-1.html){target="_blank"}
+* Posit Cloud project: **Performance Exercise 1**
+
 # Async Processing
 
 ## Single (threaded) Line {background-image="assets/img/lego_line_pay.jpg" background-size="cover"}
@@ -123,15 +144,9 @@ You need to wrap the `run_app()` function in `print()`, before passing it to `pr
 * A single R process managing the different tasks in a Shiny application
 * Executed one-by-one
 
-# Should I care?
+# Should I care? It Depends ...
 
-## It Depends ...
-
-If you are the __only__ user for a quick and efficient app: Likely not
-
-::: {.notes}
-TODO: Find a way to center the sentence vertically in the slide
-:::
+# If you are the __only__ user for a quick and efficient app: Likely not!
 
 ## Crowd Pleaser
 
@@ -194,4 +209,8 @@ Using `{crew}` inside a Shiny application:
 
 # Code-Along {background-color="#17395c"}
 
-[Code-Along 1](codealong-1.html){target="_blank"}: Asynchronous calls of a web API
+Asynchronous calls of a model prediction API.
+
+* [Details](codealong-2.html){target="_blank"}
+* Posit Cloud project: **Performance Code-along 2**
+

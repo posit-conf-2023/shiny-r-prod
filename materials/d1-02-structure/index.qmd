@@ -15,6 +15,9 @@ format:
     slide-tone: false #true
     code-line-numbers: false
     history: false
+from: markdown+emoji
+revealjs-plugins:
+  - codewindow
 ---
 
 ## It's Never Just Shiny
@@ -25,81 +28,6 @@ format:
 * Connections to other execution backends
 * Additional R packages!
 
-## Turned Upside-Down
-
-Imagine your application is working great!
-
-<br>
-
-. . .
-
-:::: {.columns .v-center-container}
-
-::: {.column width="50%"}
-
-```r
-update.packages(ask = FALSE)
-remotes::install_github("pkg")
-```
-
-:::
-
-::: {.column width="50%}
-
-![](https://rfortherestofus.com/wp-content/uploads/2020/09/update-packages-prompt.png)
-
-:::
-
-::::
-
-## Turned Upside-Down
-
-:::: {.columns .v-center-container}
-
-::: {.column width="50%"}
-
-`ggplot2` version `0.9.3`
-
-![](assets/img/computer_user_happy.png){width="60%"}
-
-:::
-
-::: {.column width="50%"}
-
-`ggplot2` version `1.0.0`
-
-![](http://i.giphy.com/RhEvCHIeZAZ6E.gif)
-
-:::
-
-::::
-
-## Take Control with [`{renv}`](https://rstudio.github.io/renv/)
-
-> Create **r**eproducible **env**ironments for your R projects.
-
-* Next generation of `{packrat}`
-* Isolated package library from rest of your system
-* Transfer projects to different collaborators / platforms
-* **Reproducible** package installation
-* Easily create new projects or convert existing projects with RStudio or built-in functions.
-
-## Under the Hood
-
-Upon initializing a project:
-
-1. Project-level `.Rprofile` to activate custom package library on startup
-1. Lockfile `renv.lock` to describe state of project library
-1. `renv/library` to hold private project library
-1. `renv/activate.R` performs activation
-
-## Develop a Routine
-
-Sticking with `{renv}` will pay off (trust me)
-
-* Fair play to mix packages from CRAN, GitHub, and proprietary sources
-* Roll back when a package upgrade doesn't play nicely
-* **You** make the call when to update your library!
 
 # Application Structure Options
 
@@ -225,15 +153,13 @@ Use the helper functions in `dev/03_deploy.R` to...
 
 # Module Code Example
 
-::: {.notes}
-Change the example code below to match LEGO data. Delete this note when finished.
-:::
-
 ## Anatomy of a Function (UI) {auto-animate=true}
 
 :::: {.columns}
 
 ::: {.column width="60%"}
+::: {.codewindow .r}
+picker.R
 ```r
 set_picker_ui <- function() {
   tagList(
@@ -248,6 +174,7 @@ set_picker_ui <- function() {
 }
 ```
 :::
+:::
 
 ::: {.column width="40%"}
 
@@ -261,6 +188,8 @@ set_picker_ui <- function() {
 
 ::: {.column width="60%"}
 
+::: {.codewindow .r}
+mod_picker.R
 ```r
 set_picker_ui <- function(id) {
   ns <- NS(id)
@@ -275,6 +204,7 @@ set_picker_ui <- function(id) {
 }
 ```
 :::
+:::
 
 ::: {.column width="40%"}
 
@@ -288,7 +218,8 @@ set_picker_ui <- function(id) {
 
 ::: {.column width="60%"}
 
-
+::: {.codewindow .r}
+mod_picker.R
 ```{.r code-line-numbers="1,2,5"}
 set_picker_ui <- function(id) {
   ns <- NS(id)
@@ -302,7 +233,7 @@ set_picker_ui <- function(id) {
   )
 }
 ```
-
+:::
 :::
 
 ::: {.column width="40%"}
@@ -316,10 +247,8 @@ set_picker_ui <- function(id) {
 
 ## Anatomy of a Module (Server) {auto-animate=true}
 
-:::: {.columns}
-
-::: {.column width="75%"}
-
+::: {.codewindow .r}
+mod_picker.R
 ```r
 set_picker_server <- function(input, output, session, sets_rv) {
   set_choices <- reactive({
@@ -335,21 +264,12 @@ set_picker_server <- function(input, output, session, sets_rv) {
   })
 }
 ```
-
 :::
-
-::: {.column width="25%"}
-
-:::
-
-::::
 
 ## Anatomy of a Module (Server) {auto-animate=true}
 
-:::: {.columns}
-
-::: {.column width="75%"}
-
+::: {.codewindow .r}
+mod_picker.R
 ```r
 set_picker_server <- function(id, sets_rv) {
   moduleServer(
@@ -370,16 +290,10 @@ set_picker_server <- function(id, sets_rv) {
   )
 }
 ```
-
 :::
 
-::: {.column width="25%"}
 
 Minimal changes necessary
-
-:::
-
-::::
 
 ## Anatomy of a Module (Server) {auto-animate=true}
 
@@ -418,10 +332,14 @@ set_picker_server <- function(id, sets_rv) {
 
 ::::
 
-* ``moduleServer()`: Encapsulate server-side logic with namespace applied.
+::: {style="font-size: 70%"}
+`moduleServer()`: Encapsulate server-side logic with namespace applied.
+:::
 
 ## Invoking Modules
 
+::: {.codewindow .r}
+app.R
 ```{.r}
 library(shiny)
 library(bslib)
@@ -439,13 +357,12 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 ```
+:::
 
 ## Giving and Receiving
 
-:::: {.columns}
-
-::: {.column width="60%"}
-
+::: {.codewindow .r}
+mod_picker.R
 ```r
 set_picker_ui <- function(id, label = "Select a set") {
   ns <- NS(id)
@@ -461,18 +378,16 @@ set_picker_ui <- function(id, label = "Select a set") {
 ```
 :::
 
-::: {.column width="40%"}
-
+::: {style="font-size: 80%"}
 * Reasonable inputs: static values, vectors, flags
 * Avoid **reactive** parameters
 * Return value: `tagList()` of inputs, output placeholders, and other UI elements
-
 :::
-
-::::
 
 ## Giving and Receiving
 
+::: {.codewindow .r}
+mod_picker.R
 ```{.r}
 set_picker_server <- function(id, sets_rv) {
   moduleServer(
@@ -493,15 +408,21 @@ set_picker_server <- function(id, sets_rv) {
   )
 }
 ```
+:::
 
-* Input parameters (and return values) can be a mix of static and **reactive** objects
+::: {style="font-size: 80%"}
+Input & return values can be a mix of static and **reactive** objects
+:::
 
-## To () or not to () {.smaller}
+
+## To () or not to ()
 
 :::: {.columns}
 
-::: {.column width="40%"}
+::: {.column width="45%"}
 
+::: {.codewindow .r}
+app_server.R
 ```{.r}
 # app server
 sets_rv <- reactive({
@@ -510,11 +431,14 @@ sets_rv <- reactive({
 
 set_picker_server("mod1", sets_rv)
 ```
+:::
 
 :::
 
-::: {.column width="60%"}
+::: {.column width="55%"}
 
+::: {.codewindow .r}
+mod_picker.R
 ```{.r}
 set_picker_server <- function(id, sets_rv) {
   moduleServer(
@@ -531,19 +455,115 @@ set_picker_server <- function(id, sets_rv) {
   )
 }
 ```
+:::
+:::
+
+::::
+
+::: {style="font-size: 70%;"}
+* Reactive parameters reference by **name**: `sets_rv`
+* Inside module, **invoke** reactive parameter as you would any other reactive in Shiny: `sets_rv()`
+* Any reactive(s) returned by module should also be reference by **name**: `set_selection`,  ~~`set_selection()`~~
+:::
+
+::: footer
+:::
+
+# Code-Along {background-color="#17395c"}
+
+Add a new Shiny module to pick LEGO set themes
+
+* [Details](codealong-1.html){target="_blank"}
+* Posit Cloud project: **Application Structure Code-along 1**
+
+## Your Turn: [Exercise 1](ex-1.html){target="_blank"}
+
+Create a new Shiny module with LEGO data metrics!
+
+* [Details](ex-1.html){target="_blank"}
+* Posit Cloud project: **Application Structure Exercise 1**
+
+```{r}
+#| label: timer-modex1
+library(countdown)
+countdown(minutes = 10, seconds = 0)
+```
+
+
+# Dependency Management
+
+## Turned Upside-Down
+
+Imagine your application is working great!
+
+<br>
+
+. . .
+
+:::: {.columns .v-center-container}
+
+::: {.column width="50%"}
+
+```r
+update.packages(ask = FALSE)
+remotes::install_github("pkg")
+```
+
+:::
+
+::: {.column width="50%}
+
+![](https://rfortherestofus.com/wp-content/uploads/2020/09/update-packages-prompt.png)
 
 :::
 
 ::::
 
-* Reactive parameters reference by **name**: `sets_rv`
-* Inside module, **invoke** reactive parameter as you would any other reactive in Shiny: `sets_rv()`
-* Any reactive(s) returned by module should also be reference by **name**: `set_selection`,  ~~`set_selection()`~~
+## Turned Upside-Down
 
-# Code-Along {background-color="#17395c"}
+:::: {.columns .v-center-container}
 
-Code-Along 1: Add a new Shiny module to pick themes
+::: {.column width="50%"}
 
-## Your Turn: [Exercise 1](ex-1.html){target="_blank"}
+`ggplot2` version `0.9.3`
 
-Create a new Shiny module with LEGO data metrics!
+![](assets/img/computer_user_happy.png){width="60%"}
+
+:::
+
+::: {.column width="50%"}
+
+`ggplot2` version `1.0.0`
+
+![](http://i.giphy.com/RhEvCHIeZAZ6E.gif)
+
+:::
+
+::::
+
+## Take Control with [`{renv}`](https://rstudio.github.io/renv/)
+
+> Create **r**eproducible **env**ironments for your R projects.
+
+* Next generation of `{packrat}`
+* Isolated package library from rest of your system
+* Transfer projects to different collaborators / platforms
+* **Reproducible** package installation
+* Easily create new projects or convert existing projects with RStudio or built-in functions.
+
+## Under the Hood
+
+Upon initializing a project:
+
+1. Project-level `.Rprofile` to activate custom package library on startup
+1. Lockfile `renv.lock` to describe state of project library
+1. `renv/library` to hold private project library
+1. `renv/activate.R` performs activation
+
+## Develop a Routine
+
+Sticking with `{renv}` will pay off (trust me)
+
+* Fair play to mix packages from CRAN, GitHub, and proprietary sources
+* Roll back when a package upgrade doesn't play nicely
+* **You** make the call when to update your library!

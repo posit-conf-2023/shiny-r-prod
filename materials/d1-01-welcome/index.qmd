@@ -1,5 +1,9 @@
 ---
 title: "Welcome!"
+title-slide-attributes:
+  data-background-image: assets/img/bg/rstudioconf_crowd.jpg
+  data-background-size: cover
+  data-background-opacity: "0.3"
 subtitle: "Shiny in Production: Tools & Techniques <br> posit::conf(2023)"
 footer: "[{{< var workshop_short_url >}}]({{< var workshop_full_url >}})"
 format: 
@@ -14,8 +18,6 @@ format:
     code-line-numbers: false
     history: false
 ---
-
-## Welcome to posit::conf(2023)! {background-color="black" background-image="assets/img/bg/rstudioconf_crowd.jpg" background-size="cover"}
 
 ## Conference Logistics {visibility="hidden"}
 
@@ -38,36 +40,31 @@ format:
 
 :::
 
-## Meet the Team!
+## Meet the Team! {.smaller}
 
 :::: {.columns}
 
 ::: {.column width="50%"}
 ![](assets/img/people/enantz.jpg){fig-alt="Eric Nantz" fig-align="center" width="70%"}
+
+* `r fontawesome::fa("microphone")` [r-podcast.org](https://r-podcast.org)
+* `r fontawesome::fa("camera")` [shinydevseries.com](https://shinydevseries.com)
+* `r fontawesome::fa("microphone")` [rweekly.org/podcast](https://rweekly.org/podcast)
+
 :::
 
 ::: {.column width="50%"}
 ![](assets/img/people/mthomas.jpeg){fig-alt="Michael Thomas" fig-align="center"}
+
+* `r fontawesome::fa("link")` [www.ketchbrookanalytics.com/](https://www.ketchbrookanalytics.com)
+* `r fontawesome::fa("microphone")` [rweekly.org/podcast](https://rweekly.org/podcast)
 :::
 
 ::::
 
 ::: footer
-TODO: Link to Meet the Team Section on Home Page
+[posit-conf-2023.github.io/shiny-r-prod/#workshop-instructors](https://posit-conf-2023.github.io/shiny-r-prod/#workshop-instructors)
 :::
-
-## Your Turn
-
-Introduce yourself to your neighbor(s)
-
-What is your most memorable Shiny application in production experience?
-
-```{r}
-#| label: timer-prodquality
-library(countdown)
-countdown(minutes = 2, seconds = 0)
-```
-
 ---
 
 :::: {.columns .v-center-container}
@@ -138,15 +135,33 @@ countdown(minutes = 2, seconds = 0)
 
 :::
 
-# Power-On (Setup)
+## Your Turn
 
-Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
+Complete any remaining [Setup Procedures](../setup.qmd)
 
-* Posit Connect
 * Posit Cloud
+* Posit Connect
 * Account Integrations
 
+Introduce yourself to your neighbor(s)
+
+What is your most memorable Shiny application in production experience?
+
+```{r}
+#| label: timer-prodquality
+library(countdown)
+countdown(minutes = 5, seconds = 0)
+```
+
+::: footer
+[posit-conf-2023.github.io/shiny-r-prod/setup.html](https://posit-conf-2023.github.io/shiny-r-prod/setup.html)
+:::
+
 # The Beginning ... {background-color="black" background-image="assets/img/bg/beginning.png" background-size="cover"}
+
+::: footer
+
+:::
 
 ::: {.notes}
 * You've seen Shiny could be a game-changer for a project
@@ -155,6 +170,10 @@ Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
 :::
 
 # A New World {background-image="assets/img/bg/metroid_ship.jpg" background-size="cover" background-color="black"}
+
+::: footer
+
+:::
 
 ::: {.notes}
 * Everyone who sees it thinks the app is amazing
@@ -165,10 +184,21 @@ Follow [Setup Procedure](../setup.qmd) to connect with the workshop resources:
 
 ## Many Users {background-image="assets/img/bg/many_users.jpg" background-size="contain" background-color="black"}
 
+::: footer
+
+:::
+
 ## High-Profile Situations {background-image="assets/img/bg/nasa_mission_control.jpg" background-size="contain" background-color="black"}
 
+::: footer
+
+:::
 
 ## Part of a Critical Pipeline {background-image="assets/img/bg/pinky_brain_take_over_world.jpg" background-size="contain" background-color="black"}
+
+::: footer
+
+:::
 
 ## The Journey Ahead
 
@@ -190,6 +220,10 @@ The tooling & principles discussed in this workshop will guide you to the destin
 * A comprehensive database of LEGO items available for free!
 * We will build a Shiny dashboard to explore the inventory and enable users to generate predictions
 
+::: footer
+[rebrickable.com](https://rebrickable.com)
+:::
+
 ## {background-image="assets/img/bg/rebrickable_schema.png" background-size="cover"}
 
 ::: footer
@@ -197,6 +231,10 @@ The tooling & principles discussed in this workshop will guide you to the destin
 :::
 
 ## Applied Example {background-image="https://cdn.rebrickable.com/media/sets/42138-1.jpg" background-size="contain"}
+
+::: footer
+[Ford Mustang Shelby GT500](https://rebrickable.com/sets/42138-1/ford-mustang-shelby-gt500/?inventory=1#parts)
+:::
 
 ## Raw Data
 
@@ -207,9 +245,9 @@ library(reactable)
 library(reactablefmtr)
 
 options(reactable.theme = reactableTheme(
-    tableStyle = list(fontSize = 14),
-    headerStyle = list(fontSize = 16),
-    paginationStyle = list(fontSize = 12)
+    tableStyle = list(fontSize = 18),
+    headerStyle = list(fontSize = 20),
+    paginationStyle = list(fontSize = 16)
 ))
 
 df_sets <- readRDS("../../data_examples/df_sets.rds")
