@@ -54,8 +54,8 @@ Please view the information in the callouts below for step-by-step instructions 
 ```
 
 1. Join the Posit Cloud Workspace dedicated to this workshop by visiting this [customized invitation URL]({{< var posit_cloud_workspace_url >}}). If you already have a Posit Cloud account, you are welcome to use it for the workshop. Otherwise, you can create a new account for free.
-1. You will see a project called *shiny-r-prod*. Open that project and create a saved copy. This process could take a couple of minutes depending on server load.
-1. After the project loads, you will see messages in the R console about restoring or repairing the package library. Execute `renv::restore(prompt = FALSE)` to install packages into the project. This process should complete in one or two minutes.
+1. You will see multiple projects that have been labelled as **Assignments** to you after joining the Workspace. Open the assignment labelled *Workshop Materials*. This process could take a couple of minutes depending on server load.
+1. After the project loads, you will possible see messages in the R console about restoring or repairing the package library. To check, run `renv::status()` and if it says you are missing required packages, execute `renv::restore(prompt = FALSE)` to install packages into the project. This process should complete in one or two minutes.
 :::
 
 :::{.callout-tip collapse="true"}
