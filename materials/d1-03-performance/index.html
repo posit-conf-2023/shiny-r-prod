@@ -8,7 +8,7 @@
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.369">
+  <meta name="generator" content="quarto-1.4.371">
 
   <title>Shiny in Production - Performance</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -386,6 +386,8 @@
       margin-right: 0; 
     }
   </style>
+  <link href="../../site_libs/countdown-0.4.0/countdown.css" rel="stylesheet">
+  <script src="../../site_libs/countdown-0.4.0/countdown.js"></script>
 <meta property="og:title" content="Shiny in Production - Performance">
 <meta property="og:description" content="posit::conf(2023)  Shiny in Production: Tools &amp; Techniques">
 <meta property="og:site_name" content="Shiny in Production">
@@ -497,6 +499,22 @@
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
+</section>
+<section id="your-turn-exercise-1" class="slide level2">
+<h2>Your Turn: <a href="ex-1.html" target="_blank">Exercise 1</a></h2>
+<p>Profile the LEGO Bricks app!</p>
+<ul>
+<li><a href="ex-1.html" target="_blank">Details</a></li>
+<li>Posit Cloud project: <strong>Performance Exercise 1</strong></li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div class="countdown" id="timer_587a355c" data-update-every="1" tabindex="0" style="right:0;bottom:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">−</button><button class="countdown-bump-up">+</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+</div>
+</div>
 </section></section>
 <section>
 <section id="arrow-the-.parquet-file-format" class="title-slide slide level1 center">
@@ -559,6 +577,15 @@
       }</style></aside>
 </div>
 </section></section>
+<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<h1>Code-Along</h1>
+<p>Using <code>.parquet</code> in the LEGO Bricks Shiny app</p>
+<ul>
+<li><a href="codealong-1.html" target="_blank">Details</a></li>
+<li>Posit Cloud project: <strong>Performance Exercise 1</strong></li>
+</ul>
+</section>
+
 <section>
 <section id="async-processing" class="title-slide slide level1 center">
 <h1>Async Processing</h1>
@@ -571,27 +598,15 @@
 <li>Executed one-by-one</li>
 </ul>
 </section></section>
-<section>
-<section id="should-i-care" class="title-slide slide level1 center">
-<h1>Should I care?</h1>
+<section id="should-i-care-it-depends" class="title-slide slide level1 center">
+<h1>Should I care? It Depends …</h1>
 
 </section>
-<section id="it-depends" class="slide level2">
-<h2>It Depends …</h2>
-<p>If you are the <strong>only</strong> user for a quick and efficient app: Likely not</p>
-<aside class="notes">
-<p>TODO: Find a way to center the sentence vertically in the slide</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+
+<section>
+<section id="if-you-are-the-only-user-for-a-quick-and-efficient-app-likely-not" class="title-slide slide level1 center">
+<h1>If you are the <strong>only</strong> user for a quick and efficient app: Likely not!</h1>
+
 </section>
 <section id="crowd-pleaser" class="slide level2">
 <h2>Crowd Pleaser</h2>
@@ -653,9 +668,13 @@
 <li>Establish an event-driven push of task to the controller with monitoring of worker status</li>
 </ol>
 </section></section>
-<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<section id="code-along-1" class="title-slide slide level1 center" data-background-color="#17395c">
 <h1>Code-Along</h1>
-<p><a href="codealong-1.html" target="_blank">Code-Along 1</a>: Asynchronous calls of a web API</p>
+<p>Asynchronous calls of a model prediction API.</p>
+<ul>
+<li><a href="codealong-2.html" target="_blank">Details</a></li>
+<li>Posit Cloud project: <strong>Performance Code-along 2</strong></li>
+</ul>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>
@@ -872,6 +891,44 @@
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

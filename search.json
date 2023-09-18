@@ -2,506 +2,86 @@
   {
     "objectID": "materials/d1-03-performance/codealong-1.html",
     "href": "materials/d1-03-performance/codealong-1.html",
-    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "title": "Using .parquet files in Shiny",
     "section": "",
-    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+    "text": "The current version of our Shiny application performs additional data processing to generate part summaries that are utilized by reactive data frames. The custom function is called gen_part_metaset() which is located in the R/fct_data_processing.R script. For the purposes of this exercise, we are not going to try and optimize this specific function (certainly you are welcome to try after the workshop), instead we are going to see if we can more efficiently utilize the results of the function inside our Shiny application."
   },
   {
     "objectID": "materials/d1-03-performance/codealong-1.html#requirements",
     "href": "materials/d1-03-performance/codealong-1.html#requirements",
-    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "title": "Using .parquet files in Shiny",
     "section": "",
-    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+    "text": "The current version of our Shiny application performs additional data processing to generate part summaries that are utilized by reactive data frames. The custom function is called gen_part_metaset() which is located in the R/fct_data_processing.R script. For the purposes of this exercise, we are not going to try and optimize this specific function (certainly you are welcome to try after the workshop), instead we are going to see if we can more efficiently utilize the results of the function inside our Shiny application."
   },
   {
     "objectID": "materials/d1-03-performance/codealong-1.html#plan",
     "href": "materials/d1-03-performance/codealong-1.html#plan",
-    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "title": "Using .parquet files in Shiny",
     "section": "Plan",
-    "text": "Plan\n\nEstablish reactive values for tracking the status of the prediction calls\nCreate a new controller to launch new R processes when new prediction tasks are launched\nModify the existing observeEvent to push the prediction task to the controller, ensuring the key objects and required packages are passed on to the controller.\nCreate a poll that’s invalidated every 100 milliseconds to query the status of the submitted tasks in the controller and update the prediction result reactive value when complete."
+    "text": "Plan\nUpon closer inspection, we see that the calls to gen_part_metaset() do not take any dynamic parameters when used in the application. In addition, the function is called multiple times inside a set of reactive expressions. A first attempt at removing the bottleneck would be to move this function call to the beginning of the app_server.R logic and feeding the resulting object directly into the reactives that consume it.\nKnowing that the processing function is not leveraging any dynamic parameters, we can do even better. In our mission to ensure the Shiny application performs only the data processing that it absolutely needs to do, we can instead run this function outside of the application, and save the result of the processing as a .parquet file inside the inst/extdata directory using the {arrow} package.\n\nlibrary(dplyr)\nlibrary(arrow)\npart_meta_df &lt;- gen_part_metaset(min_set_parts = 1)\n\nwrite_parquet(\n  part_meta_df,\n  \"inst/extdata/part_meta_df.parquet\")\n)\n\nWith the processed data set available in the app infrastructure, we can utilize it inside the application with the following:\n\npart_meta_df &lt;- arrow::read_parquet(app_sys(\"extdata\", \"part_meta_df.parquet\"), as_data_frame = FALSE)\n\nWhy do set the parameter as_data_frame to FALSE in the call above? This ensures the contents of the data file are not read into R’s memory right away, and we can perform data processing on this file in a tidyverse-like pipeline and collect() the results at the end of the pipeline to minimize overhead.\nWe could add this call to the top of our app_server.R logic, which would already lead to decreased processing time. For an application that is being used very infrequently, that might be good enough. But if we have an application that is going to be used concurrently by multiple users, we may be able to increase performance by ensuring this data file is read in R once for each process launched that servers the application, instead of once for each R session corresponding to different user’s Shiny sessions. More to come later in the workshop on how we can accomplish this with {golem}!"
   },
   {
-    "objectID": "materials/d1-03-performance/codealong-1.html#solution",
-    "href": "materials/d1-03-performance/codealong-1.html#solution",
-    "title": "Asynchronous Processing of LEGO Model Prediction",
-    "section": "Solution",
-    "text": "Solution\nFirst we create the following reactiveVal objects to keep track of the prediction state:\n\npred_status &lt;- reactiveVal(\"No prediction submitted yet.\")\npred_poll &lt;- reactiveVal(FALSE)\n\nNext we set up a new controller:\n\n# establish async processing with crew\ncontroller &lt;- crew_controller_local(workers = 4, seconds_idle = 10)\ncontroller$start()\n\n# make sure to terminate the controller on stop #NEW\nonStop(function() controller$terminate())\n\nInside the observeEvent for the user clicking the prediction button, we update the logic to push the prediction task to the controller:\n\ncontroller$push(\n  command = run_prediction(df),\n  data = list(\n    run_prediction = run_prediction,\n    df = pred_data_rv$data\n  ),\n  packages = c(\"httr2\", \"dplyr\")\n)\n\npred_poll(TRUE)\n\nLastly, we create a new observe block that periodically checks whether the running {crew} tasks have completed, ensuring that this is only executed when a prediction has been launched:\n\nobserve({\n  req(pred_poll())\n\n  invalidateLater(millis = 100)\n  result &lt;- controller$pop()$result\n\n  if (!is.null(result)) {\n    pred_data_rv$data &lt;- result[[1]]\n    print(controller$summary()) \n  }\n\n  if (isFALSE(controller$nonempty())) {\n    pred_status(\"Prediction Complete\")\n    pred_poll(controller$nonempty())\n    removeNotification(id = \"pred_message\")\n  }\n})"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#choose-your-adventure",
-    "href": "materials/d1-04-deploy-admin/index.html#choose-your-adventure",
-    "title": "Deployment & Administration",
-    "section": "Choose your Adventure",
-    "text": "Choose your Adventure\n\n\nPosit Connect\n\nContainers\n\n\n\nTODO: Find pictures demonstrating the “App & Packages Only” (Posit Connect, Shinyapps.io) versus “The whole environment” (Containers)"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#deployment-checklist",
-    "href": "materials/d1-04-deploy-admin/index.html#deployment-checklist",
-    "title": "Deployment & Administration",
-    "section": "Deployment Checklist",
-    "text": "Deployment Checklist\n✅ Create app.R in directory\n✅ Take note of any custom environment variables\n✅ Ensure DESCRIPTION is up-to-date with required packages\n✅ Remove outdated functions / scripts"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#section",
-    "href": "materials/d1-04-deploy-admin/index.html#section",
-    "title": "Deployment & Administration",
+    "objectID": "materials/d1-03-performance/ex-1.html",
+    "href": "materials/d1-03-performance/ex-1.html",
+    "title": "Profile the LEGO Bricks App",
     "section": "",
-    "text": "03_deploy.R\n\n## RStudio ----\n## If you want to deploy on RStudio related platforms\ngolem::add_rstudioconnect_file()\ngolem::add_shinyappsio_file()\ngolem::add_shinyserver_file()"
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called performance-exercise1."
   },
   {
-    "objectID": "materials/d1-04-deploy-admin/index.html#balancing-act",
-    "href": "materials/d1-04-deploy-admin/index.html#balancing-act",
-    "title": "Deployment & Administration",
-    "section": "Balancing Act",
-    "text": "Balancing Act\n\n\n🔼 Max Processes\n\nMore resources dedicated to particular application\nPotential for server overload\n\n\n\n\n\n\n\n\n\n\n🔼 Min Processes\n\nResources dedicated even when app is idle\nPotentially wasteful if app is not used concurrently often"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#business-talk",
-    "href": "materials/d1-04-deploy-admin/index.html#business-talk",
-    "title": "Deployment & Administration",
-    "section": "Business Talk",
-    "text": "Business Talk"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#you-might-be-asked",
-    "href": "materials/d1-04-deploy-admin/index.html#you-might-be-asked",
-    "title": "Deployment & Administration",
-    "section": "You Might be Asked …",
-    "text": "You Might be Asked …\n\n“How many people used your app last year?”\n\n\n“How long are users on the app at a given time?”\n\n\n\n“What is the return on investment (ROI) this app is bringing the company?”\n\n\n\n\n\n\n\n\n\n\n\n\n\nNOT TODAY!"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#introducing-connectapi",
-    "href": "materials/d1-04-deploy-admin/index.html#introducing-connectapi",
-    "title": "Deployment & Administration",
-    "section": "📦 Introducing {connectapi}",
-    "text": "📦 Introducing {connectapi}\n\nR client for the Posit Connect Server API as well as helpful functions that utilize the client\n\nChecklist:\n✅ Create API key for your Posit Connect account\n✅ Create .Renviron with following variables: CONNECT_SERVER, CONNECT_API_KEY"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#introduce-yourself",
-    "href": "materials/d1-04-deploy-admin/index.html#introduce-yourself",
-    "title": "Deployment & Administration",
-    "section": "Introduce Yourself",
-    "text": "Introduce Yourself\n\nlibrary(connectapi)\n\nclient &lt;- connect(\n  server = Sys.getenv(\"CONNECT_SERVER\"),\n  api_key = Sys.getenv(\"CONNECT_API_KEY\")\n)\n\nclient\n\nPosit Connect API Client: \n  Posit Connect Server: https://rsc.training.rstudio.com\n  Posit Connect API Key: ***********FWxW\n\n\n\nclient is an R6 object representing the API client\nRequired parameter for many convenience functions"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#know-yourself",
-    "href": "materials/d1-04-deploy-admin/index.html#know-yourself",
-    "title": "Deployment & Administration",
-    "section": "Know Yourself",
-    "text": "Know Yourself\n\nmy_guid &lt;- user_guid_from_username(client, \"rpodcast\")\n\nmy_guid\n\n[1] \"47e1338f-54a8-4b0e-9b3c-e4380611b30f\"\n\n\n\nAll content/users have a unique indentifier (guid)"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#obtain-your-shiny-apps",
-    "href": "materials/d1-04-deploy-admin/index.html#obtain-your-shiny-apps",
-    "title": "Deployment & Administration",
-    "section": "Obtain (Your) Shiny Apps",
-    "text": "Obtain (Your) Shiny Apps\n\nlibrary(dplyr)\n\nmeta_df &lt;- get_content(client) |&gt;\n  filter(owner_guid == my_guid) |&gt;\n  select(guid, name, title)\n\nmeta_df\n\n# A tibble: 27 × 3\n   guid                                 name            title          \n   &lt;chr&gt;                                &lt;chr&gt;           &lt;chr&gt;          \n 1 40dd2969-5d67-4940-89c4-08fe31fd1c74 brickapp        brickapp       \n 2 fba6896e-49e4-45c6-856f-03a3bc4f498f legobricksapp   legobricks.app \n 3 626d6bb1-f36d-4c9b-bc9e-5cb44f46e698 hellogolem22    hellogolem2    \n 4 6f8116dc-eabf-4a64-aacb-4aeffbb4eaa4 golembrochure2  golembrochure  \n 5 a4e6809f-4858-4888-a848-94925d3df4a0 golembrochure   golembrochure  \n 6 f268d424-a286-41b9-91f1-ae458797e64a golemhellolocal golemhellolocal\n 7 4d9124a0-158b-4bd9-9b65-07b877db0906 test            test           \n 8 c60de16e-0b29-4267-a2c5-0eb6815d7999 hellogolem3     hellogolem     \n 9 2aec4c5b-144f-4a6c-8abf-7d07a17d78b2 hellogolem      hellogolem     \n10 344b9f1b-ddbe-4145-a1f0-eb6608662f08 hellogolem2     hellogolem     \n# ℹ 17 more rows"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#usage-metrics",
-    "href": "materials/d1-04-deploy-admin/index.html#usage-metrics",
-    "title": "Deployment & Administration",
-    "section": "Usage Metrics",
-    "text": "Usage Metrics\nSession durations for the legobricksapp:\n\napp_guid &lt;- \"fba6896e-49e4-45c6-856f-03a3bc4f498f\"\n\nget_usage_shiny(\n  client,\n  content_guid = app_guid,\n  limit = 5\n  ) |&gt;\n  filter(!is.na(ended)) |&gt;\n  mutate(session_duration = ended - started) |&gt;\n  select(user_guid, session_duration)\n\n# A tibble: 5 × 2\n  user_guid                            session_duration\n  &lt;chr&gt;                                &lt;drtn&gt;          \n1 47e1338f-54a8-4b0e-9b3c-e4380611b30f 10.933333 mins  \n2 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.216667 mins  \n3 47e1338f-54a8-4b0e-9b3c-e4380611b30f  4.733333 mins  \n4 47e1338f-54a8-4b0e-9b3c-e4380611b30f  6.766667 mins  \n5 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.183333 mins"
-  },
-  {
-    "objectID": "materials/d1-04-deploy-admin/index.html#usage-metrics-1",
-    "href": "materials/d1-04-deploy-admin/index.html#usage-metrics-1",
-    "title": "Deployment & Administration",
-    "section": "Usage Metrics",
-    "text": "Usage Metrics\nHow many users visited legobricksapp in last 28 days?\n\napp_guid &lt;- \"fba6896e-49e4-45c6-856f-03a3bc4f498f\"\ntime_start &lt;- Sys.Date() - lubridate::days(28)\nget_usage_shiny(\n  client,\n  content_guid = app_guid,\n  limit = 100,\n  from = time_start\n  ) |&gt;\n  pull(user_guid) |&gt;\n  unique() |&gt;\n  length()\n\n[1] 4\n\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
-  },
-  {
-    "objectID": "materials/d1-02-structure/ex-1.html",
-    "href": "materials/d1-02-structure/ex-1.html",
-    "title": "Value Metrics Module",
+    "objectID": "materials/d1-03-performance/ex-1.html#access-instructions",
+    "href": "materials/d1-03-performance/ex-1.html#access-instructions",
+    "title": "Profile the LEGO Bricks App",
     "section": "",
-    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called modules-exercise1."
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called performance-exercise1."
   },
   {
-    "objectID": "materials/d1-02-structure/ex-1.html#access-instructions",
-    "href": "materials/d1-02-structure/ex-1.html#access-instructions",
-    "title": "Value Metrics Module",
+    "objectID": "materials/d1-03-performance/ex-1.html#setup",
+    "href": "materials/d1-03-performance/ex-1.html#setup",
+    "title": "Profile the LEGO Bricks App",
+    "section": "Setup",
+    "text": "Setup\nUsing what you just learned about the {profvis}, your task is to run the profiler for the LEGO Bricks application contained in this project. Recall that to run the profiler in a Shiny app created with {golem}, change the run_app() call at the end of the dev/run_dev.R script to the following:\n\nprofvis::profvis({\n  print(run_app())\n})\n\nOnce the application is open, try changing a couple of the inputs contained in the sidebar. Once the outputs in the app refresh, close the profiler by stopping the R process in the R console. You should now see the {profvis} report appear as a new tab in your web browser."
+  },
+  {
+    "objectID": "materials/d1-03-performance/ex-1.html#questions",
+    "href": "materials/d1-03-performance/ex-1.html#questions",
+    "title": "Profile the LEGO Bricks App",
+    "section": "Questions",
+    "text": "Questions\n\nAre you able to identify any performance bottlenecks in the application?\nIf so, can you think of ways to fix the issues?"
+  },
+  {
+    "objectID": "materials/d1-02-structure/codealong-1.html",
+    "href": "materials/d1-02-structure/codealong-1.html",
+    "title": "Modules for LEGO attribute selections",
     "section": "",
-    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called modules-exercise1."
+    "text": "As you make the transition to building production Shiny applications, Shiny modules are a very important tool to improve code organization and overall flow of your application. We will work together to build Shiny modules that let the user filter the underlying LEGO metadata based on a key variables in the overall data."
   },
   {
-    "objectID": "materials/d1-02-structure/ex-1.html#exercise-instructions",
-    "href": "materials/d1-02-structure/ex-1.html#exercise-instructions",
-    "title": "Value Metrics Module",
-    "section": "Exercise Instructions",
-    "text": "Exercise Instructions\nYour task is to create a new Shiny module that displays three important metrics to the user:\n\nTotal number of sets\nTotal number of parts among the sets\nTotal number of mini-figures\n\nNote that these quantities are dependent on the user selections from the inputs contained in the left sidebar (theme, year, and parts range).\nKeeping with the overall user interface style, you are recommended to use the value_box function from the {bslib} package. The metrics can be derived using the function below. In the application code, you will find reactive data frames called sets_rv and part_meta_rv which can be used in the parameters of the function below.\n#' Derive key LEGO data set metrics\n#' \n#' @param sets_rv data frame containing sets information\n#' @param part_meta_rv data frame containing parts metadata information\n#' \n#' @import dplyr\nderive_widget_metrics &lt;- function(sets_rv, part_meta_rv) {\n  # number of sets\n  n_sets &lt;- length(unique(sets_rv$set_num))\n\n  # number of parts\n  n_parts &lt;- sum(sets_rv$num_parts, na.rm = TRUE)\n\n  # number of minifigs\n  n_minifigs &lt;- part_meta_rv |&gt;\n    summarize(total_minifigs = sum(minifig_ind)) |&gt;\n    collect() |&gt;\n    pull(total_minifigs)\n\n  return(\n    list(\n      n_sets = n_sets,\n      n_parts = n_parts,\n      n_minifigs = n_minifigs\n    )\n  )\n}"
+    "objectID": "materials/d1-02-structure/codealong-1.html#requirements",
+    "href": "materials/d1-02-structure/codealong-1.html#requirements",
+    "title": "Modules for LEGO attribute selections",
+    "section": "Requirements",
+    "text": "Requirements\nCreste three inputs for the user to subset the LEGO metadata by the following key variables:\n\nTheme(s) associated with sets. Default should be all sets, but let the user customize selections with a search box.\nYear range for when set was created. Give the user a visual cue of how many sets are present in each year.\nPre-defined ranges for how many parts are present in each set. Ranges are the following:\n\nSmall (1-50 parts)\nMedium (51-200 parts)\nLarge (201 or more parts)\nAll sizes"
   },
   {
-    "objectID": "materials/setup-resources/index.html#section-15",
-    "href": "materials/setup-resources/index.html#section-15",
-    "title": "Workshop Environment Setup",
-    "section": "",
-    "text": "posit-conf-2023.github.io/shiny-r-prod"
+    "objectID": "materials/d1-02-structure/codealong-1.html#data",
+    "href": "materials/d1-02-structure/codealong-1.html#data",
+    "title": "Modules for LEGO attribute selections",
+    "section": "Data",
+    "text": "Data\nThe following data sets included in the application contain the variables needed for the requirements (note that these snippets are a reduced sample of each source data set).\n\nsets\n\ndplyr::glimpse(sets)\n\n\n\nRows: 368\nColumns: 6\n$ set_num   &lt;chr&gt; \"001-1\", \"002-1\", \"1030-1\", \"1038-1\", \"1039-1\", \"1237-1\", \"1…\n$ name      &lt;chr&gt; \"Gears\", \"4.5V Samsonite Gears Motor Set\", \"TECHNIC I: Simpl…\n$ year      &lt;dbl&gt; 1965, 1965, 1985, 1985, 1986, 2001, 1999, 1999, 1999, 1999, …\n$ theme_id  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …\n$ num_parts &lt;dbl&gt; 43, 3, 210, 120, 39, 56, 30, 29, 28, 26, 28, 103, 98, 64, 28…\n$ img_url   &lt;chr&gt; \"https://cdn.rebrickable.com/media/sets/001-1.jpg\", \"https:/…\n\n\n\n\nthemes\n\ndplyr::glimpse(themes)\n\n\n\nRows: 30\nColumns: 3\n$ theme_id  &lt;dbl&gt; 191, 708, 693, 398, 650, 234, 56, 604, 136, 736, 692, 676, 2…\n$ name      &lt;chr&gt; \"Dark Forest\", \"The LEGO Batman Movie\", \"Monkie Kid\", \"FIRST…\n$ parent_id &lt;dbl&gt; 186, 697, NA, NA, 632, 233, 52, NA, 126, 501, 535, NA, 227, …"
   },
   {
-    "objectID": "materials/d1-01-welcome/index.html#welcome-to-positconf2023",
-    "href": "materials/d1-01-welcome/index.html#welcome-to-positconf2023",
-    "title": "Welcome!",
-    "section": "Welcome to posit::conf(2023)!",
-    "text": "Welcome to posit::conf(2023)!"
+    "objectID": "materials/d1-02-structure/codealong-1.html#plan",
+    "href": "materials/d1-02-structure/codealong-1.html#plan",
+    "title": "Modules for LEGO attribute selections",
+    "section": "Plan",
+    "text": "Plan\n\nCreate a new module R script (and possible a supporting R script) by using golem::add_module() in the dev/02_dev.R script.\nPick a Shiny input type that matches our requirements.\nEnsure the server-side portion of the module returns the result of the selection, with additional post-processing if necessary.\nPlug in the UI and server-side portions of the module in the main app_ui.R and app_server.R files, respectively."
   },
   {
-    "objectID": "materials/d1-01-welcome/index.html#workshop-policies",
-    "href": "materials/d1-01-welcome/index.html#workshop-policies",
-    "title": "Welcome!",
-    "section": "Workshop Policies",
-    "text": "Workshop Policies\n\n\nPlease review the posit::conf Code of Conduct.\nIssues can be addressed in following ways:\n\nIn person: Contact any posit::conf staff member, identifiable by their staff t-shirt shirt, or visit the conference registration desk.\nBy email: Send a message to conf@posit.com; event organizers will respond promptly.\nBy phone: call 844—448—1212"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#meet-the-team",
-    "href": "materials/d1-01-welcome/index.html#meet-the-team",
-    "title": "Welcome!",
-    "section": "Meet the Team!",
-    "text": "Meet the Team!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTODO: Link to Meet the Team Section on Home Page"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#your-turn",
-    "href": "materials/d1-01-welcome/index.html#your-turn",
-    "title": "Welcome!",
-    "section": "Your Turn",
-    "text": "Your Turn\nIntroduce yourself to your neighbor(s)\nWhat is your most memorable Shiny application in production experience?\n\n\n\n−+\n02:00"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#about-those-post-its",
-    "href": "materials/d1-01-welcome/index.html#about-those-post-its",
-    "title": "Welcome!",
-    "section": "About those post-its",
-    "text": "About those post-its\n\n\n\n    \n        Done with activity\n    \n\n\n\n    \n        I'd like help"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#many-users",
-    "href": "materials/d1-01-welcome/index.html#many-users",
-    "title": "Welcome!",
-    "section": "Many Users",
-    "text": "Many Users"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#high-profile-situations",
-    "href": "materials/d1-01-welcome/index.html#high-profile-situations",
-    "title": "Welcome!",
-    "section": "High-Profile Situations",
-    "text": "High-Profile Situations"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
-    "href": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
-    "title": "Welcome!",
-    "section": "Part of a Critical Pipeline",
-    "text": "Part of a Critical Pipeline"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#the-journey-ahead",
-    "href": "materials/d1-01-welcome/index.html#the-journey-ahead",
-    "title": "Welcome!",
-    "section": "The Journey Ahead",
-    "text": "The Journey Ahead\n\nProduction has more than one meaning for Shiny apps\n\n\nThe tooling & principles discussed in this workshop will guide you to the destination"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
-    "href": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
-    "title": "Welcome!",
-    "section": "Rebrickable Inventory Dashboard",
-    "text": "Rebrickable Inventory Dashboard\n\nRebrickable: Portal for LEGO builders to discover what sets they can build with their own inventory\nA comprehensive database of LEGO items available for free!\nWe will build a Shiny dashboard to explore the inventory and enable users to generate predictions"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#applied-example",
-    "href": "materials/d1-01-welcome/index.html#applied-example",
-    "title": "Welcome!",
-    "section": "Applied Example",
-    "text": "Applied Example"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#raw-data",
-    "href": "materials/d1-01-welcome/index.html#raw-data",
-    "title": "Welcome!",
-    "section": "Raw Data",
-    "text": "Raw Data\n\nsetsinventoriesinventory partsparts"
-  },
-  {
-    "objectID": "materials/d1-01-welcome/index.html#our-journey-to-production",
-    "href": "materials/d1-01-welcome/index.html#our-journey-to-production",
-    "title": "Welcome!",
-    "section": "Our Journey to Production",
-    "text": "Our Journey to Production\n\nCreate a robust infrastructure for application source code\nIdentify and solve performance bottlenecks\nEnsure app is only doing the “bare minimum” for a snappy user experience\nTune deployment to meet demand of potentially many simultaneous users\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
-  },
-  {
-    "objectID": "units/d1-01-welcome.html",
-    "href": "units/d1-01-welcome.html",
-    "title": "Welcome & Setup",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-01-welcome.html#slides",
-    "href": "units/d1-01-welcome.html#slides",
-    "title": "Welcome & Setup",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-04-deploy-admin.html",
-    "href": "units/d1-04-deploy-admin.html",
-    "title": "Deployment & Administration",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-04-deploy-admin.html#slides",
-    "href": "units/d1-04-deploy-admin.html#slides",
-    "title": "Deployment & Administration",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-02-structure.html",
-    "href": "units/d1-02-structure.html",
-    "title": "Application Structure",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-02-structure.html#slides",
-    "href": "units/d1-02-structure.html#slides",
-    "title": "Application Structure",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-02-structure.html#code-along-examples",
-    "href": "units/d1-02-structure.html#code-along-examples",
-    "title": "Application Structure",
-    "section": "Code-Along Examples",
-    "text": "Code-Along Examples\n\n\n\n\n\nCode-Along\n\n\nTitle\n\n\n\n\n\n\n \n\n\nModules for LEGO attribute selections\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "units/d1-02-structure.html#exercises",
-    "href": "units/d1-02-structure.html#exercises",
-    "title": "Application Structure",
-    "section": "Exercises",
-    "text": "Exercises\n\n\n\n\n\nExercise\n\n\nTitle\n\n\n\n\n\n\n \n\n\nValue Metrics Module\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "units/d1-02b-break.html",
-    "href": "units/d1-02b-break.html",
-    "title": "Coffee & refreshments break",
-    "section": "",
-    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at BreakroomTBD. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
-  },
-  {
-    "objectID": "schedule.html",
-    "href": "schedule.html",
-    "title": "Workshop Schedule",
-    "section": "",
-    "text": "Warning\n\n\n\nThis page is under construction and will be updated as the materials are posted online. Ordering of topics is subject to change.\n\n\n\n\n\n\n\n\n\n\n\nTime\n\n\nModule\n\n\nPresenter\n\n\n\n\n\n\n9:00 - 9:30\n\n\nWelcome & Setup\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n9:30 - 10:30\n\n\nApplication Structure\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n10:30 - 11:00\n\n\nCoffee & refreshments break\n\n\n \n\n\n\n\nTBD\n\n\nPerformance\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n12:30 - 13:30\n\n\nLunch break\n\n\n \n\n\n\n\nTBD\n\n\nDeployment & Administration\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n15:00 - 15:30\n\n\nCoffee & refreshments break\n\n\n \n\n\n\n\nTBD\n\n\nLoad Testing\n\n\nEric Nantz & Michael Thomas\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "",
-    "text": "Watch the video!\n\n\n\n\n\n\n\n    \n\n\n\n\n\nShiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience."
-  },
-  {
-    "objectID": "index.html#overview",
-    "href": "index.html#overview",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "",
-    "text": "Watch the video!\n\n\n\n\n\n\n\n    \n\n\n\n\n\nShiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience."
-  },
-  {
-    "objectID": "index.html#logistics",
-    "href": "index.html#logistics",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "Logistics",
-    "text": "Logistics\nThe workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at posit-conf-2023.github.io/shiny-r-prod and hosted on GitHub at github.com/posit-conf-2023/shiny-r-prod. For real-time messaging, we will be using the shiny-in-production-tools-and-techniques within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop."
-  },
-  {
-    "objectID": "index.html#is-this-workshop-for-me",
-    "href": "index.html#is-this-workshop-for-me",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "Is this workshop for me?",
-    "text": "Is this workshop for me?\nThis course assumes intermediate knowledge of building Shiny applications in R and prior experience deploying an application to a platform such as the shinyapps.io service or products like Posit Connect. This workshop will be appropriate for you if you answer yes to any of these questions:\n\nHave you had a Shiny application work just fine on your machine, but encounters critical issues after deployed to a hosting platform?\nAre you willing to prospectively implement techniques before deployment to plan for the unexpected?\nDo you want to know the potential pitfalls within various deployment platforms?\nDo you want to employ best practices for structuring your application source code and dependencies?"
-  },
-  {
-    "objectID": "index.html#prework-setup",
-    "href": "index.html#prework-setup",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "Prework & Setup",
-    "text": "Prework & Setup\nYou can find complete details on the required pre-work and setup instructions at the setup tab."
-  },
-  {
-    "objectID": "index.html#workshop-instructors",
-    "href": "index.html#workshop-instructors",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "Workshop Instructors",
-    "text": "Workshop Instructors\n\nEric Nantz\n\n\n\n\n\n\n\n\n\n\nEric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the R-Podcast that he launched in 2012. Eric is also the creator of the Shiny Developer Series where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his Twitch channel. In addition, Eric is a curator for the RWeekly project and co-host of the RWeekly Highlights podcast which accompanies every issue.\n\n\n\n\nMike Thomas\n\n\n\n\n\n\n\n\n\n\nMike Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the RWeekly Highlights Podcast."
-  },
-  {
-    "objectID": "index.html#workshop-tas",
-    "href": "index.html#workshop-tas",
-    "title": "Shiny in Production: Tools and Techniques",
-    "section": "Workshop TAs",
-    "text": "Workshop TAs\n\nJoe Cheng\n\n\n\n\n\n\n\n\n\n\nJoe Cheng is the Chief Technology Officer at Posit and was the original creator of the Shiny web framework, and continues to work on packages at the intersection of R and the web.\n\n\n\n\nDavid Granjon\n\n\n\n\n\n\n\n\n\n\nDavid Granjon works as a Lead Shiny Developer at Cynkra. He is the founder and maintainer of the open source RinteRface organisation. He wrote Outstanding User Interfaces with Shiny, a CRC press book, available online.\n\n\n\n\nRyan Johnson\n\n\n\n\n\n\n\n\n\n\nRyan Johnson was previously a research microbiologist and now is a data scientist at Posit. After years of working with high-throughput genomic data, he transitioned into a data science advisory role with Posit PBC. He lead workshops, webinars, and content creation to help data enthusiasts worldwide improve their workflows."
-  },
-  {
-    "objectID": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
-    "href": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
-    "title": "Attribution-ShareAlike 4.0 International",
-    "section": "Creative Commons Attribution-ShareAlike 4.0 International Public License",
-    "text": "Creative Commons Attribution-ShareAlike 4.0 International Public License\nBy exercising the Licensed Rights (defined below), You accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-ShareAlike 4.0 International Public License (“Public License”). To the extent this Public License may be interpreted as a contract, You are granted the Licensed Rights in consideration of Your acceptance of these terms and conditions, and the Licensor grants You such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.\n\nSection 1 – Definitions.\n\nAdapted Material means material subject to Copyright and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.\nAdapter’s License means the license You apply to Your Copyright and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.\nBY-SA Compatible License means a license listed at creativecommons.org/compatiblelicenses, approved by Creative Commons as essentially the equivalent of this Public License.\nCopyright and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.\nEffective Technological Measures means those measures that, in the absence of proper authority, may not be circumvented under laws fulfilling obligations under Article 11 of the WIPO Copyright Treaty adopted on December 20, 1996, and/or similar international agreements.\nExceptions and Limitations means fair use, fair dealing, and/or any other exception or limitation to Copyright and Similar Rights that applies to Your use of the Licensed Material.\nLicense Elements means the license attributes listed in the name of a Creative Commons Public License. The License Elements of this Public License are Attribution and ShareAlike.\nLicensed Material means the artistic or literary work, database, or other material to which the Licensor applied this Public License.\nLicensed Rights means the rights granted to You subject to the terms and conditions of this Public License, which are limited to all Copyright and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.\nLicensor means the individual(s) or entity(ies) granting rights under this Public License.\nShare means to provide material to the public by any means or process that requires permission under the Licensed Rights, such as reproduction, public display, public performance, distribution, dissemination, communication, or importation, and to make material available to the public including in ways that members of the public may access the material from a place and at a time individually chosen by them.\nSui Generis Database Rights means rights other than copyright resulting from Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, as amended and/or succeeded, as well as other essentially equivalent rights anywhere in the world.\nYou means the individual or entity exercising the Licensed Rights under this Public License. Your has a corresponding meaning.\n\n\n\nSection 2 – Scope.\n\nLicense grant.\n\nSubject to the terms and conditions of this Public License, the Licensor hereby grants You a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable license to exercise the Licensed Rights in the Licensed Material to:\nA. reproduce and Share the Licensed Material, in whole or in part; and\nB. produce, reproduce, and Share Adapted Material.\nExceptions and Limitations. For the avoidance of doubt, where Exceptions and Limitations apply to Your use, this Public License does not apply, and You do not need to comply with its terms and conditions.\nTerm. The term of this Public License is specified in Section 6(a).\nMedia and formats; technical modifications allowed. The Licensor authorizes You to exercise the Licensed Rights in all media and formats whether now known or hereafter created, and to make technical modifications necessary to do so. The Licensor waives and/or agrees not to assert any right or authority to forbid You from making technical modifications necessary to exercise the Licensed Rights, including technical modifications necessary to circumvent Effective Technological Measures. For purposes of this Public License, simply making modifications authorized by this Section 2(a)(4) never produces Adapted Material.\nDownstream recipients.\nA. Offer from the Licensor – Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.\nB. __Additional offer from the Licensor – Adapted Material. Every recipient of Adapted Material from You automatically receives an offer from the Licensor to exercise the Licensed Rights in the Adapted Material under the conditions of the Adapter’s License You apply.\nC. No downstream restrictions. You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, the Licensed Material if doing so restricts exercise of the Licensed Rights by any recipient of the Licensed Material.\nNo endorsement. Nothing in this Public License constitutes or may be construed as permission to assert or imply that You are, or that Your use of the Licensed Material is, connected with, or sponsored, endorsed, or granted official status by, the Licensor or others designated to receive attribution as provided in Section 3(a)(1)(A)(i).\n\nOther rights.\n\nMoral rights, such as the right of integrity, are not licensed under this Public License, nor are publicity, privacy, and/or other similar personality rights; however, to the extent possible, the Licensor waives and/or agrees not to assert any such rights held by the Licensor to the limited extent necessary to allow You to exercise the Licensed Rights, but not otherwise.\nPatent and trademark rights are not licensed under this Public License.\nTo the extent possible, the Licensor waives any right to collect royalties from You for the exercise of the Licensed Rights, whether directly or through a collecting society under any voluntary or waivable statutory or compulsory licensing scheme. In all other cases the Licensor expressly reserves any right to collect such royalties.\n\n\n\n\nSection 3 – License Conditions.\nYour exercise of the Licensed Rights is expressly made subject to the following conditions.\n\nAttribution.\n\nIf You Share the Licensed Material (including in modified form), You must:\nA. retain the following if it is supplied by the Licensor with the Licensed Material:\n\nidentification of the creator(s) of the Licensed Material and any others designated to receive attribution, in any reasonable manner requested by the Licensor (including by pseudonym if designated);\na copyright notice;\na notice that refers to this Public License;\na notice that refers to the disclaimer of warranties;\na URI or hyperlink to the Licensed Material to the extent reasonably practicable;\n\nB. indicate if You modified the Licensed Material and retain an indication of any previous modifications; and\nC. indicate the Licensed Material is licensed under this Public License, and include the text of, or the URI or hyperlink to, this Public License.\nYou may satisfy the conditions in Section 3(a)(1) in any reasonable manner based on the medium, means, and context in which You Share the Licensed Material. For example, it may be reasonable to satisfy the conditions by providing a URI or hyperlink to a resource that includes the required information.\nIf requested by the Licensor, You must remove any of the information required by Section 3(a)(1)(A) to the extent reasonably practicable.\n\nShareAlike.\n\nIn addition to the conditions in Section 3(a), if You Share Adapted Material You produce, the following conditions also apply.\n\nThe Adapter’s License You apply must be a Creative Commons license with the same License Elements, this version or later, or a BY-SA Compatible License.\nYou must include the text of, or the URI or hyperlink to, the Adapter’s License You apply. You may satisfy this condition in any reasonable manner based on the medium, means, and context in which You Share Adapted Material.\nYou may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, Adapted Material that restrict exercise of the rights granted under the Adapter’s License You apply.\n\n\n\nSection 4 – Sui Generis Database Rights.\nWhere the Licensed Rights include Sui Generis Database Rights that apply to Your use of the Licensed Material:\n\nfor the avoidance of doubt, Section 2(a)(1) grants You the right to extract, reuse, reproduce, and Share all or a substantial portion of the contents of the database;\nif You include all or a substantial portion of the database contents in a database in which You have Sui Generis Database Rights, then the database in which You have Sui Generis Database Rights (but not its individual contents) is Adapted Material, including for purposes of Section 3(b); and\nYou must comply with the conditions in Section 3(a) if You Share all or a substantial portion of the contents of the database.\n\nFor the avoidance of doubt, this Section 4 supplements and does not replace Your obligations under this Public License where the Licensed Rights include other Copyright and Similar Rights.\n\n\nSection 5 – Disclaimer of Warranties and Limitation of Liability.\n\nUnless otherwise separately undertaken by the Licensor, to the extent possible, the Licensor offers the Licensed Material as-is and as-available, and makes no representations or warranties of any kind concerning the Licensed Material, whether express, implied, statutory, or other. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not known or discoverable. Where disclaimers of warranties are not allowed in full or in part, this disclaimer may not apply to You.\nTo the extent possible, in no event will the Licensor be liable to You on any legal theory (including, without limitation, negligence) or otherwise for any direct, special, indirect, incidental, consequential, punitive, exemplary, or other losses, costs, expenses, or damages arising out of this Public License or use of the Licensed Material, even if the Licensor has been advised of the possibility of such losses, costs, expenses, or damages. Where a limitation of liability is not allowed in full or in part, this limitation may not apply to You.\nThe disclaimer of warranties and limitation of liability provided above shall be interpreted in a manner that, to the extent possible, most closely approximates an absolute disclaimer and waiver of all liability.\n\n\n\nSection 6 – Term and Termination.\n\nThis Public License applies for the term of the Copyright and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.\nWhere Your right to use the Licensed Material has terminated under Section 6(a), it reinstates:\n\nautomatically as of the date the violation is cured, provided it is cured within 30 days of Your discovery of the violation; or\nupon express reinstatement by the Licensor.\n\nFor the avoidance of doubt, this Section 6(b) does not affect any right the Licensor may have to seek remedies for Your violations of this Public License.\nFor the avoidance of doubt, the Licensor may also offer the Licensed Material under separate terms or conditions or stop distributing the Licensed Material at any time; however, doing so will not terminate this Public License.\nSections 1, 5, 6, 7, and 8 survive termination of this Public License.\n\n\n\nSection 7 – Other Terms and Conditions.\n\nThe Licensor shall not be bound by any additional or different terms or conditions communicated by You unless expressly agreed.\nAny arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.t stated herein are separate from and independent of the terms and conditions of this Public License.\n\n\n\nSection 8 – Interpretation.\n\nFor the avoidance of doubt, this Public License does not, and shall not be interpreted to, reduce, limit, restrict, or impose conditions on any use of the Licensed Material that could lawfully be made without permission under this Public License.\nTo the extent possible, if any provision of this Public License is deemed unenforceable, it shall be automatically reformed to the minimum extent necessary to make it enforceable. If the provision cannot be reformed, it shall be severed from this Public License without affecting the enforceability of the remaining terms and conditions.\nNo term or condition of this Public License will be waived and no failure to comply consented to unless expressly agreed to by the Licensor.\nNothing in this Public License constitutes or may be interpreted as a limitation upon, or waiver of, any privileges and immunities that apply to the Licensor or You, including from the legal processes of any jurisdiction or authority.\n\n\nCreative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the “Licensor.” Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark “Creative Commons” or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.\nCreative Commons may be contacted at creativecommons.org"
-  },
-  {
-    "objectID": "units/d1-03b-lunch.html",
-    "href": "units/d1-03b-lunch.html",
-    "title": "Lunch break",
-    "section": "",
-    "text": "It’s time to replenish that Shiny learning energy with a delicious lunch! Before you head over to the LunchTBD, we would greatly appreciate if you take a minute to provide your feedback on how the workshop is going so far:\n\nWrite one positive thing such as a new technique/capability you learned on a green sticky note\nWrite one item that could use improvement, such as a topic going too fast or not clear enough on a pink sticky note.\n\nYour workshop team is also using this time to re-charge. If you have any questions, please wait to ask until we re-convene for the next unit."
-  },
-  {
-    "objectID": "units/d1-04b-break.html",
-    "href": "units/d1-04b-break.html",
-    "title": "Coffee & refreshments break",
-    "section": "",
-    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at BreakroomTBD. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
-  },
-  {
-    "objectID": "units/d1-03-performance.html",
-    "href": "units/d1-03-performance.html",
-    "title": "Performance",
-    "section": "",
-    "text": "View slides in full screen"
-  },
-  {
-    "objectID": "units/d1-03-performance.html#slides",
-    "href": "units/d1-03-performance.html#slides",
-    "title": "Performance",
-    "section": "",
-    "text": "View slides in full screen"
-  },
-  {
-    "objectID": "units/d1-9001-loadtesting.html",
-    "href": "units/d1-9001-loadtesting.html",
-    "title": "Load Testing",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "units/d1-9001-loadtesting.html#slides",
-    "href": "units/d1-9001-loadtesting.html#slides",
-    "title": "Load Testing",
-    "section": "",
-    "text": "Warning\n\n\n\nThese slides are under construction and will be finalized prior to the workshop date.\n\n\nView slides in full screen"
-  },
-  {
-    "objectID": "setup.html",
-    "href": "setup.html",
-    "title": "Setup",
-    "section": "",
-    "text": "We are excited to have you join us for our workshop Shiny in Production: Tools and Techniques! The format of the workshop will be a mix of presentation slides, example Shiny applications, and hands-on exercises. To ensure you are ready for the journey, please review the following instructions."
-  },
-  {
-    "objectID": "setup.html#pre-work",
-    "href": "setup.html#pre-work",
-    "title": "Setup",
-    "section": "Pre-Work",
-    "text": "Pre-Work\nThis workshop will be a blend of teaching materials, live-coding demonstrations, and hands-on exercises to practice key concepts. Posit has generously provided us access to a dedicated workshop coding environment using Posit Cloud, which is accessible with a modern web browser such as Google Chrome, Microsoft Edge, Firefox, or others. In addition, Posit is also providing a dedicated instance of the Posit Connect platform for hosting Shiny applications that you create and view throughout the workshop.\nIn the first session of the workshop, we will allocate time for everyone to configure their accounts and development environments. If you would like to complete these steps before the workshop, you can follow the procedures detailed in Environment Configuration below."
-  },
-  {
-    "objectID": "setup.html#accounts",
-    "href": "setup.html#accounts",
-    "title": "Setup",
-    "section": "Accounts",
-    "text": "Accounts\n\nGitHub account: You can create a GitHub account for free using the instructions provided in the Register for GitHub chapter of Jenny Bryan’s Happy Git and GitHub for the UseR. If you already have an account, you are welcome to use it for the workshop. While version control itself is not a major focus of the course, we will discuss how certain elements can play an important role in application development and deployment. A great resource for getting a basic familiarity with Git version control is Jenny Bryan’s Happy Git and GitHub for the useR online book.\nPosit Cloud account: Visit posit.cloud and click the Sign Up link. Then create a Free account. If you already have an account, you do not need to create a new one."
-  },
-  {
-    "objectID": "setup.html#local-clone-of-repository",
-    "href": "setup.html#local-clone-of-repository",
-    "title": "Setup",
-    "section": "Local Clone of Repository",
-    "text": "Local Clone of Repository\nIf we encounter any technical issues with the cloud-based environments, it is a good idea to have a clone of the workshop repository on your local laptop as a backup. If you already have Git installed, you can clone the repository from https://github.com/posit-conf-2023/shiny-r-prod, or without Git you can download the repository using this link."
-  },
-  {
-    "objectID": "setup.html#environment-configuration",
-    "href": "setup.html#environment-configuration",
-    "title": "Setup",
-    "section": "Environment Configuration",
-    "text": "Environment Configuration\nPlease view the information in the callouts below for step-by-step instructions on configuring your accounts and environments. While Posit Cloud is the preferred development environment, you may utilize your local installation of R with your preferred integrated development environment such as RStudio, Visual Studio Code, or even vim/emacs if you prefer.\n\n\n\n\n\n\nPosit Connect\n\n\n\n\n\nView screenshots in full screen\n\n\nCreate an account on the workshop Posit Connect server by visiting https://rsc.training.rstudio.com and clicking the login link in the upper right corner.\nYou will see a window that asks for either an email/password or to use a GitHub account. Please choose the GitHub option and follow the instructions to authorize Posit Connect to your GitHub account.\nYou should now be logged in to Posit Connect. Please create an API key for your account by following the Posit Connect User Guide instructions on creating an API key. Save it to a secure place as you will need it for account integration.\n\n\n\n\n\n\n\n\n\n\nPosit Cloud\n\n\n\n\n\nView screenshots in full screen\n\n\nJoin the Posit Cloud Workspace dedicated to this workshop by visiting this customized invitation URL. If you already have a Posit Cloud account, you are welcome to use it for the workshop. Otherwise, you can create a new account for free.\nYou will see a project called shiny-r-prod. Open that project and create a saved copy. This process could take a couple of minutes depending on server load.\nAfter the project loads, you will see messages in the R console about restoring or repairing the package library. Execute renv::restore(prompt = FALSE) to install packages into the project. This process should complete in one or two minutes.\n\n\n\n\n\n\n\n\n\n\nLocal R & RStudio IDE\n\n\n\n\n\nIf you prefer to use a local installation of R and RStudio, ensure you setup meets the following requirements:\n\nR version 4.3 or later.\nLatest release of RStudio IDE, 2023.06.1-524 or later\nThe {renv} R package.\n\nYou can workshop materials using the following procedure:\n\nVisit the workshop repository at https://github.com/posit-conf-2023/shiny-r-prod and either clone to your local machine with Git or download a zip archive of the materials. A direct link to the archive is here.\nLaunch RStudio and open the project file shiny-r-prod.Rproj to initialize the workshop project.\nThe {renv} package will begin bootstrapping the package library. When prompted, run renv::restore() to complete the package installation process.\n\n\n\n\n\n\n\n\n\n\nDocker Container with Visual Studio Code & RStudio\n\n\n\n\n\nThe repository for this workshop also gives you the ability to create custom Docker containers to encapsulate a complete R development environment tailored to this workshop. This workshop repository uses a similar container definition as found at https://github.com/rpodcast/r_dev_projects. At a high level, you will need an installation of Visual Studio Code with the Remote Development extension.\n\nVisit the workshop repository at https://github.com/posit-conf-2023/shiny-r-prod and either clone to your local machine with Git or download a zip archive of the materials. A direct link to the archive is here.\nWithin the .devcontainer subdirectory, create a new file called .env based on the template provided at .env.example. In this file, change the value of the environment variable RENV_PATHS_CACHE_HOST to the deisred directory on your system.\nLaunch Visual Studio Code and open the folder of your local copy of the workshop repository.\nYou will be prompted to re-open the folder to begin the container build process. Note that this process can take a few minutes depending on your computer’s hardware specifications and network bandwidth.\nOnce the development container is built, you are free to continue using Visual Studio Code or use a container version of the RStudio open source server by visiting localhost:4567 in your web browser.\n\n\nIf using visual studio code, the user needs to add the renv library path to their r.libPaths setting in the R extension. Details at https://github.com/REditorSupport/vscode-R/wiki/Working-with-renv-enabled-projects ."
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#one-to-many",
-    "href": "materials/d1-9001-loadtesting/index.html#one-to-many",
-    "title": "Load Testing",
-    "section": "One to Many",
-    "text": "One to Many\n\n\n\n\n\nsingle-user\n\n\n\n\n\n\ncrowd"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#optimization-loop-method",
-    "href": "materials/d1-9001-loadtesting/index.html#optimization-loop-method",
-    "title": "Load Testing",
-    "section": "Optimization Loop Method",
-    "text": "Optimization Loop Method\n\n\nrstudio.github.io/shinyloadtest/articles/case-study-scaling.html"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#double-the-load-testing-fun",
-    "href": "materials/d1-9001-loadtesting/index.html#double-the-load-testing-fun",
-    "title": "Load Testing",
-    "section": "Double the (Load-Testing) Fun",
-    "text": "Double the (Load-Testing) Fun\n{shinyloadtest}\n\nRecord the events of a Shiny application session\nProcess and analyze metrics associated with application runs\n\nshinycannon\n\nCommand-line utility to launch multiple application sessions and collect event-based metrics\nCross-platform (built with Kotlin)"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#hosting-requirements",
-    "href": "materials/d1-9001-loadtesting/index.html#hosting-requirements",
-    "title": "Load Testing",
-    "section": "Hosting Requirements",
-    "text": "Hosting Requirements\n\nApplication deployed to a server supporting SockJS (Posit Connect, Shiny Server)\nIf authentication required for app on Posit Connect, you’ll need an API key"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#recording-a-session",
-    "href": "materials/d1-9001-loadtesting/index.html#recording-a-session",
-    "title": "Load Testing",
-    "section": "Recording a Session",
-    "text": "Recording a Session\n\nlibrary(shinyloadtest)\nrecord_session(\"https://my-lego-app.me\", output_file = \"recording.log\")"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#recorder-tips",
-    "href": "materials/d1-9001-loadtesting/index.html#recorder-tips",
-    "title": "Load Testing",
-    "section": "Recorder Tips",
-    "text": "Recorder Tips\n\nEmulate a real-world usage of your application\nAvoid rapid clicks / selections of your inputs"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#the-log",
-    "href": "materials/d1-9001-loadtesting/index.html#the-log",
-    "title": "Load Testing",
-    "section": "The log",
-    "text": "The log\n# version: 1\n# target_url: https://my-lego-app.me/\n# target_type: RStudio Server Connect\n# rscApiKeyRequired: false\n{\"type\":\"REQ_HOME\",\"begin\":\"2023-09-07T13:03:39.042Z\",\"end\":\"2023-09-07T13:03:40.138Z\",\"status\":200,\"url\":\"/\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.332Z\",\"end\":\"2023-09-07T13:03:40.502Z\",\"status\":200,\"url\":\"/_w_${WORKER}/shiny-sass-1.7.5/shiny-sass.css\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.517Z\",\"end\":\"2023-09-07T13:03:40.678Z\",\"status\":200,\"url\":\"/_w_${WORKER}/bslib-grid-styles-0.5.1/grid.css\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.692Z\",\"end\":\"2023-09-07T13:03:40.886Z\",\"status\":200,\"url\":\"/_w_${WORKER}/bootstrap-5.2.2/bootstrap.min.css\"}\n...\n...\n{\"type\":\"WS_SEND\",\"begin\":\"2023-09-07T13:04:17.805Z\",\"message\":\"[\\\"D#0|m|{\\\\\\\"method\\\\\\\":\\\\\\\"update\\\\\\\",\\\\\\\"data\\\\\\\":{\\\\\\\"n_parts_display\\\\\\\":\\\\\\\"20\\\\\\\"}}\\\"]\"}\n{\"type\":\"WS_CLOSE\",\"begin\":\"2023-09-07T13:04:35.561Z\"}"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#loading-the-shiny-cannon",
-    "href": "materials/d1-9001-loadtesting/index.html#loading-the-shiny-cannon",
-    "title": "Load Testing",
-    "section": "Loading the (shiny) cannon",
-    "text": "Loading the (shiny) cannon\n\nbash\n\njava -jar shinycannon-1.1.3-dd43f6b.jar \\\n  recording.log \\\n  https://my-lego-app.me \\\n  --loaded-duration-minutes 2 \\\n  --workers 1 \\\n  --output-dir run1\n\n\n\n\nrun_shinycannon.R\n\nsource(file.path(here::here(), \"R\", \"shinycannon.R\"))\n\nshinycannon(\n  \"shinycannon-1.1.3-dd43f6b.jar\",\n  \"recording.log\",\n  \"https://my-lego-app.me\",\n  loaded_duration_minutes = 2,\n  workers = 1,\n  output_dir = \"run1\"\n)"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#metrics",
-    "href": "materials/d1-9001-loadtesting/index.html#metrics",
-    "title": "Load Testing",
-    "section": "Metrics",
-    "text": "Metrics\n\n\n\n\nanalyze_recording.R\n\nlibrary(shinyloadtest)\ndf &lt;- load_runs(\"Run 1\" = \"run1\")\n\n\n\n\n\n# A tibble: 138 × 13\n   run   user_id session_id iteration input_line_number event  start   end  time\n   &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;             &lt;int&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n 1 Run 1       0          0         0                 5 REQ_H… 0     0.951 0.951\n 2 Run 1       0          0         0                 6 REQ_G… 0.952 1.27  0.320\n 3 Run 1       0          0         0                 7 REQ_G… 1.27  1.54  0.271\n 4 Run 1       0          0         0                 8 REQ_G… 1.54  1.85  0.308\n 5 Run 1       0          0         0                 9 REQ_G… 1.85  2.19  0.334\n 6 Run 1       0          0         0                10 REQ_G… 2.19  2.44  0.253\n 7 Run 1       0          0         0                11 REQ_G… 2.44  2.86  0.422\n 8 Run 1       0          0         0                12 REQ_G… 2.86  3.12  0.257\n 9 Run 1       0          0         0                13 REQ_G… 3.12  3.37  0.252\n10 Run 1       0          0         0                14 REQ_G… 3.37  3.62  0.253\n# ℹ 128 more rows\n# ℹ 4 more variables: concurrency &lt;dbl&gt;, maintenance &lt;lgl&gt;, label &lt;ord&gt;,\n#   json &lt;list&gt;"
-  },
-  {
-    "objectID": "materials/d1-9001-loadtesting/index.html#but-wait-..-theres-more",
-    "href": "materials/d1-9001-loadtesting/index.html#but-wait-..-theres-more",
-    "title": "Load Testing",
-    "section": "But Wait .. There’s More",
-    "text": "But Wait .. There’s More\n\ngen_report.R\n\nlibrary(shinyloadtest)\ndf &lt;- load_runs(\"Run 1\" = \"run1\")\nshinyloadtest_report(df, output = \"report_test.html\")\n\n\n\n\n\n\n\n\nTODO\n\n\nAdd screenshot of HTML report with hyperlink"
+    "objectID": "materials/d1-02-structure/codealong-1.html#solution-theme-picker",
+    "href": "materials/d1-02-structure/codealong-1.html#solution-theme-picker",
+    "title": "Modules for LEGO attribute selections",
+    "section": "Solution (Theme Picker)",
+    "text": "Solution (Theme Picker)\nCreate the module file with the following snippet:\n\ngolem::add_module(name = \"theme_picker\", with_test = FALSE)\n\nWhile we could choose a selectInput that displays the name of the theme as the choices and allow multiple to be selected, we want to incorporate a search box with snappy performance. The virtualSelectInput from the {shinyWidgets} package is an excellent solution.\nSince we have the themes data set available, we can also leverage the supporting function shinyWidgets::prepare_choices() to get the possible choices ready for the input. The module will simply return the selection as a reactive variable.\n\n# UI portion\nmod_theme_picker_ui &lt;- function(id, label = NULL) {\n  ns &lt;- NS(id)\n\n  themes &lt;- dplyr::arrange(themes, name)\n\n  choices_list &lt;- shinyWidgets::prepare_choices(\n    themes,\n    label = name,\n    value = theme_id\n  )\n\n  tagList(\n    virtualSelectInput(\n      ns(\"virt_theme_id\"),\n      label = label,\n      choices = choices_list,\n      selected = themes$theme_id,\n      multiple = TRUE,\n      search = TRUE\n    )\n  )\n}\n\n# server portion\nmod_theme_picker_server &lt;- function(id){\n  moduleServer( id, function(input, output, session){\n    ns &lt;- session$ns\n\n    return(reactive(input$virt_theme_id))\n  })\n}\n\nAt the bottom of the module script, {golem} automatically includes commented code for referencing the module UI and server blocks in your main Shiny application. We can copy them into the app_ui.R and app_server.R files.\n\n# app_ui.R\nmod_theme_picker_ui(\"theme_picker_1\")\n\n# app_server.R\ninput_theme_ids &lt;- mod_theme_picker_server(\"theme_picker_1\")"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#its-never-just-shiny",
@@ -509,41 +89,6 @@
     "title": "Application Structure",
     "section": "It’s Never Just Shiny",
     "text": "It’s Never Just Shiny\n… at least for production-quality apps!\n\nExternal data sources\nConnections to other execution backends\nAdditional R packages!"
-  },
-  {
-    "objectID": "materials/d1-02-structure/index.html#turned-upside-down",
-    "href": "materials/d1-02-structure/index.html#turned-upside-down",
-    "title": "Application Structure",
-    "section": "Turned Upside-Down",
-    "text": "Turned Upside-Down\nImagine your application is working great!\n\n\n\n\nupdate.packages(ask = FALSE)\nremotes::install_github(\"pkg\")"
-  },
-  {
-    "objectID": "materials/d1-02-structure/index.html#turned-upside-down-1",
-    "href": "materials/d1-02-structure/index.html#turned-upside-down-1",
-    "title": "Application Structure",
-    "section": "Turned Upside-Down",
-    "text": "Turned Upside-Down\n\n\nggplot2 version 0.9.3\n\n\n\n\n\n\n\n\nggplot2 version 1.0.0"
-  },
-  {
-    "objectID": "materials/d1-02-structure/index.html#take-control-with-renv",
-    "href": "materials/d1-02-structure/index.html#take-control-with-renv",
-    "title": "Application Structure",
-    "section": "Take Control with {renv}",
-    "text": "Take Control with {renv}\n\nCreate reproducible environments for your R projects.\n\n\nNext generation of {packrat}\nIsolated package library from rest of your system\nTransfer projects to different collaborators / platforms\nReproducible package installation\nEasily create new projects or convert existing projects with RStudio or built-in functions."
-  },
-  {
-    "objectID": "materials/d1-02-structure/index.html#under-the-hood",
-    "href": "materials/d1-02-structure/index.html#under-the-hood",
-    "title": "Application Structure",
-    "section": "Under the Hood",
-    "text": "Under the Hood\nUpon initializing a project:\n\nProject-level .Rprofile to activate custom package library on startup\nLockfile renv.lock to describe state of project library\nrenv/library to hold private project library\nrenv/activate.R performs activation"
-  },
-  {
-    "objectID": "materials/d1-02-structure/index.html#develop-a-routine",
-    "href": "materials/d1-02-structure/index.html#develop-a-routine",
-    "title": "Application Structure",
-    "section": "Develop a Routine",
-    "text": "Develop a Routine\nSticking with {renv} will pay off (trust me)\n\nFair play to mix packages from CRAN, GitHub, and proprietary sources\nRoll back when a package upgrade doesn’t play nicely\nYou make the call when to update your library!"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#a-single-point-app.r",
@@ -613,112 +158,602 @@
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-function-ui",
     "title": "Application Structure",
     "section": "Anatomy of a Function (UI)",
-    "text": "Anatomy of a Function (UI)\n\n\nset_picker_ui &lt;- function() {\n  tagList(\n    selectInput(\n      inputId = \"set_num\",\n      label = \"Select a set\"\n      choices = c(\"set1\", \"set2\"),\n      selected = \"set1\",\n      multiple = FALSE\n    )\n  )\n}"
+    "text": "Anatomy of a Function (UI)\n\n\n\npicker.R\nset_picker_ui &lt;- function() {\n  tagList(\n    selectInput(\n      inputId = \"set_num\",\n      label = \"Select a set\"\n      choices = c(\"set1\", \"set2\"),\n      selected = \"set1\",\n      multiple = FALSE\n    )\n  )\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui",
     "title": "Application Structure",
     "section": "Anatomy of a Module (UI)",
-    "text": "Anatomy of a Module (UI)\n\n\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}"
+    "text": "Anatomy of a Module (UI)\n\n\n\nmod_picker.R\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-ui-1",
     "title": "Application Structure",
     "section": "Anatomy of a Module (UI)",
-    "text": "Anatomy of a Module (UI)\n\n\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\nid: String to use for namespace\nns &lt;- NS(id): Create proper namespace function"
+    "text": "Anatomy of a Module (UI)\n\n\n\nmod_picker.R\nset_picker_ui &lt;- function(id) {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = \"Select a set\"\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\n\nid: String to use for namespace\nns &lt;- NS(id): Create proper namespace function"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(input, output, session, sets_rv) {\n  set_choices &lt;- reactive({\n    # do something with sets_rv\n  })\n\n  observeEvent(set_choices(), {\n    req(set_choices())\n    updateSelectInput(\n      \"set_num\",\n      choices = set_choices()\n    )\n  })\n}"
+    "text": "Anatomy of a Module (Server)\n\nmod_picker.R\nset_picker_server &lt;- function(input, output, session, sets_rv) {\n  set_choices &lt;- reactive({\n    # do something with sets_rv\n  })\n\n  observeEvent(set_choices(), {\n    req(set_choices())\n    updateSelectInput(\n      \"set_num\",\n      choices = set_choices()\n    )\n  })\n}"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-1",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\nMinimal changes necessary"
+    "text": "Anatomy of a Module (Server)\n\nmod_picker.R\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\nMinimal changes necessary"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
     "href": "materials/d1-02-structure/index.html#anatomy-of-a-module-server-2",
     "title": "Application Structure",
     "section": "Anatomy of a Module (Server)",
-    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\n:thinking: id\n\n\n\n`moduleServer(): Encapsulate server-side logic with namespace applied."
+    "text": "Anatomy of a Module (Server)\n\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\n🤔 id\n\n\n\nmoduleServer(): Encapsulate server-side logic with namespace applied."
   },
   {
     "objectID": "materials/d1-02-structure/index.html#invoking-modules",
     "href": "materials/d1-02-structure/index.html#invoking-modules",
     "title": "Application Structure",
     "section": "Invoking Modules",
-    "text": "Invoking Modules\nlibrary(shiny)\nlibrary(bslib)\nui &lt;- page_fluid(\n  set_picker_ui(\"mod1\")\n)\n\nserver &lt;- function(input, output, session) {\n  sets_rv &lt;- reactive({\n    # processing\n  })\n\n  set_picker_server(\"mod1\", sets_rv)\n}\n\nshinyApp(ui, server)"
+    "text": "Invoking Modules\n\napp.R\nlibrary(shiny)\nlibrary(bslib)\nui &lt;- page_fluid(\n  set_picker_ui(\"mod1\")\n)\n\nserver &lt;- function(input, output, session) {\n  sets_rv &lt;- reactive({\n    # processing\n  })\n\n  set_picker_server(\"mod1\", sets_rv)\n}\n\nshinyApp(ui, server)"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#giving-and-receiving",
     "href": "materials/d1-02-structure/index.html#giving-and-receiving",
     "title": "Application Structure",
     "section": "Giving and Receiving",
-    "text": "Giving and Receiving\n\n\nset_picker_ui &lt;- function(id, label = \"Select a set\") {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = label,\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\nReasonable inputs: static values, vectors, flags\nAvoid reactive parameters\nReturn value: tagList() of inputs, output placeholders, and other UI elements"
+    "text": "Giving and Receiving\n\nmod_picker.R\nset_picker_ui &lt;- function(id, label = \"Select a set\") {\n  ns &lt;- NS(id)\n  tagList(\n    selectInput(\n      inputId = ns(\"set_num\"),\n      label = label,\n      choices = c(),\n      multiple = FALSE\n    )\n  )\n}\n\n\n\nReasonable inputs: static values, vectors, flags\nAvoid reactive parameters\nReturn value: tagList() of inputs, output placeholders, and other UI elements"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#giving-and-receiving-1",
     "href": "materials/d1-02-structure/index.html#giving-and-receiving-1",
     "title": "Application Structure",
     "section": "Giving and Receiving",
-    "text": "Giving and Receiving\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\nInput parameters (and return values) can be a mix of static and reactive objects"
+    "text": "Giving and Receiving\n\nmod_picker.R\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      set_choices &lt;- reactive({\n        # do something with sets_rv\n      })\n\n      observeEvent(set_choices(), {\n        req(set_choices())\n        updateSelectInput(\n          \"set_num\",\n          choices = set_choices()\n        )\n      })\n    }\n  )\n}\n\n\nInput & return values can be a mix of static and reactive objects"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#to-or-not-to",
     "href": "materials/d1-02-structure/index.html#to-or-not-to",
     "title": "Application Structure",
     "section": "To () or not to ()",
-    "text": "To () or not to ()\n\n\n# app server\nsets_rv &lt;- reactive({\n  # processing\n})\n\nset_picker_server(\"mod1\", sets_rv)\n\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      # ...\n\n      set_selection  &lt;- reactive({\n        input$set_num\n      })\n\n      set_selection\n    }\n  )\n}\n\n\n\nReactive parameters reference by name: sets_rv\nInside module, invoke reactive parameter as you would any other reactive in Shiny: sets_rv()\nAny reactive(s) returned by module should also be reference by name: set_selection, set_selection()"
+    "text": "To () or not to ()\n\n\n\napp_server.R\n# app server\nsets_rv &lt;- reactive({\n  # processing\n})\n\nset_picker_server(\"mod1\", sets_rv)\n\n\n\nmod_picker.R\nset_picker_server &lt;- function(id, sets_rv) {\n  moduleServer(\n    id,\n    function(input, output, session) {\n      # ...\n\n      set_selection  &lt;- reactive({\n        input$set_num\n      })\n\n      set_selection\n    }\n  )\n}\n\n\n\n\n\nReactive parameters reference by name: sets_rv\nInside module, invoke reactive parameter as you would any other reactive in Shiny: sets_rv()\nAny reactive(s) returned by module should also be reference by name: set_selection, set_selection()"
   },
   {
     "objectID": "materials/d1-02-structure/index.html#your-turn-exercise-1",
     "href": "materials/d1-02-structure/index.html#your-turn-exercise-1",
     "title": "Application Structure",
     "section": "Your Turn: Exercise 1",
-    "text": "Your Turn: Exercise 1\nCreate a new Shiny module with LEGO data metrics!\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+    "text": "Your Turn: Exercise 1\nCreate a new Shiny module with LEGO data metrics!\n\nDetails\nPosit Cloud project: Application Structure Exercise 1\n\n\n\n\n−+\n10:00"
   },
   {
-    "objectID": "materials/d1-02-structure/codealong-1.html",
-    "href": "materials/d1-02-structure/codealong-1.html",
-    "title": "Modules for LEGO attribute selections",
+    "objectID": "materials/d1-02-structure/index.html#turned-upside-down",
+    "href": "materials/d1-02-structure/index.html#turned-upside-down",
+    "title": "Application Structure",
+    "section": "Turned Upside-Down",
+    "text": "Turned Upside-Down\nImagine your application is working great!\n\n\n\n\nupdate.packages(ask = FALSE)\nremotes::install_github(\"pkg\")"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#turned-upside-down-1",
+    "href": "materials/d1-02-structure/index.html#turned-upside-down-1",
+    "title": "Application Structure",
+    "section": "Turned Upside-Down",
+    "text": "Turned Upside-Down\n\n\nggplot2 version 0.9.3\n\n\n\n\n\n\n\n\nggplot2 version 1.0.0"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#take-control-with-renv",
+    "href": "materials/d1-02-structure/index.html#take-control-with-renv",
+    "title": "Application Structure",
+    "section": "Take Control with {renv}",
+    "text": "Take Control with {renv}\n\nCreate reproducible environments for your R projects.\n\n\nNext generation of {packrat}\nIsolated package library from rest of your system\nTransfer projects to different collaborators / platforms\nReproducible package installation\nEasily create new projects or convert existing projects with RStudio or built-in functions."
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#under-the-hood",
+    "href": "materials/d1-02-structure/index.html#under-the-hood",
+    "title": "Application Structure",
+    "section": "Under the Hood",
+    "text": "Under the Hood\nUpon initializing a project:\n\nProject-level .Rprofile to activate custom package library on startup\nLockfile renv.lock to describe state of project library\nrenv/library to hold private project library\nrenv/activate.R performs activation"
+  },
+  {
+    "objectID": "materials/d1-02-structure/index.html#develop-a-routine",
+    "href": "materials/d1-02-structure/index.html#develop-a-routine",
+    "title": "Application Structure",
+    "section": "Develop a Routine",
+    "text": "Develop a Routine\nSticking with {renv} will pay off (trust me)\n\nFair play to mix packages from CRAN, GitHub, and proprietary sources\nRoll back when a package upgrade doesn’t play nicely\nYou make the call when to update your library!\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#choose-your-adventure",
+    "href": "materials/d1-05-deploy-admin/index.html#choose-your-adventure",
+    "title": "Deployment & Administration",
+    "section": "Choose your Adventure",
+    "text": "Choose your Adventure\n\n\n\n\n\nPosit Connect\n\n\n\n\n\n\n\n\nContainers"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#deployment-checklist",
+    "href": "materials/d1-05-deploy-admin/index.html#deployment-checklist",
+    "title": "Deployment & Administration",
+    "section": "Deployment Checklist",
+    "text": "Deployment Checklist\n✅ Create app.R in directory\n✅ Take note of any custom environment variables\n✅ Ensure DESCRIPTION is up-to-date with required packages\n✅ Remove outdated functions / scripts"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#section",
+    "href": "materials/d1-05-deploy-admin/index.html#section",
+    "title": "Deployment & Administration",
     "section": "",
-    "text": "As you make the transition to building production Shiny applications, Shiny modules are a very important tool to improve code organization and overall flow of your application. We will work together to build Shiny modules that let the user filter the underlying LEGO metadata based on a key variables in the overall data."
+    "text": "03_deploy.R\n\n## RStudio ----\n## If you want to deploy on RStudio related platforms\ngolem::add_rstudioconnect_file()\ngolem::add_shinyappsio_file()\ngolem::add_shinyserver_file()"
   },
   {
-    "objectID": "materials/d1-02-structure/codealong-1.html#requirements",
-    "href": "materials/d1-02-structure/codealong-1.html#requirements",
-    "title": "Modules for LEGO attribute selections",
-    "section": "Requirements",
-    "text": "Requirements\nCreste three inputs for the user to subset the LEGO metadata by the following key variables:\n\nTheme(s) associated with sets. Default should be all sets, but let the user customize selections with a search box.\nYear range for when set was created. Give the user a visual cue of how many sets are present in each year.\nPre-defined ranges for how many parts are present in each set. Ranges are the following:\n\nSmall (1-50 parts)\nMedium (51-200 parts)\nLarge (201 or more parts)\nAll sizes"
+    "objectID": "materials/d1-05-deploy-admin/index.html#balancing-act",
+    "href": "materials/d1-05-deploy-admin/index.html#balancing-act",
+    "title": "Deployment & Administration",
+    "section": "Balancing Act",
+    "text": "Balancing Act\n\n\n🔼 Max Processes\n\nMore resources dedicated to particular application\nPotential for server overload\n\n\n\n\n\n\n\n\n\n\n🔼 Min Processes\n\nResources dedicated even when app is idle\nPotentially wasteful if app is not used concurrently often"
   },
   {
-    "objectID": "materials/d1-02-structure/codealong-1.html#data",
-    "href": "materials/d1-02-structure/codealong-1.html#data",
-    "title": "Modules for LEGO attribute selections",
-    "section": "Data",
-    "text": "Data\nThe following data sets included in the application contain the variables needed for the requirements (note that these snippets are a reduced sample of each source data set).\n\nsets\n\ndplyr::glimpse(sets)\n\n\n\nRows: 368\nColumns: 6\n$ set_num   &lt;chr&gt; \"001-1\", \"002-1\", \"1030-1\", \"1038-1\", \"1039-1\", \"1237-1\", \"1…\n$ name      &lt;chr&gt; \"Gears\", \"4.5V Samsonite Gears Motor Set\", \"TECHNIC I: Simpl…\n$ year      &lt;dbl&gt; 1965, 1965, 1985, 1985, 1986, 2001, 1999, 1999, 1999, 1999, …\n$ theme_id  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …\n$ num_parts &lt;dbl&gt; 43, 3, 210, 120, 39, 56, 30, 29, 28, 26, 28, 103, 98, 64, 28…\n$ img_url   &lt;chr&gt; \"https://cdn.rebrickable.com/media/sets/001-1.jpg\", \"https:/…\n\n\n\n\nthemes\n\ndplyr::glimpse(themes)\n\n\n\nRows: 30\nColumns: 3\n$ theme_id  &lt;dbl&gt; 191, 708, 693, 398, 650, 234, 56, 604, 136, 736, 692, 676, 2…\n$ name      &lt;chr&gt; \"Dark Forest\", \"The LEGO Batman Movie\", \"Monkie Kid\", \"FIRST…\n$ parent_id &lt;dbl&gt; 186, 697, NA, NA, 632, 233, 52, NA, 126, 501, 535, NA, 227, …"
+    "objectID": "materials/d1-05-deploy-admin/index.html#containers-for-shiny-deployment",
+    "href": "materials/d1-05-deploy-admin/index.html#containers-for-shiny-deployment",
+    "title": "Deployment & Administration",
+    "section": "Containers for Shiny Deployment",
+    "text": "Containers for Shiny Deployment\n\nAnyone with a container runtime can execute your container without R on their system\n\nPopular container runtimes: Docker, Podman, LXC\n\nA multitude of web services offer serverless app deployments with containers\n\nBring your container image, they take care of the rest\nTerrific reviews available at hosting.analythium.io\n\n\n\nComing soon: Container support for Posit Connect"
   },
   {
-    "objectID": "materials/d1-02-structure/codealong-1.html#plan",
-    "href": "materials/d1-02-structure/codealong-1.html#plan",
-    "title": "Modules for LEGO attribute selections",
-    "section": "Plan",
-    "text": "Plan\n\nCreate a new module R script (and possible a supporting R script) by using golem::add_module() in the dev/02_dev.R script.\nPick a Shiny input type that matches our requirements.\nEnsure the server-side portion of the module returns the result of the selection, with additional post-processing if necessary.\nPlug in the UI and server-side portions of the module in the main app_ui.R and app_server.R files, respectively."
+    "objectID": "materials/d1-05-deploy-admin/index.html#business-talk",
+    "href": "materials/d1-05-deploy-admin/index.html#business-talk",
+    "title": "Deployment & Administration",
+    "section": "Business Talk",
+    "text": "Business Talk"
   },
   {
-    "objectID": "materials/d1-02-structure/codealong-1.html#solution-theme-picker",
-    "href": "materials/d1-02-structure/codealong-1.html#solution-theme-picker",
-    "title": "Modules for LEGO attribute selections",
-    "section": "Solution (Theme Picker)",
-    "text": "Solution (Theme Picker)\nCreate the module file with the following snippet:\n\ngolem::add_module(name = \"theme_picker\", with_test = FALSE)\n\nWhile we could choose a selectInput that displays the name of the theme as the choices and allow multiple to be selected, we want to incorporate a search box with snappy performance. The virtualSelectInput from the {shinyWidgets} package is an excellent solution.\nSince we have the themes data set available, we can also leverage the supporting function shinyWidgets::prepare_choices() to get the possible choices ready for the input. The module will simply return the selection as a reactive variable.\n\n# UI portion\nmod_theme_picker_ui &lt;- function(id, label = NULL) {\n  ns &lt;- NS(id)\n\n  themes &lt;- dplyr::arrange(themes, name)\n\n  choices_list &lt;- shinyWidgets::prepare_choices(\n    themes,\n    label = name,\n    value = theme_id\n  )\n\n  tagList(\n    virtualSelectInput(\n      ns(\"virt_theme_id\"),\n      label = label,\n      choices = choices_list,\n      selected = themes$theme_id,\n      multiple = TRUE,\n      search = TRUE\n    )\n  )\n}\n\n# server portion\nmod_theme_picker_server &lt;- function(id){\n  moduleServer( id, function(input, output, session){\n    ns &lt;- session$ns\n\n    return(reactive(input$virt_theme_id))\n  })\n}\n\nAt the bottom of the module script, {golem} automatically includes commented code for referencing the module UI and server blocks in your main Shiny application. We can copy them into the app_ui.R and app_server.R files.\n\n# app_ui.R\nmod_theme_picker_ui(\"theme_picker_1\")\n\n# app_server.R\ninput_theme_ids &lt;- mod_theme_picker_server(\"theme_picker_1\")"
+    "objectID": "materials/d1-05-deploy-admin/index.html#you-might-be-asked",
+    "href": "materials/d1-05-deploy-admin/index.html#you-might-be-asked",
+    "title": "Deployment & Administration",
+    "section": "You Might be Asked …",
+    "text": "You Might be Asked …\n\n“How many people used your app last year?”\n\n\n“How long are users on the app at a given time?”\n\n\n\n“What is the return on investment (ROI) this app is bringing the company?”\n\n\n\n\n\n\n\n\n\n\n\n\n\nNOT TODAY!"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#introducing-connectapi",
+    "href": "materials/d1-05-deploy-admin/index.html#introducing-connectapi",
+    "title": "Deployment & Administration",
+    "section": "📦 Introducing {connectapi}",
+    "text": "📦 Introducing {connectapi}\n\nR client for the Posit Connect Server API as well as helpful functions that utilize the client\n\nChecklist:\n✅ Create API key for your Posit Connect account\n✅ Create .Renviron with following variables: CONNECT_SERVER, CONNECT_API_KEY"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#introduce-yourself",
+    "href": "materials/d1-05-deploy-admin/index.html#introduce-yourself",
+    "title": "Deployment & Administration",
+    "section": "Introduce Yourself",
+    "text": "Introduce Yourself\n\nlibrary(connectapi)\n\nclient &lt;- connect(\n  server = Sys.getenv(\"CONNECT_SERVER\"),\n  api_key = Sys.getenv(\"CONNECT_API_KEY\")\n)\n\nclient\n\nPosit Connect API Client: \n  Posit Connect Server: https://rsc.training.rstudio.com\n  Posit Connect API Key: ***********FWxW\n\n\n\nclient is an R6 object representing the API client\nRequired parameter for many convenience functions"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#know-yourself",
+    "href": "materials/d1-05-deploy-admin/index.html#know-yourself",
+    "title": "Deployment & Administration",
+    "section": "Know Yourself",
+    "text": "Know Yourself\n\nmy_guid &lt;- user_guid_from_username(client, \"rpodcast\")\n\nmy_guid\n\n[1] \"47e1338f-54a8-4b0e-9b3c-e4380611b30f\"\n\n\n\nAll content/users have a unique indentifier (guid)"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#obtain-your-shiny-apps",
+    "href": "materials/d1-05-deploy-admin/index.html#obtain-your-shiny-apps",
+    "title": "Deployment & Administration",
+    "section": "Obtain (Your) Shiny Apps",
+    "text": "Obtain (Your) Shiny Apps\n\nlibrary(dplyr)\n\nmeta_df &lt;- get_content(client) |&gt;\n  filter(owner_guid == my_guid) |&gt;\n  select(guid, name, title)\n\nmeta_df\n\n# A tibble: 27 × 3\n   guid                                 name            title          \n   &lt;chr&gt;                                &lt;chr&gt;           &lt;chr&gt;          \n 1 40dd2969-5d67-4940-89c4-08fe31fd1c74 brickapp        brickapp       \n 2 fba6896e-49e4-45c6-856f-03a3bc4f498f legobricksapp   legobricks.app \n 3 626d6bb1-f36d-4c9b-bc9e-5cb44f46e698 hellogolem22    hellogolem2    \n 4 6f8116dc-eabf-4a64-aacb-4aeffbb4eaa4 golembrochure2  golembrochure  \n 5 a4e6809f-4858-4888-a848-94925d3df4a0 golembrochure   golembrochure  \n 6 f268d424-a286-41b9-91f1-ae458797e64a golemhellolocal golemhellolocal\n 7 4d9124a0-158b-4bd9-9b65-07b877db0906 test            test           \n 8 c60de16e-0b29-4267-a2c5-0eb6815d7999 hellogolem3     hellogolem     \n 9 2aec4c5b-144f-4a6c-8abf-7d07a17d78b2 hellogolem      hellogolem     \n10 344b9f1b-ddbe-4145-a1f0-eb6608662f08 hellogolem2     hellogolem     \n# ℹ 17 more rows"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#usage-metrics",
+    "href": "materials/d1-05-deploy-admin/index.html#usage-metrics",
+    "title": "Deployment & Administration",
+    "section": "Usage Metrics",
+    "text": "Usage Metrics\nSession durations for the legobricksapp:\n\napp_guid &lt;- \"fba6896e-49e4-45c6-856f-03a3bc4f498f\"\n\nget_usage_shiny(\n  client,\n  content_guid = app_guid,\n  limit = 5\n  ) |&gt;\n  filter(!is.na(ended)) |&gt;\n  mutate(session_duration = ended - started) |&gt;\n  select(user_guid, session_duration)\n\n# A tibble: 5 × 2\n  user_guid                            session_duration\n  &lt;chr&gt;                                &lt;drtn&gt;          \n1 47e1338f-54a8-4b0e-9b3c-e4380611b30f 10.933333 mins  \n2 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.216667 mins  \n3 47e1338f-54a8-4b0e-9b3c-e4380611b30f  4.733333 mins  \n4 47e1338f-54a8-4b0e-9b3c-e4380611b30f  6.766667 mins  \n5 47e1338f-54a8-4b0e-9b3c-e4380611b30f  1.183333 mins"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#usage-metrics-1",
+    "href": "materials/d1-05-deploy-admin/index.html#usage-metrics-1",
+    "title": "Deployment & Administration",
+    "section": "Usage Metrics",
+    "text": "Usage Metrics\nHow many users visited legobricksapp in last 28 days?\n\napp_guid &lt;- \"fba6896e-49e4-45c6-856f-03a3bc4f498f\"\ntime_start &lt;- Sys.Date() - lubridate::days(28)\nget_usage_shiny(\n  client,\n  content_guid = app_guid,\n  limit = 100,\n  from = time_start\n  ) |&gt;\n  pull(user_guid) |&gt;\n  unique() |&gt;\n  length()\n\n[1] 4"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#your-turn",
+    "href": "materials/d1-05-deploy-admin/index.html#your-turn",
+    "title": "Deployment & Administration",
+    "section": "Your Turn",
+    "text": "Your Turn\nObtain metadata for your deployed application(s) on Posit Connect\n\nExplore the data as you like!\n\n\n\n\n−+\n05:00"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#going-further-with-metrics",
+    "href": "materials/d1-05-deploy-admin/index.html#going-further-with-metrics",
+    "title": "Deployment & Administration",
+    "section": "Going Further with Metrics",
+    "text": "Going Further with Metrics\nCollection of interesting use cases available at github.com/sol-eng/connect-usage\n\nMost-viewed content in last 30 days\nInteractive dashboard of usage metrics\n{connectViz}: Collection of customizable functions for visualizing content usage for an organization"
+  },
+  {
+    "objectID": "materials/d1-05-deploy-admin/index.html#our-journey-is-complete",
+    "href": "materials/d1-05-deploy-admin/index.html#our-journey-is-complete",
+    "title": "Deployment & Administration",
+    "section": "Our Journey is Complete!",
+    "text": "Our Journey is Complete!\n\n\n\n\n\n\n\n\n\n\n\n\nRobust app infrastructure with {golem}\nProfiling your app with {profvis}\nSolving performance bottlenecks\nAssessing your app under high user load\nEfficient app deployments and tuning\nObtaining usage metrics\n\n\n\n\n\npos.it/conf-workshop-survey\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#workshop-policies",
+    "href": "materials/d1-01-welcome/index.html#workshop-policies",
+    "title": "Welcome!",
+    "section": "Workshop Policies",
+    "text": "Workshop Policies\n\n\nPlease review the posit::conf Code of Conduct.\nIssues can be addressed in following ways:\n\nIn person: Contact any posit::conf staff member, identifiable by their staff t-shirt shirt, or visit the conference registration desk.\nBy email: Send a message to conf@posit.com; event organizers will respond promptly.\nBy phone: call 844—448—1212"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#meet-the-team",
+    "href": "materials/d1-01-welcome/index.html#meet-the-team",
+    "title": "Welcome!",
+    "section": "Meet the Team!",
+    "text": "Meet the Team!\n\n\n\n\n\n\n\n\n\n\n r-podcast.org\n shinydevseries.com\n rweekly.org/podcast\n\n\n\n\n\n\n\n\n\n\n www.ketchbrookanalytics.com/\n rweekly.org/podcast\n\n\n\n\nposit-conf-2023.github.io/shiny-r-prod/#workshop-instructors"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#about-those-post-its",
+    "href": "materials/d1-01-welcome/index.html#about-those-post-its",
+    "title": "Welcome!",
+    "section": "About those post-its",
+    "text": "About those post-its\n\n\n\n    \n        Done with activity\n    \n\n\n\n    \n        I'd like help"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#your-turn",
+    "href": "materials/d1-01-welcome/index.html#your-turn",
+    "title": "Welcome!",
+    "section": "Your Turn",
+    "text": "Your Turn\nComplete any remaining Setup Procedures\n\nPosit Cloud\nPosit Connect\nAccount Integrations\n\nIntroduce yourself to your neighbor(s)\nWhat is your most memorable Shiny application in production experience?\n\n\n\n−+\n05:00\n\n\n\n\nposit-conf-2023.github.io/shiny-r-prod/setup.html"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#many-users",
+    "href": "materials/d1-01-welcome/index.html#many-users",
+    "title": "Welcome!",
+    "section": "Many Users",
+    "text": "Many Users"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#high-profile-situations",
+    "href": "materials/d1-01-welcome/index.html#high-profile-situations",
+    "title": "Welcome!",
+    "section": "High-Profile Situations",
+    "text": "High-Profile Situations"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
+    "href": "materials/d1-01-welcome/index.html#part-of-a-critical-pipeline",
+    "title": "Welcome!",
+    "section": "Part of a Critical Pipeline",
+    "text": "Part of a Critical Pipeline"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#the-journey-ahead",
+    "href": "materials/d1-01-welcome/index.html#the-journey-ahead",
+    "title": "Welcome!",
+    "section": "The Journey Ahead",
+    "text": "The Journey Ahead\n\nProduction has more than one meaning for Shiny apps\n\n\nThe tooling & principles discussed in this workshop will guide you to the destination"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
+    "href": "materials/d1-01-welcome/index.html#rebrickable-inventory-dashboard",
+    "title": "Welcome!",
+    "section": "Rebrickable Inventory Dashboard",
+    "text": "Rebrickable Inventory Dashboard\n\nRebrickable: Portal for LEGO builders to discover what sets they can build with their own inventory\nA comprehensive database of LEGO items available for free!\nWe will build a Shiny dashboard to explore the inventory and enable users to generate predictions\n\n\nrebrickable.com"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#applied-example",
+    "href": "materials/d1-01-welcome/index.html#applied-example",
+    "title": "Welcome!",
+    "section": "Applied Example",
+    "text": "Applied Example\n\nFord Mustang Shelby GT500"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#raw-data",
+    "href": "materials/d1-01-welcome/index.html#raw-data",
+    "title": "Welcome!",
+    "section": "Raw Data",
+    "text": "Raw Data\n\nsetsinventoriesinventory partsparts"
+  },
+  {
+    "objectID": "materials/d1-01-welcome/index.html#our-journey-to-production",
+    "href": "materials/d1-01-welcome/index.html#our-journey-to-production",
+    "title": "Welcome!",
+    "section": "Our Journey to Production",
+    "text": "Our Journey to Production\n\nCreate a robust infrastructure for application source code\nIdentify and solve performance bottlenecks\nEnsure app is only doing the “bare minimum” for a snappy user experience\nTune deployment to meet demand of potentially many simultaneous users\n\n\n\nposit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "units/d1-04-loadtesting.html",
+    "href": "units/d1-04-loadtesting.html",
+    "title": "Load Testing",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-04-loadtesting.html#slides",
+    "href": "units/d1-04-loadtesting.html#slides",
+    "title": "Load Testing",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-03-performance.html",
+    "href": "units/d1-03-performance.html",
+    "title": "Performance",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-03-performance.html#slides",
+    "href": "units/d1-03-performance.html#slides",
+    "title": "Performance",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-04b-break.html",
+    "href": "units/d1-04b-break.html",
+    "title": "Coffee & refreshments break",
+    "section": "",
+    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at near the registration area. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
+  },
+  {
+    "objectID": "units/d1-02b-break.html",
+    "href": "units/d1-02b-break.html",
+    "title": "Coffee & refreshments break",
+    "section": "",
+    "text": "It’s time for a well-deserved break! Coffee and refreshments are served at near the registration area. If you have any questions during the break, please discuss with the workshop instructors or a workshop TA."
+  },
+  {
+    "objectID": "schedule.html",
+    "href": "schedule.html",
+    "title": "Workshop Schedule",
+    "section": "",
+    "text": "Time\n\n\nWorkshop Module\n\n\n\n\n\n\n9:00 - 9:30\n\n\nWelcome & Setup\n\n\n\n\n9:30 - 10:30\n\n\nApplication Structure\n\n\n\n\n10:30 - 11:00\n\n\nCoffee & refreshments break\n\n\n\n\n11:00 - 12:30\n\n\nPerformance\n\n\n\n\n12:30 - 13:30\n\n\nLunch break\n\n\n\n\n13:30 - 15:00\n\n\nLoad Testing\n\n\n\n\n15:00 - 15:30\n\n\nCoffee & refreshments break\n\n\n\n\n15:30 - 17:00\n\n\nDeployment & Administration\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "",
+    "text": "Watch the video!\n\n\n\n\n\n\n\n    \n\n\n\n\n\nShiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience."
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "",
+    "text": "Watch the video!\n\n\n\n\n\n\n\n    \n\n\n\n\n\nShiny brings tremendous possibilities to share innovative data science workflows with others inside an intuitive web interface. Many in the Shiny community have shared effective development techniques for building a robust application. Even with the best intentions before sharing your application with others, a myriad of issues can arise once it leaves the confines of your machine. In this one-day workshop, you will implement core techniques to account for common scenarios that arise as your application is used in production, such as accounting for thousands of simultaneous users, how effective profiling can address performance bottlenecks, and ensuring your application is doing as little as possible to ensure a smooth and responsive experience."
+  },
+  {
+    "objectID": "index.html#logistics",
+    "href": "index.html#logistics",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Logistics",
+    "text": "Logistics\nThe workshop will start at 9 AM and end at 5 PM, with multiple coffee breaks and a lunch break. All materials for the course will be viewable online at posit-conf-2023.github.io/shiny-r-prod and hosted on GitHub at github.com/posit-conf-2023/shiny-r-prod. For real-time messaging, we will be using the shiny-in-production-tools-and-techniques within the Posit Conf 2023 Discord. Additional details for onboarding will be sent prior to the workshop."
+  },
+  {
+    "objectID": "index.html#is-this-workshop-for-me",
+    "href": "index.html#is-this-workshop-for-me",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Is this workshop for me?",
+    "text": "Is this workshop for me?\nThis course assumes intermediate knowledge of building Shiny applications in R and prior experience deploying an application to a platform such as the shinyapps.io service or products like Posit Connect. This workshop will be appropriate for you if you answer yes to any of these questions:\n\nHave you had a Shiny application work just fine on your machine, but encounters critical issues after deployed to a hosting platform?\nAre you willing to prospectively implement techniques before deployment to plan for the unexpected?\nDo you want to know the potential pitfalls within various deployment platforms?\nDo you want to employ best practices for structuring your application source code and dependencies?"
+  },
+  {
+    "objectID": "index.html#prework-setup",
+    "href": "index.html#prework-setup",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Prework & Setup",
+    "text": "Prework & Setup\nYou can find complete details on the required pre-work and setup instructions at the setup tab."
+  },
+  {
+    "objectID": "index.html#workshop-instructors",
+    "href": "index.html#workshop-instructors",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Workshop Instructors",
+    "text": "Workshop Instructors\n\nEric Nantz\n\n\n\n\n\n\n\n\n\n\nEric Nantz is a director within the statistical innovation center at Eli Lilly and Company, creating analytical pipelines and capabilities of advanced statistical methodologies for clinical design used in multiple phases of development. Outside of his day job, Eric is passionate about connecting with and showcasing the brilliant R community in multiple ways. You may recognize his voice from the R-Podcast that he launched in 2012. Eric is also the creator of the Shiny Developer Series where he interviews authors of Shiny-related packages and practitioners developing applications, as well as sharing his own R and Shiny adventures via livestreams on his Twitch channel. In addition, Eric is a curator for the RWeekly project and co-host of the RWeekly Highlights podcast which accompanies every issue.\n\n\n\n\nMike Thomas\n\n\n\n\n\n\n\n\n\n\nMike Thomas is the Chief Data Scientist at Ketchbrook Analytics, with background in credit risk modeling, regression & time series forecasting, machine learning, recommendation engines, and natural language processing. Mike has extensive data visualization experience across a variety of software products and technologies and is passionate about reproducibility and following healthy software development practices in data science. In addition, Mike is a co-host of the RWeekly Highlights Podcast."
+  },
+  {
+    "objectID": "index.html#workshop-tas",
+    "href": "index.html#workshop-tas",
+    "title": "Shiny in Production: Tools and Techniques",
+    "section": "Workshop TAs",
+    "text": "Workshop TAs\n\nJoe Cheng\n\n\n\n\n\n\n\n\n\n\nJoe Cheng is the Chief Technology Officer at Posit and was the original creator of the Shiny web framework, and continues to work on packages at the intersection of R and the web.\n\n\n\n\nDavid Granjon\n\n\n\n\n\n\n\n\n\n\nDavid Granjon works as a Lead Shiny Developer at Cynkra. He is the founder and maintainer of the open source RinteRface organisation. He wrote Outstanding User Interfaces with Shiny, a CRC press book, available online.\n\n\n\n\nRyan Johnson\n\n\n\n\n\n\n\n\n\n\nRyan Johnson was previously a research microbiologist and now is a data scientist at Posit. After years of working with high-throughput genomic data, he transitioned into a data science advisory role with Posit PBC. He lead workshops, webinars, and content creation to help data enthusiasts worldwide improve their workflows."
+  },
+  {
+    "objectID": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
+    "href": "LICENSE.html#creative-commons-attribution-sharealike-4.0-international-public-license",
+    "title": "Attribution-ShareAlike 4.0 International",
+    "section": "Creative Commons Attribution-ShareAlike 4.0 International Public License",
+    "text": "Creative Commons Attribution-ShareAlike 4.0 International Public License\nBy exercising the Licensed Rights (defined below), You accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-ShareAlike 4.0 International Public License (“Public License”). To the extent this Public License may be interpreted as a contract, You are granted the Licensed Rights in consideration of Your acceptance of these terms and conditions, and the Licensor grants You such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.\n\nSection 1 – Definitions.\n\nAdapted Material means material subject to Copyright and Similar Rights that is derived from or based upon the Licensed Material and in which the Licensed Material is translated, altered, arranged, transformed, or otherwise modified in a manner requiring permission under the Copyright and Similar Rights held by the Licensor. For purposes of this Public License, where the Licensed Material is a musical work, performance, or sound recording, Adapted Material is always produced where the Licensed Material is synched in timed relation with a moving image.\nAdapter’s License means the license You apply to Your Copyright and Similar Rights in Your contributions to Adapted Material in accordance with the terms and conditions of this Public License.\nBY-SA Compatible License means a license listed at creativecommons.org/compatiblelicenses, approved by Creative Commons as essentially the equivalent of this Public License.\nCopyright and Similar Rights means copyright and/or similar rights closely related to copyright including, without limitation, performance, broadcast, sound recording, and Sui Generis Database Rights, without regard to how the rights are labeled or categorized. For purposes of this Public License, the rights specified in Section 2(b)(1)-(2) are not Copyright and Similar Rights.\nEffective Technological Measures means those measures that, in the absence of proper authority, may not be circumvented under laws fulfilling obligations under Article 11 of the WIPO Copyright Treaty adopted on December 20, 1996, and/or similar international agreements.\nExceptions and Limitations means fair use, fair dealing, and/or any other exception or limitation to Copyright and Similar Rights that applies to Your use of the Licensed Material.\nLicense Elements means the license attributes listed in the name of a Creative Commons Public License. The License Elements of this Public License are Attribution and ShareAlike.\nLicensed Material means the artistic or literary work, database, or other material to which the Licensor applied this Public License.\nLicensed Rights means the rights granted to You subject to the terms and conditions of this Public License, which are limited to all Copyright and Similar Rights that apply to Your use of the Licensed Material and that the Licensor has authority to license.\nLicensor means the individual(s) or entity(ies) granting rights under this Public License.\nShare means to provide material to the public by any means or process that requires permission under the Licensed Rights, such as reproduction, public display, public performance, distribution, dissemination, communication, or importation, and to make material available to the public including in ways that members of the public may access the material from a place and at a time individually chosen by them.\nSui Generis Database Rights means rights other than copyright resulting from Directive 96/9/EC of the European Parliament and of the Council of 11 March 1996 on the legal protection of databases, as amended and/or succeeded, as well as other essentially equivalent rights anywhere in the world.\nYou means the individual or entity exercising the Licensed Rights under this Public License. Your has a corresponding meaning.\n\n\n\nSection 2 – Scope.\n\nLicense grant.\n\nSubject to the terms and conditions of this Public License, the Licensor hereby grants You a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable license to exercise the Licensed Rights in the Licensed Material to:\nA. reproduce and Share the Licensed Material, in whole or in part; and\nB. produce, reproduce, and Share Adapted Material.\nExceptions and Limitations. For the avoidance of doubt, where Exceptions and Limitations apply to Your use, this Public License does not apply, and You do not need to comply with its terms and conditions.\nTerm. The term of this Public License is specified in Section 6(a).\nMedia and formats; technical modifications allowed. The Licensor authorizes You to exercise the Licensed Rights in all media and formats whether now known or hereafter created, and to make technical modifications necessary to do so. The Licensor waives and/or agrees not to assert any right or authority to forbid You from making technical modifications necessary to exercise the Licensed Rights, including technical modifications necessary to circumvent Effective Technological Measures. For purposes of this Public License, simply making modifications authorized by this Section 2(a)(4) never produces Adapted Material.\nDownstream recipients.\nA. Offer from the Licensor – Licensed Material. Every recipient of the Licensed Material automatically receives an offer from the Licensor to exercise the Licensed Rights under the terms and conditions of this Public License.\nB. __Additional offer from the Licensor – Adapted Material. Every recipient of Adapted Material from You automatically receives an offer from the Licensor to exercise the Licensed Rights in the Adapted Material under the conditions of the Adapter’s License You apply.\nC. No downstream restrictions. You may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, the Licensed Material if doing so restricts exercise of the Licensed Rights by any recipient of the Licensed Material.\nNo endorsement. Nothing in this Public License constitutes or may be construed as permission to assert or imply that You are, or that Your use of the Licensed Material is, connected with, or sponsored, endorsed, or granted official status by, the Licensor or others designated to receive attribution as provided in Section 3(a)(1)(A)(i).\n\nOther rights.\n\nMoral rights, such as the right of integrity, are not licensed under this Public License, nor are publicity, privacy, and/or other similar personality rights; however, to the extent possible, the Licensor waives and/or agrees not to assert any such rights held by the Licensor to the limited extent necessary to allow You to exercise the Licensed Rights, but not otherwise.\nPatent and trademark rights are not licensed under this Public License.\nTo the extent possible, the Licensor waives any right to collect royalties from You for the exercise of the Licensed Rights, whether directly or through a collecting society under any voluntary or waivable statutory or compulsory licensing scheme. In all other cases the Licensor expressly reserves any right to collect such royalties.\n\n\n\n\nSection 3 – License Conditions.\nYour exercise of the Licensed Rights is expressly made subject to the following conditions.\n\nAttribution.\n\nIf You Share the Licensed Material (including in modified form), You must:\nA. retain the following if it is supplied by the Licensor with the Licensed Material:\n\nidentification of the creator(s) of the Licensed Material and any others designated to receive attribution, in any reasonable manner requested by the Licensor (including by pseudonym if designated);\na copyright notice;\na notice that refers to this Public License;\na notice that refers to the disclaimer of warranties;\na URI or hyperlink to the Licensed Material to the extent reasonably practicable;\n\nB. indicate if You modified the Licensed Material and retain an indication of any previous modifications; and\nC. indicate the Licensed Material is licensed under this Public License, and include the text of, or the URI or hyperlink to, this Public License.\nYou may satisfy the conditions in Section 3(a)(1) in any reasonable manner based on the medium, means, and context in which You Share the Licensed Material. For example, it may be reasonable to satisfy the conditions by providing a URI or hyperlink to a resource that includes the required information.\nIf requested by the Licensor, You must remove any of the information required by Section 3(a)(1)(A) to the extent reasonably practicable.\n\nShareAlike.\n\nIn addition to the conditions in Section 3(a), if You Share Adapted Material You produce, the following conditions also apply.\n\nThe Adapter’s License You apply must be a Creative Commons license with the same License Elements, this version or later, or a BY-SA Compatible License.\nYou must include the text of, or the URI or hyperlink to, the Adapter’s License You apply. You may satisfy this condition in any reasonable manner based on the medium, means, and context in which You Share Adapted Material.\nYou may not offer or impose any additional or different terms or conditions on, or apply any Effective Technological Measures to, Adapted Material that restrict exercise of the rights granted under the Adapter’s License You apply.\n\n\n\nSection 4 – Sui Generis Database Rights.\nWhere the Licensed Rights include Sui Generis Database Rights that apply to Your use of the Licensed Material:\n\nfor the avoidance of doubt, Section 2(a)(1) grants You the right to extract, reuse, reproduce, and Share all or a substantial portion of the contents of the database;\nif You include all or a substantial portion of the database contents in a database in which You have Sui Generis Database Rights, then the database in which You have Sui Generis Database Rights (but not its individual contents) is Adapted Material, including for purposes of Section 3(b); and\nYou must comply with the conditions in Section 3(a) if You Share all or a substantial portion of the contents of the database.\n\nFor the avoidance of doubt, this Section 4 supplements and does not replace Your obligations under this Public License where the Licensed Rights include other Copyright and Similar Rights.\n\n\nSection 5 – Disclaimer of Warranties and Limitation of Liability.\n\nUnless otherwise separately undertaken by the Licensor, to the extent possible, the Licensor offers the Licensed Material as-is and as-available, and makes no representations or warranties of any kind concerning the Licensed Material, whether express, implied, statutory, or other. This includes, without limitation, warranties of title, merchantability, fitness for a particular purpose, non-infringement, absence of latent or other defects, accuracy, or the presence or absence of errors, whether or not known or discoverable. Where disclaimers of warranties are not allowed in full or in part, this disclaimer may not apply to You.\nTo the extent possible, in no event will the Licensor be liable to You on any legal theory (including, without limitation, negligence) or otherwise for any direct, special, indirect, incidental, consequential, punitive, exemplary, or other losses, costs, expenses, or damages arising out of this Public License or use of the Licensed Material, even if the Licensor has been advised of the possibility of such losses, costs, expenses, or damages. Where a limitation of liability is not allowed in full or in part, this limitation may not apply to You.\nThe disclaimer of warranties and limitation of liability provided above shall be interpreted in a manner that, to the extent possible, most closely approximates an absolute disclaimer and waiver of all liability.\n\n\n\nSection 6 – Term and Termination.\n\nThis Public License applies for the term of the Copyright and Similar Rights licensed here. However, if You fail to comply with this Public License, then Your rights under this Public License terminate automatically.\nWhere Your right to use the Licensed Material has terminated under Section 6(a), it reinstates:\n\nautomatically as of the date the violation is cured, provided it is cured within 30 days of Your discovery of the violation; or\nupon express reinstatement by the Licensor.\n\nFor the avoidance of doubt, this Section 6(b) does not affect any right the Licensor may have to seek remedies for Your violations of this Public License.\nFor the avoidance of doubt, the Licensor may also offer the Licensed Material under separate terms or conditions or stop distributing the Licensed Material at any time; however, doing so will not terminate this Public License.\nSections 1, 5, 6, 7, and 8 survive termination of this Public License.\n\n\n\nSection 7 – Other Terms and Conditions.\n\nThe Licensor shall not be bound by any additional or different terms or conditions communicated by You unless expressly agreed.\nAny arrangements, understandings, or agreements regarding the Licensed Material not stated herein are separate from and independent of the terms and conditions of this Public License.t stated herein are separate from and independent of the terms and conditions of this Public License.\n\n\n\nSection 8 – Interpretation.\n\nFor the avoidance of doubt, this Public License does not, and shall not be interpreted to, reduce, limit, restrict, or impose conditions on any use of the Licensed Material that could lawfully be made without permission under this Public License.\nTo the extent possible, if any provision of this Public License is deemed unenforceable, it shall be automatically reformed to the minimum extent necessary to make it enforceable. If the provision cannot be reformed, it shall be severed from this Public License without affecting the enforceability of the remaining terms and conditions.\nNo term or condition of this Public License will be waived and no failure to comply consented to unless expressly agreed to by the Licensor.\nNothing in this Public License constitutes or may be interpreted as a limitation upon, or waiver of, any privileges and immunities that apply to the Licensor or You, including from the legal processes of any jurisdiction or authority.\n\n\nCreative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the “Licensor.” Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark “Creative Commons” or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.\nCreative Commons may be contacted at creativecommons.org"
+  },
+  {
+    "objectID": "units/d1-03b-lunch.html",
+    "href": "units/d1-03b-lunch.html",
+    "title": "Lunch break",
+    "section": "",
+    "text": "It’s time to replenish that Shiny learning energy with a delicious lunch! Before you head over to the Riverside room, we would greatly appreciate if you take a minute to provide your feedback on how the workshop is going so far:\n\nWrite one positive thing such as a new technique/capability you learned on a green sticky note\nWrite one item that could use improvement, such as a topic going too fast or not clear enough on a pink sticky note.\n\nYour workshop team is also using this time to re-charge. If you have any questions, please wait to ask until we re-convene for the next unit."
+  },
+  {
+    "objectID": "units/d1-05-deploy-admin.html",
+    "href": "units/d1-05-deploy-admin.html",
+    "title": "Deployment & Administration",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-05-deploy-admin.html#slides",
+    "href": "units/d1-05-deploy-admin.html#slides",
+    "title": "Deployment & Administration",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-02-structure.html",
+    "href": "units/d1-02-structure.html",
+    "title": "Application Structure",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-02-structure.html#slides",
+    "href": "units/d1-02-structure.html#slides",
+    "title": "Application Structure",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-02-structure.html#code-along-examples",
+    "href": "units/d1-02-structure.html#code-along-examples",
+    "title": "Application Structure",
+    "section": "Code-Along Examples",
+    "text": "Code-Along Examples\n\n\n\n\n\nExercise Title\n\n\n\n\n\n\nModules for LEGO attribute selections\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "units/d1-02-structure.html#exercises",
+    "href": "units/d1-02-structure.html#exercises",
+    "title": "Application Structure",
+    "section": "Exercises",
+    "text": "Exercises\n\n\n\n\n\nCode-along Title\n\n\n\n\n\n\nValue Metrics Module\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "units/d1-01-welcome.html",
+    "href": "units/d1-01-welcome.html",
+    "title": "Welcome & Setup",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "units/d1-01-welcome.html#slides",
+    "href": "units/d1-01-welcome.html#slides",
+    "title": "Welcome & Setup",
+    "section": "",
+    "text": "View slides in full screen"
+  },
+  {
+    "objectID": "setup.html",
+    "href": "setup.html",
+    "title": "Setup",
+    "section": "",
+    "text": "We are excited to have you join us for our workshop Shiny in Production: Tools and Techniques! The format of the workshop will be a mix of presentation slides, example Shiny applications, and hands-on exercises. To ensure you are ready for the journey, please review the following instructions."
+  },
+  {
+    "objectID": "setup.html#pre-work",
+    "href": "setup.html#pre-work",
+    "title": "Setup",
+    "section": "Pre-Work",
+    "text": "Pre-Work\nThis workshop will be a blend of teaching materials, live-coding demonstrations, and hands-on exercises to practice key concepts. Posit has generously provided us access to a dedicated workshop coding environment using Posit Cloud, which is accessible with a modern web browser such as Google Chrome, Microsoft Edge, Firefox, or others. In addition, Posit is also providing a dedicated instance of the Posit Connect platform for hosting Shiny applications that you create and view throughout the workshop.\nIn the first session of the workshop, we will allocate time for everyone to configure their accounts and development environments. If you would like to complete these steps before the workshop, you can follow the procedures detailed in Environment Configuration below."
+  },
+  {
+    "objectID": "setup.html#accounts",
+    "href": "setup.html#accounts",
+    "title": "Setup",
+    "section": "Accounts",
+    "text": "Accounts\n\nGitHub account: You can create a GitHub account for free using the instructions provided in the Register for GitHub chapter of Jenny Bryan’s Happy Git and GitHub for the UseR. If you already have an account, you are welcome to use it for the workshop. While version control itself is not a major focus of the course, we will discuss how certain elements can play an important role in application development and deployment. A great resource for getting a basic familiarity with Git version control is Jenny Bryan’s Happy Git and GitHub for the useR online book.\nPosit Cloud account: Visit posit.cloud and click the Sign Up link. Then create a Free account. If you already have an account, you do not need to create a new one."
+  },
+  {
+    "objectID": "setup.html#local-clone-of-repository",
+    "href": "setup.html#local-clone-of-repository",
+    "title": "Setup",
+    "section": "Local Clone of Repository",
+    "text": "Local Clone of Repository\nIf we encounter any technical issues with the cloud-based environments, it is a good idea to have a clone of the workshop repository on your local laptop as a backup. If you already have Git installed, you can clone the repository from https://github.com/posit-conf-2023/shiny-r-prod, or without Git you can download the repository using this link."
+  },
+  {
+    "objectID": "setup.html#environment-configuration",
+    "href": "setup.html#environment-configuration",
+    "title": "Setup",
+    "section": "Environment Configuration",
+    "text": "Environment Configuration\nPlease view the information in the callouts below for step-by-step instructions on configuring your accounts and environments. While Posit Cloud is the preferred development environment, you may utilize your local installation of R with your preferred integrated development environment such as RStudio, Visual Studio Code, or even vim/emacs if you prefer.\n\n\n\n\n\n\nPosit Connect\n\n\n\n\n\nView screenshots in full screen\n\n\nCreate an account on the workshop Posit Connect server by visiting https://rsc.training.rstudio.com and clicking the login link in the upper right corner.\nYou will see a window that asks for either an email/password or to use a GitHub account. Please choose the GitHub option and follow the instructions to authorize Posit Connect to your GitHub account.\nYou should now be logged in to Posit Connect. Please create an API key for your account by following the Posit Connect User Guide instructions on creating an API key. Save it to a secure place as you will need it for account integration.\n\n\n\n\n\n\n\n\n\n\nPosit Cloud\n\n\n\n\n\nView screenshots in full screen\n\n\nJoin the Posit Cloud Workspace dedicated to this workshop by visiting this customized invitation URL. If you already have a Posit Cloud account, you are welcome to use it for the workshop. Otherwise, you can create a new account for free.\nYou will see a project called shiny-r-prod. Open that project and create a saved copy. This process could take a couple of minutes depending on server load.\nAfter the project loads, you will see messages in the R console about restoring or repairing the package library. Execute renv::restore(prompt = FALSE) to install packages into the project. This process should complete in one or two minutes.\n\n\n\n\n\n\n\n\n\n\nLocal R & RStudio IDE\n\n\n\n\n\nIf you prefer to use a local installation of R and RStudio, ensure you setup meets the following requirements:\n\nR version 4.3 or later.\nLatest release of RStudio IDE, 2023.06.1-524 or later\nThe {renv} R package.\n\nYou can workshop materials using the following procedure:\n\nVisit the workshop repository at https://github.com/posit-conf-2023/shiny-r-prod and either clone to your local machine with Git or download a zip archive of the materials. A direct link to the archive is here.\nLaunch RStudio and open the project file shiny-r-prod.Rproj to initialize the workshop project.\nThe {renv} package will begin bootstrapping the package library. When prompted, run renv::restore() to complete the package installation process.\n\n\n\n\n\n\n\n\n\n\nDocker Container with Visual Studio Code & RStudio\n\n\n\n\n\nThe repository for this workshop also gives you the ability to create custom Docker containers to encapsulate a complete R development environment tailored to this workshop. This workshop repository uses a similar container definition as found at https://github.com/rpodcast/r_dev_projects. At a high level, you will need an installation of Visual Studio Code with the Remote Development extension.\n\nVisit the workshop repository at https://github.com/posit-conf-2023/shiny-r-prod and either clone to your local machine with Git or download a zip archive of the materials. A direct link to the archive is here.\nWithin the .devcontainer subdirectory, create a new file called .env based on the template provided at .env.example. In this file, change the value of the environment variable RENV_PATHS_CACHE_HOST to the deisred directory on your system.\nLaunch Visual Studio Code and open the folder of your local copy of the workshop repository.\nYou will be prompted to re-open the folder to begin the container build process. Note that this process can take a few minutes depending on your computer’s hardware specifications and network bandwidth.\nOnce the development container is built, you are free to continue using Visual Studio Code or use a container version of the RStudio open source server by visiting localhost:4567 in your web browser.\n\n\nIf using visual studio code, the user needs to add the renv library path to their r.libPaths setting in the R extension. Details at https://github.com/REditorSupport/vscode-R/wiki/Working-with-renv-enabled-projects ."
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#one-to-many",
+    "href": "materials/d1-04-loadtesting/index.html#one-to-many",
+    "title": "Load Testing",
+    "section": "One to Many",
+    "text": "One to Many"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#optimization-loop-method",
+    "href": "materials/d1-04-loadtesting/index.html#optimization-loop-method",
+    "title": "Load Testing",
+    "section": "Optimization Loop Method",
+    "text": "Optimization Loop Method\n\n\nrstudio.github.io/shinyloadtest/articles/case-study-scaling.html"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#double-the-load-testing-fun",
+    "href": "materials/d1-04-loadtesting/index.html#double-the-load-testing-fun",
+    "title": "Load Testing",
+    "section": "Double the (Load-Testing) Fun",
+    "text": "Double the (Load-Testing) Fun\n{shinyloadtest}\n\nRecord the events of a Shiny application session\nProcess and analyze metrics associated with application runs\n\nshinycannon\n\nCommand-line utility to launch multiple application sessions and collect event-based metrics\nCross-platform (built with Kotlin)"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#hosting-requirements",
+    "href": "materials/d1-04-loadtesting/index.html#hosting-requirements",
+    "title": "Load Testing",
+    "section": "Hosting Requirements",
+    "text": "Hosting Requirements\n\nApplication deployed to a server supporting SockJS (Posit Connect, Shiny Server)\nIf authentication required for app on Posit Connect, you’ll need an API key"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#recording-a-session",
+    "href": "materials/d1-04-loadtesting/index.html#recording-a-session",
+    "title": "Load Testing",
+    "section": "Recording a Session",
+    "text": "Recording a Session\n\nshinyloadtest_recording.R\n\nlibrary(shinyloadtest)\nrecord_session(\"https://my-lego-app.me\", output_file = \"recording.log\")\n\n\n\nEmulate a real-world usage of your application\nAvoid rapid clicks / selections of your inputs"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#the-log",
+    "href": "materials/d1-04-loadtesting/index.html#the-log",
+    "title": "Load Testing",
+    "section": "The log",
+    "text": "The log\n\nrecording.log\n# version: 1\n# target_url: https://my-lego-app.me/\n# target_type: RStudio Server Connect\n# rscApiKeyRequired: false\n{\"type\":\"REQ_HOME\",\"begin\":\"2023-09-07T13:03:39.042Z\",\"end\":\"2023-09-07T13:03:40.138Z\",\"status\":200,\"url\":\"/\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.332Z\",\"end\":\"2023-09-07T13:03:40.502Z\",\"status\":200,\"url\":\"/_w_${WORKER}/shiny-sass-1.7.5/shiny-sass.css\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.517Z\",\"end\":\"2023-09-07T13:03:40.678Z\",\"status\":200,\"url\":\"/_w_${WORKER}/bslib-grid-styles-0.5.1/grid.css\"}\n{\"type\":\"REQ_GET\",\"begin\":\"2023-09-07T13:03:40.692Z\",\"end\":\"2023-09-07T13:03:40.886Z\",\"status\":200,\"url\":\"/_w_${WORKER}/bootstrap-5.2.2/bootstrap.min.css\"}\n...\n...\n{\"type\":\"WS_SEND\",\"begin\":\"2023-09-07T13:04:17.805Z\",\"message\":\"[\\\"D#0|m|{\\\\\\\"method\\\\\\\":\\\\\\\"update\\\\\\\",\\\\\\\"data\\\\\\\":{\\\\\\\"n_parts_display\\\\\\\":\\\\\\\"20\\\\\\\"}}\\\"]\"}\n{\"type\":\"WS_CLOSE\",\"begin\":\"2023-09-07T13:04:35.561Z\"}"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#loading-the-shiny-cannon",
+    "href": "materials/d1-04-loadtesting/index.html#loading-the-shiny-cannon",
+    "title": "Load Testing",
+    "section": "Loading the (shiny) cannon",
+    "text": "Loading the (shiny) cannon\n\nbash\n\njava -jar shinycannon-1.1.3-dd43f6b.jar \\\n  recording.log \\\n  https://my-lego-app.me \\\n  --loaded-duration-minutes 2 \\\n  --workers 1 \\\n  --output-dir run1\n\n\n\n\nrun_shinycannon.R\n\nsource(file.path(here::here(), \"R\", \"shinycannon.R\"))\n\nshinycannon(\n  \"shinycannon-1.1.3-dd43f6b.jar\",\n  \"recording.log\",\n  \"https://rsc.training.posit.co/brickapp-sync/\",\n  loaded_duration_minutes = 2,\n  workers = 1,\n  output_dir = \"run1\"\n)"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#metrics",
+    "href": "materials/d1-04-loadtesting/index.html#metrics",
+    "title": "Load Testing",
+    "section": "Metrics",
+    "text": "Metrics\n\n\n\n\nanalyze_recording.R\n\nlibrary(shinyloadtest)\ndf &lt;- load_runs(\"Run 1\" = \"run1\")\n\n\n\n\n\n# A tibble: 80 × 13\n   run   user_id session_id iteration input_line_number event start   end   time\n   &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;             &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;\n 1 Run 1       0          0         0                 4 REQ_…   0    24.2 24.2  \n 2 Run 1       0          0         0                 5 REQ_…  24.2  24.5  0.259\n 3 Run 1       0          0         0                 6 REQ_…  24.5  24.6  0.155\n 4 Run 1       0          0         0                 7 REQ_…  24.6  24.9  0.284\n 5 Run 1       0          0         0                 8 REQ_…  24.9  25.3  0.382\n 6 Run 1       0          0         0                 9 REQ_…  25.3  25.5  0.170\n 7 Run 1       0          0         0                10 REQ_…  25.5  25.7  0.242\n 8 Run 1       0          0         0                11 REQ_…  25.7  25.9  0.25 \n 9 Run 1       0          0         0                12 REQ_…  25.9  26.3  0.395\n10 Run 1       0          0         0                13 REQ_…  26.3  26.5  0.198\n# ℹ 70 more rows\n# ℹ 4 more variables: concurrency &lt;dbl&gt;, maintenance &lt;lgl&gt;, label &lt;ord&gt;,\n#   json &lt;list&gt;"
+  },
+  {
+    "objectID": "materials/d1-04-loadtesting/index.html#but-wait-..-theres-more",
+    "href": "materials/d1-04-loadtesting/index.html#but-wait-..-theres-more",
+    "title": "Load Testing",
+    "section": "But Wait .. There’s More",
+    "text": "But Wait .. There’s More\n\ngen_report.R\n\nlibrary(shinyloadtest)\ndf &lt;- load_runs(\"Run 1\" = \"run1\")\nshinyloadtest_report(df, output = \"report_test.html\")"
+  },
+  {
+    "objectID": "materials/setup-resources/index.html#section-15",
+    "href": "materials/setup-resources/index.html#section-15",
+    "title": "Workshop Environment Setup",
+    "section": "",
+    "text": "posit-conf-2023.github.io/shiny-r-prod"
+  },
+  {
+    "objectID": "materials/d1-02-structure/ex-1.html",
+    "href": "materials/d1-02-structure/ex-1.html",
+    "title": "Value Metrics Module",
+    "section": "",
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called modules-exercise1."
+  },
+  {
+    "objectID": "materials/d1-02-structure/ex-1.html#access-instructions",
+    "href": "materials/d1-02-structure/ex-1.html#access-instructions",
+    "title": "Value Metrics Module",
+    "section": "",
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called modules-exercise1."
+  },
+  {
+    "objectID": "materials/d1-02-structure/ex-1.html#exercise-instructions",
+    "href": "materials/d1-02-structure/ex-1.html#exercise-instructions",
+    "title": "Value Metrics Module",
+    "section": "Exercise Instructions",
+    "text": "Exercise Instructions\nYour task is to create a new Shiny module that displays three important metrics to the user:\n\nTotal number of sets\nTotal number of parts among the sets\nTotal number of mini-figures\n\nNote that these quantities are dependent on the user selections from the inputs contained in the left sidebar (theme, year, and parts range).\nKeeping with the overall user interface style, you are recommended to use the value_box function from the {bslib} package. The metrics can be derived using the function below. In the application code, you will find reactive data frames called sets_rv and part_meta_rv which can be used in the parameters of the function below.\n#' Derive key LEGO data set metrics\n#' \n#' @param sets_rv data frame containing sets information\n#' @param part_meta_rv data frame containing parts metadata information\n#' \n#' @import dplyr\nderive_widget_metrics &lt;- function(sets_rv, part_meta_rv) {\n  # number of sets\n  n_sets &lt;- length(unique(sets_rv$set_num))\n\n  # number of parts\n  n_parts &lt;- sum(sets_rv$num_parts, na.rm = TRUE)\n\n  # number of minifigs\n  n_minifigs &lt;- part_meta_rv |&gt;\n    summarize(total_minifigs = sum(minifig_ind)) |&gt;\n    collect() |&gt;\n    pull(total_minifigs)\n\n  return(\n    list(\n      n_sets = n_sets,\n      n_parts = n_parts,\n      n_minifigs = n_minifigs\n    )\n  )\n}"
   },
   {
     "objectID": "materials/d1-03-performance/index.html#performance-agenda",
@@ -756,6 +791,13 @@
     "text": "Demo!\n\n\n\nShow how to change the dev/run_dev.R script to enable {profvis} profiling\nLaunch the app, navigate to the “Overview” page, and change a filter\nStop the app, and wait for the report to load\nDescribe the flamegraph, change the filters to only show events that took time\nNavigate to the ‘data’ tab and discuss what took the most time"
   },
   {
+    "objectID": "materials/d1-03-performance/index.html#your-turn-exercise-1",
+    "href": "materials/d1-03-performance/index.html#your-turn-exercise-1",
+    "title": "Performance",
+    "section": "Your Turn: Exercise 1",
+    "text": "Your Turn: Exercise 1\nProfile the LEGO Bricks app!\n\nDetails\nPosit Cloud project: Performance Exercise 1\n\n\n\n\n−+\n05:00"
+  },
+  {
     "objectID": "materials/d1-03-performance/index.html#what-are-.parquet-files",
     "href": "materials/d1-03-performance/index.html#what-are-.parquet-files",
     "title": "Performance",
@@ -775,13 +817,6 @@
     "title": "Performance",
     "section": "Single (threaded) Line",
     "text": "Single (threaded) Line\n\nA single R process managing the different tasks in a Shiny application\nExecuted one-by-one"
-  },
-  {
-    "objectID": "materials/d1-03-performance/index.html#it-depends",
-    "href": "materials/d1-03-performance/index.html#it-depends",
-    "title": "Performance",
-    "section": "It Depends …",
-    "text": "It Depends …\nIf you are the only user for a quick and efficient app: Likely not\n\nTODO: Find a way to center the sentence vertically in the slide"
   },
   {
     "objectID": "materials/d1-03-performance/index.html#crowd-pleaser",
@@ -817,5 +852,33 @@
     "title": "Performance",
     "section": "Setting up for Success",
     "text": "Setting up for Success\n\nCreate functions for long-running tasks\nCreate multiple reactiveVal objects for bookkeeping\nSet up a {crew} controller\nEstablish an event-driven push of task to the controller with monitoring of worker status"
+  },
+  {
+    "objectID": "materials/d1-03-performance/codealong-2.html",
+    "href": "materials/d1-03-performance/codealong-2.html",
+    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "section": "",
+    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+  },
+  {
+    "objectID": "materials/d1-03-performance/codealong-2.html#requirements",
+    "href": "materials/d1-03-performance/codealong-2.html#requirements",
+    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "section": "",
+    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+  },
+  {
+    "objectID": "materials/d1-03-performance/codealong-2.html#plan",
+    "href": "materials/d1-03-performance/codealong-2.html#plan",
+    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "section": "Plan",
+    "text": "Plan\n\nEstablish reactive values for tracking the status of the prediction calls\nCreate a new controller to launch new R processes when new prediction tasks are launched\nModify the existing observeEvent to push the prediction task to the controller, ensuring the key objects and required packages are passed on to the controller.\nCreate a poll that’s invalidated every 100 milliseconds to query the status of the submitted tasks in the controller and update the prediction result reactive value when complete."
+  },
+  {
+    "objectID": "materials/d1-03-performance/codealong-2.html#solution",
+    "href": "materials/d1-03-performance/codealong-2.html#solution",
+    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "section": "Solution",
+    "text": "Solution\nFirst we create the following reactiveVal objects to keep track of the prediction state:\n\npred_status &lt;- reactiveVal(\"No prediction submitted yet.\")\npred_poll &lt;- reactiveVal(FALSE)\n\nNext we set up a new controller:\n\n# establish async processing with crew\ncontroller &lt;- crew_controller_local(workers = 4, seconds_idle = 10)\ncontroller$start()\n\n# make sure to terminate the controller on stop #NEW\nonStop(function() controller$terminate())\n\nInside the observeEvent for the user clicking the prediction button, we update the logic to push the prediction task to the controller:\n\ncontroller$push(\n  command = run_prediction(df),\n  data = list(\n    run_prediction = run_prediction,\n    df = pred_data_rv$data\n  ),\n  packages = c(\"httr2\", \"dplyr\")\n)\n\npred_poll(TRUE)\n\nLastly, we create a new observe block that periodically checks whether the running {crew} tasks have completed, ensuring that this is only executed when a prediction has been launched:\n\nobserve({\n  req(pred_poll())\n\n  invalidateLater(millis = 100)\n  result &lt;- controller$pop()$result\n\n  if (!is.null(result)) {\n    pred_data_rv$data &lt;- result[[1]]\n    print(controller$summary()) \n  }\n\n  if (isFALSE(controller$nonempty())) {\n    pred_status(\"Prediction Complete\")\n    pred_poll(controller$nonempty())\n    removeNotification(id = \"pred_message\")\n  }\n})"
   }
 ]

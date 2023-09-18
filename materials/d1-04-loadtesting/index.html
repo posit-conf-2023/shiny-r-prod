@@ -8,9 +8,8 @@
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.369">
+  <meta name="generator" content="quarto-1.4.371">
 
-  <meta name="author" content="TBD">
   <title>Shiny in Production - Load Testing</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -400,11 +399,6 @@
   <p class="subtitle">posit::conf(2023) <br> Shiny in Production: Tools &amp; Techniques</p>
 
 <div class="quarto-title-authors">
-<div class="quarto-title-author">
-<div class="quarto-title-author-name">
-TBD 
-</div>
-</div>
 </div>
 
 </section>
@@ -412,17 +406,19 @@ TBD
 <h2>One to Many</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/img/lego_single_user_computer.png"></p>
-<figcaption>single-user</figcaption>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-1" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/lego_single_user_computer.png" id="fig-539a35d47e664c97a50115a146a7f1bd-1">
+</div>
 </figure>
 </div>
 </div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="assets/img/lego_crowd.jpg"></p>
-<figcaption>crowd</figcaption>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/lego_crowd.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-2">
+</div>
 </figure>
 </div>
 </div>
@@ -431,7 +427,7 @@ TBD
 <section id="optimization-loop-method" class="slide level2">
 <h2>Optimization Loop Method</h2>
 
-<img data-src="assets/img/loop.svg" id="fig-539a35d47e664c97a50115a146a7f1bd-1" class="r-stretch quarto-figure-center"><div class="footer">
+<img data-src="assets/img/loop.svg" id="fig-539a35d47e664c97a50115a146a7f1bd-3" class="r-stretch quarto-figure-center"><div class="footer">
 <p><a href="https://rstudio.github.io/shinyloadtest/articles/case-study-scaling.html">rstudio.github.io/shinyloadtest/articles/case-study-scaling.html</a></p>
 </div>
 </section>
@@ -457,13 +453,13 @@ TBD
 </section>
 <section id="recording-a-session" class="slide level2">
 <h2>Recording a Session</h2>
+<div class="codewindow r">
+<p>shinyloadtest_recording.R</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(shinyloadtest)</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="fu">record_session</span>(<span class="st">"https://my-lego-app.me"</span>, <span class="at">output_file =</span> <span class="st">"recording.log"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="recorder-tips" class="slide level2">
-<h2>Recorder Tips</h2>
+</div>
 <ul>
 <li>Emulate a real-world usage of your application</li>
 <li>Avoid rapid clicks / selections of your inputs</li>
@@ -471,23 +467,26 @@ TBD
 </section>
 <section id="the-log" class="slide level2">
 <h2>The log</h2>
-<pre><code># version: 1
-# target_url: https://my-lego-app.me/
-# target_type: RStudio Server Connect
-# rscApiKeyRequired: false
-{"type":"REQ_HOME","begin":"2023-09-07T13:03:39.042Z","end":"2023-09-07T13:03:40.138Z","status":200,"url":"/"}
-{"type":"REQ_GET","begin":"2023-09-07T13:03:40.332Z","end":"2023-09-07T13:03:40.502Z","status":200,"url":"/_w_${WORKER}/shiny-sass-1.7.5/shiny-sass.css"}
-{"type":"REQ_GET","begin":"2023-09-07T13:03:40.517Z","end":"2023-09-07T13:03:40.678Z","status":200,"url":"/_w_${WORKER}/bslib-grid-styles-0.5.1/grid.css"}
-{"type":"REQ_GET","begin":"2023-09-07T13:03:40.692Z","end":"2023-09-07T13:03:40.886Z","status":200,"url":"/_w_${WORKER}/bootstrap-5.2.2/bootstrap.min.css"}
-...
-...
-{"type":"WS_SEND","begin":"2023-09-07T13:04:17.805Z","message":"[\"D#0|m|{\\\"method\\\":\\\"update\\\",\\\"data\\\":{\\\"n_parts_display\\\":\\\"20\\\"}}\"]"}
-{"type":"WS_CLOSE","begin":"2023-09-07T13:04:35.561Z"}</code></pre>
+<div class="codewindow">
+<p>recording.log</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource .bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># version: 1</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co"># target_url: https://my-lego-app.me/</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># target_type: RStudio Server Connect</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># rscApiKeyRequired: false</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="dt">{</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"REQ_HOME"</span><span class="op">,</span><span class="st">"begin"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:39.042Z"</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.138Z"</span><span class="op">,</span><span class="st">"status"</span><span class="dt">:200</span><span class="op">,</span><span class="st">"url"</span><span class="dt">:</span><span class="st">"/"</span><span class="dt">}</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="dt">{</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"REQ_GET"</span><span class="op">,</span><span class="st">"begin"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.332Z"</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.502Z"</span><span class="op">,</span><span class="st">"status"</span><span class="dt">:200</span><span class="op">,</span><span class="st">"url"</span><span class="dt">:</span><span class="st">"/_w_</span><span class="va">${WORKER}</span><span class="st">/shiny-sass-1.7.5/shiny-sass.css"</span><span class="dt">}</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="dt">{</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"REQ_GET"</span><span class="op">,</span><span class="st">"begin"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.517Z"</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.678Z"</span><span class="op">,</span><span class="st">"status"</span><span class="dt">:200</span><span class="op">,</span><span class="st">"url"</span><span class="dt">:</span><span class="st">"/_w_</span><span class="va">${WORKER}</span><span class="st">/bslib-grid-styles-0.5.1/grid.css"</span><span class="dt">}</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="dt">{</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"REQ_GET"</span><span class="op">,</span><span class="st">"begin"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.692Z"</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:</span><span class="st">"2023-09-07T13:03:40.886Z"</span><span class="op">,</span><span class="st">"status"</span><span class="dt">:200</span><span class="op">,</span><span class="st">"url"</span><span class="dt">:</span><span class="st">"/_w_</span><span class="va">${WORKER}</span><span class="st">/bootstrap-5.2.2/bootstrap.min.css"</span><span class="dt">}</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="ex">...</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="ex">...</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="ex">{</span><span class="st">"type"</span><span class="ex">:</span><span class="st">"WS_SEND"</span><span class="ex">,</span><span class="st">"begin"</span><span class="ex">:</span><span class="st">"2023-09-07T13:04:17.805Z"</span><span class="ex">,</span><span class="st">"message"</span><span class="ex">:</span><span class="st">"[</span><span class="dt">\"</span><span class="st">D#0|m|{</span><span class="dt">\\\"</span><span class="st">method</span><span class="dt">\\\"</span><span class="st">:</span><span class="dt">\\\"</span><span class="st">update</span><span class="dt">\\\"</span><span class="st">,</span><span class="dt">\\\"</span><span class="st">data</span><span class="dt">\\\"</span><span class="st">:{</span><span class="dt">\\\"</span><span class="st">n_parts_display</span><span class="dt">\\\"</span><span class="st">:</span><span class="dt">\\\"</span><span class="st">20</span><span class="dt">\\\"</span><span class="st">}}</span><span class="dt">\"</span><span class="st">]"</span><span class="ex">}</span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="dt">{</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"WS_CLOSE"</span><span class="op">,</span><span class="st">"begin"</span><span class="dt">:</span><span class="st">"2023-09-07T13:04:35.561Z"</span><span class="dt">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="fragment">
-<div id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="absolute quarto-figure quarto-figure-center" data-top="50" width="500px" height="500px" data-right="250" style="top: 50px; right: 250px; width: 500px; height: 500px; ">
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-4" class="absolute quarto-figure quarto-figure-center" data-right="250" height="500px" data-top="50" width="500px" style="top: 50px; right: 250px; width: 500px; height: 500px; ">
 <figure class="quarto-float quarto-float-fig">
 <div>
-<img data-src="assets/img/confused_minifig.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="absolute" style="top: 50px; right: 250px; width: 500px; height: 500px; ">
+<img data-src="assets/img/confused_minifig.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-4" class="absolute" style="top: 50px; right: 250px; width: 500px; height: 500px; ">
 </div>
 </figure>
 </div>
@@ -515,7 +514,7 @@ TBD
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">shinycannon</span>(</span>
 <span id="cb4-4"><a href="#cb4-4"></a>  <span class="st">"shinycannon-1.1.3-dd43f6b.jar"</span>,</span>
 <span id="cb4-5"><a href="#cb4-5"></a>  <span class="st">"recording.log"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6"></a>  <span class="st">"https://my-lego-app.me"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="st">"https://rsc.training.posit.co/brickapp-sync/"</span>,</span>
 <span id="cb4-7"><a href="#cb4-7"></a>  <span class="at">loaded_duration_minutes =</span> <span class="dv">2</span>,</span>
 <span id="cb4-8"><a href="#cb4-8"></a>  <span class="at">workers =</span> <span class="dv">1</span>,</span>
 <span id="cb4-9"><a href="#cb4-9"></a>  <span class="at">output_dir =</span> <span class="st">"run1"</span></span>
@@ -543,20 +542,20 @@ TBD
 <div class="smaller-output">
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 138 × 13
-   run   user_id session_id iteration input_line_number event  start   end  time
-   &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;             &lt;int&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
- 1 Run 1       0          0         0                 5 REQ_H… 0     0.951 0.951
- 2 Run 1       0          0         0                 6 REQ_G… 0.952 1.27  0.320
- 3 Run 1       0          0         0                 7 REQ_G… 1.27  1.54  0.271
- 4 Run 1       0          0         0                 8 REQ_G… 1.54  1.85  0.308
- 5 Run 1       0          0         0                 9 REQ_G… 1.85  2.19  0.334
- 6 Run 1       0          0         0                10 REQ_G… 2.19  2.44  0.253
- 7 Run 1       0          0         0                11 REQ_G… 2.44  2.86  0.422
- 8 Run 1       0          0         0                12 REQ_G… 2.86  3.12  0.257
- 9 Run 1       0          0         0                13 REQ_G… 3.12  3.37  0.252
-10 Run 1       0          0         0                14 REQ_G… 3.37  3.62  0.253
-# ℹ 128 more rows
+<pre><code># A tibble: 80 × 13
+   run   user_id session_id iteration input_line_number event start   end   time
+   &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;             &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 Run 1       0          0         0                 4 REQ_…   0    24.2 24.2  
+ 2 Run 1       0          0         0                 5 REQ_…  24.2  24.5  0.259
+ 3 Run 1       0          0         0                 6 REQ_…  24.5  24.6  0.155
+ 4 Run 1       0          0         0                 7 REQ_…  24.6  24.9  0.284
+ 5 Run 1       0          0         0                 8 REQ_…  24.9  25.3  0.382
+ 6 Run 1       0          0         0                 9 REQ_…  25.3  25.5  0.170
+ 7 Run 1       0          0         0                10 REQ_…  25.5  25.7  0.242
+ 8 Run 1       0          0         0                11 REQ_…  25.7  25.9  0.25 
+ 9 Run 1       0          0         0                12 REQ_…  25.9  26.3  0.395
+10 Run 1       0          0         0                13 REQ_…  26.3  26.5  0.198
+# ℹ 70 more rows
 # ℹ 4 more variables: concurrency &lt;dbl&gt;, maintenance &lt;lgl&gt;, label &lt;ord&gt;,
 #   json &lt;list&gt;</code></pre>
 </div>
@@ -573,23 +572,14 @@ TBD
 <span id="cb7-3"><a href="#cb7-3"></a><span class="fu">shinyloadtest_report</span>(df, <span class="at">output =</span> <span class="st">"report_test.html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<div class="callout callout-warning callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>TODO</strong></p>
-</div>
-<div class="callout-content">
-<p>Add screenshot of HTML report with hyperlink</p>
-</div>
-</div>
-</div>
-</section>
+
+<img data-src="assets/img/report_screenshot.png" id="fig-539a35d47e664c97a50115a146a7f1bd-5" class="r-stretch quarto-figure-center"></section>
 <section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
-<h1><svg aria-hidden="true" role="img" viewbox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:white;overflow:visible;position:relative;"><path d="M80 48a48 48 0 1 1 96 0A48 48 0 1 1 80 48zm64 193.7v65.1l51 51c7.1 7.1 11.8 16.2 13.4 26.1l15.2 90.9c2.9 17.4-8.9 33.9-26.3 36.8s-33.9-8.9-36.8-26.3l-14.3-85.9L66.8 320C54.8 308 48 291.7 48 274.7V186.6c0-32.4 26.2-58.6 58.6-58.6c24.1 0 46.5 12 59.9 32l47.4 71.1 10.1 5V160c0-17.7 14.3-32 32-32H384c17.7 0 32 14.3 32 32v76.2l10.1-5L473.5 160c13.3-20 35.8-32 59.9-32c32.4 0 58.6 26.2 58.6 58.6v88.1c0 17-6.7 33.3-18.7 45.3l-79.4 79.4-14.3 85.9c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l15.2-90.9c1.6-9.9 6.3-19 13.4-26.1l51-51V241.7l-19 28.5c-4.6 7-11 12.6-18.5 16.3l-59.6 29.8c-2.4 1.3-4.9 2.2-7.6 2.8c-2.6 .6-5.3 .9-7.9 .8H256.7c-2.5 .1-5-.2-7.5-.7c-2.9-.6-5.6-1.6-8.1-3l-59.5-29.8c-7.5-3.7-13.8-9.4-18.5-16.3l-19-28.5zM2.3 468.1L50.1 348.6l49.2 49.2-37.6 94c-6.6 16.4-25.2 24.4-41.6 17.8S-4.3 484.5 2.3 468.1zM512 0a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm77.9 348.6l47.8 119.5c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8l-37.6-94 49.2-49.2z"></path></svg> Code-Along</h1>
-<p>Code-Along 1: Record and analyze a baseline application session</p>
+<h1>Code-Along</h1>
+<p>Record and analyze load-testing sessions with <code>shinyCannon</code> and <code>{shinyloadtest}</code></p>
+<ul>
+<li>Application URL: <a href="https://rsc.training.posit.co/brickapp-sync/" class="uri">https://rsc.training.posit.co/brickapp-sync/</a></li>
+</ul>
 
 <div class="footer footer-default">
 <p><a href="https://posit-conf-2023.github.io/shiny-r-prod">posit-conf-2023.github.io/shiny-r-prod</a></p>

@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.369">
+<meta name="generator" content="quarto-1.4.371">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Shiny in Production - Asynchronous Processing of LEGO Model Prediction</title>
+<title>Shiny in Production - Using .parquet files in Shiny</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -103,7 +103,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Shiny in Production - Asynchronous Processing of LEGO Model Prediction">
+<meta property="og:title" content="Shiny in Production - Using .parquet files in Shiny">
 <meta property="og:description" content="Website for the posit::conf(2023) workshop ‘Shiny in Production: Tools and Techniques’">
 <meta property="og:site_name" content="Shiny in Production">
 </head>
@@ -156,7 +156,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#requirements" id="toc-requirements" class="nav-link active" data-scroll-target="#requirements">Requirements</a></li>
   <li><a href="#plan" id="toc-plan" class="nav-link" data-scroll-target="#plan">Plan</a></li>
-  <li><a href="#solution" id="toc-solution" class="nav-link" data-scroll-target="#solution">Solution</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/materials/d1-03-performance/codealong-1.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -165,7 +164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Asynchronous Processing of LEGO Model Prediction</h1>
+<h1 class="title">Using <code>.parquet</code> files in Shiny</h1>
 </div>
 
 
@@ -183,93 +182,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<p>The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the <a href="https://httr2.r-lib.org/"><code>{httr2}</code></a> package. Here is the function wrapping the API execution:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#' @importFrom httr2 request req_body_json req_perform resp_body_json</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>run_prediction <span class="ot">&lt;-</span> <span class="cf">function</span>(df, endpoint_url, <span class="at">back_transform =</span> <span class="cn">TRUE</span>, <span class="at">round_result =</span> <span class="cn">TRUE</span>) {</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create request object</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  req <span class="ot">&lt;-</span> <span class="fu">request</span>(endpoint_url)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># perform request</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  resp <span class="ot">&lt;-</span> req <span class="sc">|&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_body_json</span>(df) <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_perform</span>()</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># extract predictions from response</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  pred_values <span class="ot">&lt;-</span> <span class="fu">resp_body_json</span>(resp)<span class="sc">$</span>.pred <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># back-transform log10 value of predicted number of parts if requested</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (back_transform) {</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    pred_values <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="sc">^</span> pred_values</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># round result up to nearest integer if requested</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (round_result) pred_values <span class="ot">&lt;-</span> <span class="fu">ceiling</span>(pred_values)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># append predictions to supplied data frame</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(df, <span class="at">predicted_num_parts =</span> pred_values)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Unfortunately, the prediction API call takes a bit of time to execute due to some <strong>extremely sophisticated processing</strong> 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from <em>synchronous</em> to <em>asynchronous</em> using <code>{crew}</code></p>
+<p>The current version of our Shiny application performs additional data processing to generate part summaries that are utilized by reactive data frames. The custom function is called <code>gen_part_metaset()</code> which is located in the <code>R/fct_data_processing.R</code> script. For the purposes of this exercise, we are not going to try and optimize this specific function (certainly you are welcome to try after the workshop), instead we are going to see if we can more efficiently utilize the results of the function inside our Shiny application.</p>
 </section>
 <section id="plan" class="level2">
 <h2 class="anchored" data-anchor-id="plan">Plan</h2>
-<ol type="1">
-<li>Establish reactive values for tracking the status of the prediction calls</li>
-<li>Create a new controller to launch new R processes when new prediction tasks are launched</li>
-<li>Modify the existing <code>observeEvent</code> to push the prediction task to the controller, ensuring the key objects and required packages are passed on to the controller.</li>
-<li>Create a poll that’s invalidated every 100 milliseconds to query the status of the submitted tasks in the controller and update the prediction result reactive value when complete.</li>
-</ol>
-</section>
-<section id="solution" class="level2">
-<h2 class="anchored" data-anchor-id="solution">Solution</h2>
-<p>First we create the following <code>reactiveVal</code> objects to keep track of the prediction state:</p>
+<p>Upon closer inspection, we see that the calls to <code>gen_part_metaset()</code> do not take any dynamic parameters when used in the application. In addition, the function is called multiple times inside a set of <code>reactive</code> expressions. A first attempt at removing the bottleneck would be to move this function call to the beginning of the <code>app_server.R</code> logic and feeding the resulting object directly into the reactives that consume it.</p>
+<p>Knowing that the processing function is not leveraging any dynamic parameters, we can do even better. In our mission to ensure the Shiny application performs only the data processing that it absolutely needs to do, we can instead run this function outside of the application, and save the result of the processing as a <code>.parquet</code> file inside the <code>inst/extdata</code> directory using the <a href="https://arrow.apache.org/docs/r/"><code>{arrow}</code></a> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pred_status <span class="ot">&lt;-</span> <span class="fu">reactiveVal</span>(<span class="st">"No prediction submitted yet."</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pred_poll <span class="ot">&lt;-</span> <span class="fu">reactiveVal</span>(<span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(arrow)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>part_meta_df <span class="ot">&lt;-</span> <span class="fu">gen_part_metaset</span>(<span class="at">min_set_parts =</span> <span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_parquet</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  part_meta_df,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"inst/extdata/part_meta_df.parquet"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="er">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Next we set up a new controller:</p>
+<p>With the processed data set available in the app infrastructure, we can utilize it inside the application with the following:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># establish async processing with crew</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>controller <span class="ot">&lt;-</span> <span class="fu">crew_controller_local</span>(<span class="at">workers =</span> <span class="dv">4</span>, <span class="at">seconds_idle =</span> <span class="dv">10</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>controller<span class="sc">$</span><span class="fu">start</span>()</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure to terminate the controller on stop #NEW</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">onStop</span>(<span class="cf">function</span>() controller<span class="sc">$</span><span class="fu">terminate</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>part_meta_df <span class="ot">&lt;-</span> arrow<span class="sc">::</span><span class="fu">read_parquet</span>(<span class="fu">app_sys</span>(<span class="st">"extdata"</span>, <span class="st">"part_meta_df.parquet"</span>), <span class="at">as_data_frame =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Inside the <code>observeEvent</code> for the user clicking the prediction button, we update the logic to push the prediction task to the controller:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>controller<span class="sc">$</span><span class="fu">push</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">command =</span> <span class="fu">run_prediction</span>(df),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">run_prediction =</span> run_prediction,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">df =</span> pred_data_rv<span class="sc">$</span>data</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">packages =</span> <span class="fu">c</span>(<span class="st">"httr2"</span>, <span class="st">"dplyr"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">pred_poll</span>(<span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Lastly, we create a new <code>observe</code> block that periodically checks whether the running <code>{crew}</code> tasks have completed, ensuring that this is only executed when a prediction has been launched:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">observe</span>({</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">req</span>(<span class="fu">pred_poll</span>())</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invalidateLater</span>(<span class="at">millis =</span> <span class="dv">100</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> controller<span class="sc">$</span><span class="fu">pop</span>()<span class="sc">$</span>result</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(result)) {</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    pred_data_rv<span class="sc">$</span>data <span class="ot">&lt;-</span> result[[<span class="dv">1</span>]]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(controller<span class="sc">$</span><span class="fu">summary</span>()) </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">isFALSE</span>(controller<span class="sc">$</span><span class="fu">nonempty</span>())) {</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pred_status</span>(<span class="st">"Prediction Complete"</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pred_poll</span>(controller<span class="sc">$</span><span class="fu">nonempty</span>())</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">removeNotification</span>(<span class="at">id =</span> <span class="st">"pred_message"</span>)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Why do set the parameter <code>as_data_frame</code> to <code>FALSE</code> in the call above? This ensures the contents of the data file are not read into R’s memory right away, and we can perform data processing on this file in a tidyverse-like pipeline and <code>collect()</code> the results at the end of the pipeline to minimize overhead.</p>
+<p>We could add this call to the top of our <code>app_server.R</code> logic, which would already lead to decreased processing time. For an application that is being used very infrequently, that might be good enough. But if we have an application that is going to be used concurrently by multiple users, we may be able to increase performance by ensuring this data file is read in R once for each process launched that servers the application, instead of once for each R <strong>session</strong> corresponding to different user’s Shiny sessions. More to come later in the workshop on how we can accomplish this with <code>{golem}</code>!</p>
 
 
 </section>

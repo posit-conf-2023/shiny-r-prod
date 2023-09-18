@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Shiny in Production - Value Metrics Module</title>
+<title>Shiny in Production - Profile the LEGO Bricks App</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -103,7 +103,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Shiny in Production - Value Metrics Module">
+<meta property="og:title" content="Shiny in Production - Profile the LEGO Bricks App">
 <meta property="og:description" content="Website for the posit::conf(2023) workshop ‘Shiny in Production: Tools and Techniques’">
 <meta property="og:site_name" content="Shiny in Production">
 </head>
@@ -155,16 +155,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#access-instructions" id="toc-access-instructions" class="nav-link active" data-scroll-target="#access-instructions">Access Instructions</a></li>
-  <li><a href="#exercise-instructions" id="toc-exercise-instructions" class="nav-link" data-scroll-target="#exercise-instructions">Exercise Instructions</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions">Questions</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/materials/d1-02-structure/ex-1.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/materials/d1-03-performance/ex-1.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Value Metrics Module</h1>
+<h1 class="title">Profile the LEGO Bricks App</h1>
 </div>
 
 
@@ -182,45 +183,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="access-instructions" class="level2">
 <h2 class="anchored" data-anchor-id="access-instructions">Access Instructions</h2>
-<p>The project used for this particular exercise is hosted on <a href="https://posit.cloud">Posit Cloud</a> in this <a href="https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7">space</a>. The project for this exercise is called <strong>modules-exercise1</strong>.</p>
+<p>The project used for this particular exercise is hosted on <a href="https://posit.cloud">Posit Cloud</a> in this <a href="https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7">space</a>. The project for this exercise is called <strong>performance-exercise1</strong>.</p>
 </section>
-<section id="exercise-instructions" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-instructions">Exercise Instructions</h2>
-<p>Your task is to create a new Shiny module that displays three important metrics to the user:</p>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>Using what you just learned about the <a href="http://rstudio.github.io/profvis/examples.html#example-3---profiling-a-shiny-application"><code>{profvis}</code></a>, your task is to run the profiler for the LEGO Bricks application contained in this project. Recall that to run the profiler in a Shiny app created with <code>{golem}</code>, change the <code>run_app()</code> call at the end of the <code>dev/run_dev.R</code> script to the following:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>profvis<span class="sc">::</span><span class="fu">profvis</span>({</span>
+<span id="cb1-2"><a href="#cb1-2"></a>  <span class="fu">print</span>(<span class="fu">run_app</span>())</span>
+<span id="cb1-3"><a href="#cb1-3"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once the application is open, try changing a couple of the inputs contained in the sidebar. Once the outputs in the app refresh, close the profiler by stopping the R process in the R console. You should now see the <code>{profvis}</code> report appear as a new tab in your web browser.</p>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions</h2>
 <ul>
-<li>Total number of sets</li>
-<li>Total number of parts among the sets</li>
-<li>Total number of mini-figures</li>
+<li>Are you able to identify any performance bottlenecks in the application?</li>
+<li>If so, can you think of ways to fix the issues?</li>
 </ul>
-<p>Note that these quantities are dependent on the user selections from the inputs contained in the left sidebar (theme, year, and parts range).</p>
-<p>Keeping with the overall user interface style, you are recommended to use the <a href="https://rstudio.github.io/bslib/reference/value_box.html"><code>value_box</code></a> function from the <a href="https://rstudio.github.io/bslib/"><code>{bslib}</code></a> package. The metrics can be derived using the function below. In the application code, you will find reactive data frames called <code>sets_rv</code> and <code>part_meta_rv</code> which can be used in the parameters of the function below.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#' Derive key LEGO data set metrics</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#' </span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#' @param sets_rv data frame containing sets information</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#' @param part_meta_rv data frame containing parts metadata information</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#' </span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#' @import dplyr</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>derive_widget_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(sets_rv, part_meta_rv) {</span>
-<span id="cb1-8"><a href="#cb1-8"></a>  <span class="co"># number of sets</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a>  n_sets <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(sets_rv<span class="sc">$</span>set_num))</span>
-<span id="cb1-10"><a href="#cb1-10"></a></span>
-<span id="cb1-11"><a href="#cb1-11"></a>  <span class="co"># number of parts</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a>  n_parts <span class="ot">&lt;-</span> <span class="fu">sum</span>(sets_rv<span class="sc">$</span>num_parts, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-13"><a href="#cb1-13"></a></span>
-<span id="cb1-14"><a href="#cb1-14"></a>  <span class="co"># number of minifigs</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a>  n_minifigs <span class="ot">&lt;-</span> part_meta_rv <span class="sc">|&gt;</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a>    <span class="fu">summarize</span>(<span class="at">total_minifigs =</span> <span class="fu">sum</span>(minifig_ind)) <span class="sc">|&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a>    <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-18"><a href="#cb1-18"></a>    <span class="fu">pull</span>(total_minifigs)</span>
-<span id="cb1-19"><a href="#cb1-19"></a></span>
-<span id="cb1-20"><a href="#cb1-20"></a>  <span class="fu">return</span>(</span>
-<span id="cb1-21"><a href="#cb1-21"></a>    <span class="fu">list</span>(</span>
-<span id="cb1-22"><a href="#cb1-22"></a>      <span class="at">n_sets =</span> n_sets,</span>
-<span id="cb1-23"><a href="#cb1-23"></a>      <span class="at">n_parts =</span> n_parts,</span>
-<span id="cb1-24"><a href="#cb1-24"></a>      <span class="at">n_minifigs =</span> n_minifigs</span>
-<span id="cb1-25"><a href="#cb1-25"></a>    )</span>
-<span id="cb1-26"><a href="#cb1-26"></a>  )</span>
-<span id="cb1-27"><a href="#cb1-27"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

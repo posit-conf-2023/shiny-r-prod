@@ -8,7 +8,7 @@
 <link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.369">
+  <meta name="generator" content="quarto-1.4.371">
 
   <title>Shiny in Production - Deployment &amp; Administration</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -386,6 +386,8 @@
       margin-right: 0; 
     }
   </style>
+  <link href="../../site_libs/countdown-0.4.0/countdown.css" rel="stylesheet">
+  <script src="../../site_libs/countdown-0.4.0/countdown.js"></script>
 <meta property="og:title" content="Shiny in Production - Deployment &amp; Administration">
 <meta property="og:description" content="posit::conf(2023)  Shiny in Production: Tools &amp; Techniques">
 <meta property="og:site_name" content="Shiny in Production">
@@ -402,8 +404,8 @@
 </div>
 
 </section>
-<section class="slide level2">
-
+<section id="choose-your-adventure" class="slide level2">
+<h2>Choose your Adventure</h2>
 <div class="cell">
 <style type="text/css">
 .centerheading h2 {
@@ -425,29 +427,34 @@
 }
 </style>
 </div>
-</section>
-<section id="choose-your-adventure" class="slide level2">
-<h2>Choose your Adventure</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <h3 id="posit-connect">Posit Connect</h3>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-1" class="quarto-figure quarto-figure-center" width="80%">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/shiny.png" id="fig-539a35d47e664c97a50115a146a7f1bd-1" style="width:80.0%">
+</div>
+</figure>
+</div>
 </div><div class="column" style="width:50%;">
 <h3 id="containers">Containers</h3>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="quarto-figure quarto-figure-center" width="50%">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/Rlogo.png" id="fig-539a35d47e664c97a50115a146a7f1bd-2" style="width:50.0%">
+</div>
+</figure>
+</div>
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-3" class="quarto-figure quarto-figure-center" width="50%">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/linux.png" id="fig-539a35d47e664c97a50115a146a7f1bd-3" style="width:50.0%">
+</div>
+</figure>
 </div>
 </div>
-<aside class="notes">
-<p>TODO: Find pictures demonstrating the “App &amp; Packages Only” (Posit Connect, Shinyapps.io) versus “The whole environment” (Containers)</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+</div>
 </section>
 <section id="deployment-checklist" class="slide level2">
 <h2>Deployment Checklist</h2>
@@ -470,11 +477,6 @@
 </div>
 </div>
 </div>
-</section>
-<section>
-<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
-<h1><svg aria-hidden="true" role="img" viewbox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:white;overflow:visible;position:relative;"><path d="M80 48a48 48 0 1 1 96 0A48 48 0 1 1 80 48zm64 193.7v65.1l51 51c7.1 7.1 11.8 16.2 13.4 26.1l15.2 90.9c2.9 17.4-8.9 33.9-26.3 36.8s-33.9-8.9-36.8-26.3l-14.3-85.9L66.8 320C54.8 308 48 291.7 48 274.7V186.6c0-32.4 26.2-58.6 58.6-58.6c24.1 0 46.5 12 59.9 32l47.4 71.1 10.1 5V160c0-17.7 14.3-32 32-32H384c17.7 0 32 14.3 32 32v76.2l10.1-5L473.5 160c13.3-20 35.8-32 59.9-32c32.4 0 58.6 26.2 58.6 58.6v88.1c0 17-6.7 33.3-18.7 45.3l-79.4 79.4-14.3 85.9c-2.9 17.4-19.4 29.2-36.8 26.3s-29.2-19.4-26.3-36.8l15.2-90.9c1.6-9.9 6.3-19 13.4-26.1l51-51V241.7l-19 28.5c-4.6 7-11 12.6-18.5 16.3l-59.6 29.8c-2.4 1.3-4.9 2.2-7.6 2.8c-2.6 .6-5.3 .9-7.9 .8H256.7c-2.5 .1-5-.2-7.5-.7c-2.9-.6-5.6-1.6-8.1-3l-59.5-29.8c-7.5-3.7-13.8-9.4-18.5-16.3l-19-28.5zM2.3 468.1L50.1 348.6l49.2 49.2-37.6 94c-6.6 16.4-25.2 24.4-41.6 17.8S-4.3 484.5 2.3 468.1zM512 0a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm77.9 348.6l47.8 119.5c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8l-37.6-94 49.2-49.2z"></path></svg> Code-Along</h1>
-<p>Push-Button Deployment to Posit Connect</p>
 </section>
 <section class="slide level2">
 
@@ -501,6 +503,16 @@
 </div>
 </div>
 </section>
+<section>
+<section id="code-along" class="title-slide slide level1 center" data-background-color="#17395c">
+<h1>Code-Along</h1>
+<p>Deploy your application(s) to Posit Connect:</p>
+<ul>
+<li>Use any of the applications from a previous exercise</li>
+<li>Attempt both deployment types (push-button &amp; <code>{rsconnect}</code>)</li>
+<li>Explore application settings in Posit Connect</li>
+</ul>
+</section>
 <section id="balancing-act" class="slide level2 centerheading">
 <h2>Balancing Act</h2>
 <div class="columns">
@@ -511,10 +523,10 @@
 <li>Potential for server overload</li>
 </ul>
 </div><div class="column" style="width:33%;">
-<div id="fig-539a35d47e664c97a50115a146a7f1bd-1" class="quarto-figure quarto-figure-center">
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-4" class="quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-fig">
 <div>
-<img data-src="assets/img/teeter_totter.png" id="fig-539a35d47e664c97a50115a146a7f1bd-1">
+<img data-src="assets/img/teeter_totter.png" id="fig-539a35d47e664c97a50115a146a7f1bd-4">
 </div>
 </figure>
 </div>
@@ -525,6 +537,23 @@
 <li>Potentially wasteful if app is not used concurrently often</li>
 </ul>
 </div>
+</div>
+</section>
+<section id="containers-for-shiny-deployment" class="slide level2">
+<h2>Containers for Shiny Deployment</h2>
+<ul>
+<li>Anyone with a container runtime can execute your container <strong>without R on their system</strong>
+<ul>
+<li>Popular container runtimes: Docker, Podman, LXC</li>
+</ul></li>
+<li>A multitude of web services offer <em>serverless</em> app deployments with containers
+<ul>
+<li>Bring your container image, they take care of the rest</li>
+<li>Terrific reviews available at <a href="https://hosting.analythium.io">hosting.analythium.io</a></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<p><strong>Coming soon</strong>: Container support for Posit Connect</p>
 </div>
 </section>
 <section id="business-talk" class="slide level2" data-background-image="assets/img/lego_boss_office.jpg" data-background-size="cover" data-background-color="black">
@@ -546,10 +575,10 @@
 <div class="fragment">
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="fig-539a35d47e664c97a50115a146a7f1bd-2" class="quarto-figure quarto-figure-center" width="90%">
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-5" class="quarto-figure quarto-figure-center" width="90%">
 <figure class="quarto-float quarto-float-fig">
 <div>
-<img data-src="assets/img/daniel-bryan-no.gif" id="fig-539a35d47e664c97a50115a146a7f1bd-2" style="width:90.0%">
+<img data-src="assets/img/daniel-bryan-no.gif" id="fig-539a35d47e664c97a50115a146a7f1bd-5" style="width:90.0%">
 </div>
 </figure>
 </div>
@@ -676,6 +705,58 @@
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4</code></pre>
 </div>
+</div>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>Your Turn</h2>
+<p>Obtain metadata for your deployed application(s) on Posit Connect</p>
+<ul>
+<li>Explore the data as you like!</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div class="countdown" id="timer_37c22a0b" data-update-every="1" tabindex="0" style="right:0;bottom:0;">
+<div class="countdown-controls"><button class="countdown-bump-down">−</button><button class="countdown-bump-up">+</button></div>
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+</div>
+</div>
+</section>
+<section id="going-further-with-metrics" class="slide level2">
+<h2>Going Further with Metrics</h2>
+<p>Collection of interesting use cases available at <a href="https://github.com/sol-eng/connect-usage">github.com/sol-eng/connect-usage</a></p>
+<ul>
+<li>Most-viewed content in last 30 days</li>
+<li><a href="https://colorado.posit.co/rsc/usage-interactive/">Interactive dashboard</a> of usage metrics</li>
+<li><a href="https://github.com/RinteRface/connectViz"><code>{connectViz}</code></a>: Collection of customizable functions for visualizing content usage for an organization</li>
+</ul>
+</section>
+<section id="our-journey-is-complete" class="slide level2">
+<h2>Our Journey is Complete!</h2>
+<div class="columns">
+<div class="column" style="width:70%;">
+<div id="fig-539a35d47e664c97a50115a146a7f1bd-6" class="quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div>
+<img data-src="assets/img/lego_victory.jpg" id="fig-539a35d47e664c97a50115a146a7f1bd-6">
+</div>
+</figure>
+</div>
+</div><div class="column" style="width:30%;">
+<div style="font-size: 70%">
+<ul>
+<li>Robust app infrastructure with <code>{golem}</code></li>
+<li>Profiling your app with <code>{profvis}</code></li>
+<li>Solving performance bottlenecks</li>
+<li>Assessing your app under high user load</li>
+<li>Efficient app deployments and tuning</li>
+<li>Obtaining usage metrics</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer">
+<p><a href="https://pos.it/conf-workshop-survey">pos.it/conf-workshop-survey</a></p>
 </div>
 
 <div class="footer footer-default">

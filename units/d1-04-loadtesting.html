@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Eric Nantz &amp; Michael Thomas">
+<meta name="dcterms.date" content="2023-09-18">
 
-<title>Shiny in Production - Value Metrics Module</title>
+<title>Shiny in Production - Load Testing</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,61 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -103,8 +71,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Shiny in Production - Value Metrics Module">
-<meta property="og:description" content="Website for the posit::conf(2023) workshop ‘Shiny in Production: Tools and Techniques’">
+<meta property="og:title" content="Shiny in Production - Load Testing">
+<meta property="og:description" content="13:30 - 15:00">
 <meta property="og:site_name" content="Shiny in Production">
 </head>
 
@@ -115,7 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Shiny in Production</span>
     </a>
   </div>
@@ -126,15 +94,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../schedule.html"> 
+    <a class="nav-link" href="../schedule.html"> 
 <span class="menu-text">Schedule</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../setup.html"> 
+    <a class="nav-link" href="../setup.html"> 
 <span class="menu-text">Setup</span></a>
   </li>  
 </ul>
@@ -154,24 +122,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#access-instructions" id="toc-access-instructions" class="nav-link active" data-scroll-target="#access-instructions">Access Instructions</a></li>
-  <li><a href="#exercise-instructions" id="toc-exercise-instructions" class="nav-link" data-scroll-target="#exercise-instructions">Exercise Instructions</a></li>
+  <li><a href="#slides" id="toc-slides" class="nav-link active" data-scroll-target="#slides">Slides</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/materials/d1-02-structure/ex-1.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/edit/main/units/d1-04-loadtesting.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/posit-conf-2023/shiny-r-prod/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Value Metrics Module</h1>
+<h1 class="title">Load Testing</h1>
+<p class="subtitle lead">13:30 - 15:00</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Eric Nantz &amp; Michael Thomas </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 18, 2023</p>
+    </div>
+  </div>
   
     
   </div>
@@ -180,47 +160,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="access-instructions" class="level2">
-<h2 class="anchored" data-anchor-id="access-instructions">Access Instructions</h2>
-<p>The project used for this particular exercise is hosted on <a href="https://posit.cloud">Posit Cloud</a> in this <a href="https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7">space</a>. The project for this exercise is called <strong>modules-exercise1</strong>.</p>
-</section>
-<section id="exercise-instructions" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-instructions">Exercise Instructions</h2>
-<p>Your task is to create a new Shiny module that displays three important metrics to the user:</p>
-<ul>
-<li>Total number of sets</li>
-<li>Total number of parts among the sets</li>
-<li>Total number of mini-figures</li>
-</ul>
-<p>Note that these quantities are dependent on the user selections from the inputs contained in the left sidebar (theme, year, and parts range).</p>
-<p>Keeping with the overall user interface style, you are recommended to use the <a href="https://rstudio.github.io/bslib/reference/value_box.html"><code>value_box</code></a> function from the <a href="https://rstudio.github.io/bslib/"><code>{bslib}</code></a> package. The metrics can be derived using the function below. In the application code, you will find reactive data frames called <code>sets_rv</code> and <code>part_meta_rv</code> which can be used in the parameters of the function below.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">#' Derive key LEGO data set metrics</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#' </span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#' @param sets_rv data frame containing sets information</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#' @param part_meta_rv data frame containing parts metadata information</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#' </span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="co">#' @import dplyr</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>derive_widget_metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(sets_rv, part_meta_rv) {</span>
-<span id="cb1-8"><a href="#cb1-8"></a>  <span class="co"># number of sets</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a>  n_sets <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(sets_rv<span class="sc">$</span>set_num))</span>
-<span id="cb1-10"><a href="#cb1-10"></a></span>
-<span id="cb1-11"><a href="#cb1-11"></a>  <span class="co"># number of parts</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a>  n_parts <span class="ot">&lt;-</span> <span class="fu">sum</span>(sets_rv<span class="sc">$</span>num_parts, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-13"><a href="#cb1-13"></a></span>
-<span id="cb1-14"><a href="#cb1-14"></a>  <span class="co"># number of minifigs</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a>  n_minifigs <span class="ot">&lt;-</span> part_meta_rv <span class="sc">|&gt;</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a>    <span class="fu">summarize</span>(<span class="at">total_minifigs =</span> <span class="fu">sum</span>(minifig_ind)) <span class="sc">|&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a>    <span class="fu">collect</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-18"><a href="#cb1-18"></a>    <span class="fu">pull</span>(total_minifigs)</span>
-<span id="cb1-19"><a href="#cb1-19"></a></span>
-<span id="cb1-20"><a href="#cb1-20"></a>  <span class="fu">return</span>(</span>
-<span id="cb1-21"><a href="#cb1-21"></a>    <span class="fu">list</span>(</span>
-<span id="cb1-22"><a href="#cb1-22"></a>      <span class="at">n_sets =</span> n_sets,</span>
-<span id="cb1-23"><a href="#cb1-23"></a>      <span class="at">n_parts =</span> n_parts,</span>
-<span id="cb1-24"><a href="#cb1-24"></a>      <span class="at">n_minifigs =</span> n_minifigs</span>
-<span id="cb1-25"><a href="#cb1-25"></a>    )</span>
-<span id="cb1-26"><a href="#cb1-26"></a>  )</span>
-<span id="cb1-27"><a href="#cb1-27"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="slides" class="level2">
+<h2 class="anchored" data-anchor-id="slides">Slides</h2>
+<p><a href="../materials/d1-04-loadtesting/index.html">View slides in full screen</a></p>
+<iframe class="slide-deck" src="../materials/d1-04-loadtesting/" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 
 
 </section>
