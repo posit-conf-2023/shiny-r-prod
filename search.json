@@ -25,14 +25,14 @@
     "href": "materials/d1-03-performance/ex-1.html",
     "title": "Profile the LEGO Bricks App",
     "section": "",
-    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called performance-exercise1."
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called Performance Exercise 1."
   },
   {
     "objectID": "materials/d1-03-performance/ex-1.html#access-instructions",
     "href": "materials/d1-03-performance/ex-1.html#access-instructions",
     "title": "Profile the LEGO Bricks App",
     "section": "",
-    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called performance-exercise1."
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called Performance Exercise 1."
   },
   {
     "objectID": "materials/d1-03-performance/ex-1.html#setup",
@@ -858,14 +858,21 @@
     "href": "materials/d1-03-performance/codealong-2.html",
     "title": "Asynchronous Processing of LEGO Model Prediction",
     "section": "",
-    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called Performance Code-along 2."
+  },
+  {
+    "objectID": "materials/d1-03-performance/codealong-2.html#access-instructions",
+    "href": "materials/d1-03-performance/codealong-2.html#access-instructions",
+    "title": "Asynchronous Processing of LEGO Model Prediction",
+    "section": "",
+    "text": "The project used for this particular exercise is hosted on Posit Cloud in this space. The project for this exercise is called Performance Code-along 2."
   },
   {
     "objectID": "materials/d1-03-performance/codealong-2.html#requirements",
     "href": "materials/d1-03-performance/codealong-2.html#requirements",
     "title": "Asynchronous Processing of LEGO Model Prediction",
-    "section": "",
-    "text": "The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
+    "section": "Requirements",
+    "text": "Requirements\nThe current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the {httr2} package. Here is the function wrapping the API execution:\n\n#' @importFrom httr2 request req_body_json req_perform resp_body_json\nrun_prediction &lt;- function(df, endpoint_url, back_transform = TRUE, round_result = TRUE) {\n  # create request object\n  req &lt;- request(endpoint_url)\n\n  # perform request\n  resp &lt;- req |&gt;\n    req_body_json(df) |&gt;\n    req_perform()\n\n  # extract predictions from response\n  pred_values &lt;- resp_body_json(resp)$.pred |&gt; unlist()\n\n  # back-transform log10 value of predicted number of parts if requested\n  if (back_transform) {\n    pred_values &lt;- 10 ^ pred_values\n  }\n\n  # round result up to nearest integer if requested\n  if (round_result) pred_values &lt;- ceiling(pred_values)\n\n  # append predictions to supplied data frame\n  dplyr::mutate(df, predicted_num_parts = pred_values)\n}\n\nUnfortunately, the prediction API call takes a bit of time to execute due to some extremely sophisticated processing 😅. As a result, any interactions within the application will not be processed until the prediction call completes. Our goal is to convert the prediction processing from synchronous to asynchronous using {crew}"
   },
   {
     "objectID": "materials/d1-03-performance/codealong-2.html#plan",
