@@ -206,8 +206,8 @@ Posit Cloud
 <iframe class="slide-deck" src="materials/setup-resources/#/posit-cloud-setup" height="420" width="747" style="border: 1px solid #2e3846;"></iframe>
 <ol type="1">
 <li>Join the Posit Cloud Workspace dedicated to this workshop by visiting this <a href="https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7">customized invitation URL</a>. If you already have a Posit Cloud account, you are welcome to use it for the workshop. Otherwise, you can create a new account for free.</li>
-<li>You will see a project called <em>shiny-r-prod</em>. Open that project and create a saved copy. This process could take a couple of minutes depending on server load.</li>
-<li>After the project loads, you will see messages in the R console about restoring or repairing the package library. Execute <code>renv::restore(prompt = FALSE)</code> to install packages into the project. This process should complete in one or two minutes.</li>
+<li>You will see multiple projects that have been labelled as <strong>Assignments</strong> to you after joining the Workspace. Open the assignment labelled <em>Workshop Materials</em>. This process could take a couple of minutes depending on server load.</li>
+<li>After the project loads, you will possible see messages in the R console about restoring or repairing the package library. To check, run <code>renv::status()</code> and if it says you are missing required packages, execute <code>renv::restore(prompt = FALSE)</code> to install packages into the project. This process should complete in one or two minutes.</li>
 </ol>
 </div>
 </div>
