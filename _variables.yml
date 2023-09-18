@@ -1,8 +1,8 @@
 version: 0.1
 workshop_full_url: "https://posit-conf-2023.github.io/shiny-r-prod"
 workshop_short_url: "posit-conf-2023.github.io/shiny-r-prod"
-break_location: "BreakroomTBD"
-lunch_location: "LunchTBD"
+break_location: "near the registration area"
+lunch_location: "Riverside room"
 quiet_location: "Grand Suites 2A & 2B"
 lactation_location: "Grand Suite 1"
 bathrooms_location: "Among Grand Suite Ballrooms"
@@ -10,7 +10,7 @@ wifi_username: "Posit Conf 2023"
 wifi_password: "conf2023"
 room: "Grand Hall I"
 rsconnect_url: "https://rsc.training.rstudio.com"
-posit_cloud_workspace_url: "URL Forthcoming"
+posit_cloud_workspace_url: "https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7"
 people:
   enantz:
     name: "Eric Nantz"
