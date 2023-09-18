@@ -8,6 +8,10 @@ format:
      eval: false
 ---
 
+## Access Instructions
+
+The project used for this particular exercise is hosted on [Posit Cloud](https://posit.cloud) in this [space](https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7). The project for this exercise is called **Performance Code-along 2**.
+
 ## Requirements
 
 The current version of our Shiny application contains a module for generating predictions of the number of LEGO parts in a set using the number of unique colors and number of unique part categories. The API is executed and processed using the [`{httr2}`](https://httr2.r-lib.org/) package. Here is the function wrapping the API execution:

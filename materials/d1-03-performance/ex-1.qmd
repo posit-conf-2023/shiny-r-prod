@@ -4,7 +4,7 @@ title: "Profile the LEGO Bricks App"
 
 ## Access Instructions
 
-The project used for this particular exercise is hosted on [Posit Cloud](https://posit.cloud) in this [space](https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7). The project for this exercise is called **performance-exercise1**.
+The project used for this particular exercise is hosted on [Posit Cloud](https://posit.cloud) in this [space](https://posit.cloud/spaces/400774/join?access_code=DDgV_peF5WCCCpB5JHjQtMN2aHByWoNF0k5p8Wp7). The project for this exercise is called **Performance Exercise 1**.
 
 ## Setup
 
